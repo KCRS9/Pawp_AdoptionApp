@@ -27,7 +27,7 @@ def insert_user(user: UserDb) -> int:
             #Devuelve el id del usuario insertado con la funcion lastrowid
             return cursor.lastrowid 
 
-#Funcion para obtener un usuario por email
+# Funcion para obtener un usuario por email
 def get_user_by_email(email: str) -> UserDb | None:
 
     with mariadb.connect(**db_config) as conn:
@@ -40,7 +40,7 @@ def get_user_by_email(email: str) -> UserDb | None:
         
             result = cursor.fetchone()
 
-            #Si encuentra el usuario devuelve un objeto UserDb
+            # Si encuentra el usuario devuelve un objeto UserDb
             if result:
                 return UserDb(
                     id=result[0],
@@ -50,5 +50,5 @@ def get_user_by_email(email: str) -> UserDb | None:
                     role=result[4],
                     location=result[5]
                 )
-    #Si no encuentra el usuario devuelve None
+    # Si no encuentra el usuario devuelve None
     return None
