@@ -1,41 +1,55 @@
+import mariadb
 from app.models.users import UserDb
 from app.auth.auth import get_hash_password
 
+# Configuración de la conexión a la base de datos
 db_config = {
     "host": "myapidb",
     "port": 3306,
     "user": "myapi",
     "password": "myapi",
-    "database": "myapi"
+    "database": "animal_shelter_db"
 }
 
-
+# Función para insertar un usuario en la base de datos
 def insert_user(user: UserDb) -> int:
+
     with mariadb.connect(**db_config) as conn:
+        
         with conn.cursor() as cursor:
-            sql = "insert into users (name, username, password) values (?, ?, ?)"
-            values = (user.name, user.username, user.password)
+    
+            sql = "INSERT INTO `user` (name, email, password, role, location) VALUES (?, ?, ?, ?, ?)"
+    
+            values = (user.name, user.email, user.password, user.role, user.location)
+    
             cursor.execute(sql, values)
             conn.commit()
-            return cursor.lastrowid
 
+            #Devuelve el id del usuario insertado con la funcion lastrowid
+            return cursor.lastrowid 
 
-def get_user_by_username(username: str) -> UserDb | None:
-    # TODO terminar esta función
+# Funcion para obtener un usuario por email
+def get_user_by_email(email: str) -> UserDb | None:
+
+    with mariadb.connect(**db_config) as conn:
+
+        with conn.cursor() as cursor:
+            # No usamos * por si en el futuro añadimos mas columnas
+            sql = "SELECT id, name, email, password, role, location FROM `user` WHERE email = ?"
+        
+            cursor.execute(sql, (email,))
+        
+            result = cursor.fetchone()
+
+            # Si encuentra el usuario devuelve un objeto UserDb
+            if result:
+                return UserDb(
+                    id=result[0],
+                    name=result[1],
+                    email=result[2],
+                    password=result[3],
+                    role=result[4],
+                    location=result[5]
+                )
+    # Si no encuentra el usuario devuelve None
     return None
-    
-
-users: list[UserDb] = [
-    UserDb(
-        id=1,
-        name="Alice",
-        username="alice",
-        password=get_hash_password("alice")
-    ),
-    UserDb(
-        id=2,
-        name="Bob",
-        username="bobo",
-        password=get_hash_password("bob")
-    )
-]
