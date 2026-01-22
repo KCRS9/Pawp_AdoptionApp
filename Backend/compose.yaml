@@ -18,7 +18,7 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_USER: myapi
       MARIADB_PASSWORD: myapi
-      MARIADB_DATABASE: myapi
+      MARIADB_DATABASE: animal_shelter_db
     networks:
       - myapi_network
     volumes:
