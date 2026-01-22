@@ -1,3 +1,4 @@
+import mariadb
 from app.models.users import UserDb
 from app.auth.auth import get_hash_password
 

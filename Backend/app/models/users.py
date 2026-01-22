@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     email: str
     location: str
-    rol: str = "user"
+    role: str = "user"
 
 #Clase IN: datos para crear un usuario
 class UserIn(UserBase):
