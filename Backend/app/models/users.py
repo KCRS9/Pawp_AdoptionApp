@@ -12,9 +12,8 @@ class UserIn(UserBase):
     password: str
 
 #Clase OUT: Lo que devolvemos al frontend
-class UserOut(BaseModel):
+class UserOut(UserBase):
     id: int
-    username: str
     name: str
 
 #Clase DB: Lo que guardamos en la base de datos
