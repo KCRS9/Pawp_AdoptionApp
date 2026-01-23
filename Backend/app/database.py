@@ -1,5 +1,5 @@
 import mariadb
-from app.models.users import UserDb
+from app.models.users import UserIn, UserDb
 from app.auth.auth import get_hash_password
 
 # Configuración de la conexión a la base de datos
@@ -12,7 +12,7 @@ db_config = {
 }
 
 # Función para insertar un usuario en la base de datos
-def insert_user(user: UserDb) -> int:
+def insert_user(user: UserIn) -> int:
 
     with mariadb.connect(**db_config) as conn:
         
