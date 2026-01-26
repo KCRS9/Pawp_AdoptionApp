@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models.users import UserBase, UserIn, UserOut, UserDb, UserLogin
+from app.models.users import UserIn, UserOut, UserDb
 from app.database import insert_user, get_user_by_email
 from app.auth.auth import (
     get_hash_password, 
@@ -17,6 +17,14 @@ router = APIRouter(
     prefix="/users",
     tags=["Users"]
 )
+
+# Me creo esta funcion para poder obtener el usuario actual
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    data: TokenData = decode_token(token)
+    user = get_user_by_email(data.email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 # Ruta para crear un usuario
 @router.post(
@@ -60,9 +68,10 @@ async def create_user(userIn: UserIn):
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     # 1. Busco username y password en la petición HTTP
-    email: str | None = form_data.email
+    email: str | None = form_data.username
     password: str | None = form_data.password
 
+    # 2. Compruebo que no vienen vacios
     if email is None or password is None:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
@@ -70,64 +79,22 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
 
     # 2. Busco username en la base de datos
-    usersFound = [u for u in users if u.email == email]
-    if not usersFound:
+    user = get_user_by_email(email)
+    if not user:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail = "Username and/or password incorrect"
         )
 
     # 3. Compruebo contraseñas
-    user: UserDb = usersFound[0]
     if not verify_password(password, user.password):
         raise HTTPException(
-            status_code = status.HTTP_401_UNAUTHORIZED,
-            detail = "Username and/or password incorrect"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username and/or password incorrect"
         )
 
-    token = create_access_token(
-        UserBase(
-            email = user.email,
-            password = user.password
-        )
-    )
-    return token
+    return create_access_token(user)
 
-# Ruta para obtener todos los usuarios
-@router.get(
-
-    "/", 
-    response_model = list[UserOut]
-)
-async def get_users(token: str = Depends(oauth2_scheme)):
-    
-    # 1. Decodifico el token
-    data: TokenData = decode_token(token)
-    
-    # 2. Compruebo que el usuario tiene permiso
-    if data.email not in [u.email for u in users]:
-
-        raise HTTPException(
-            status_code = status.HTTP_403_FORBIDDEN,
-            detail = "Forbidden"
-        )
-
-    # 3. Devuelvo todos los usuarios
-    return [
-        UserOut(id = userDb.id, name = userDb.name, username = userDb.username)
-        for userDb in users
-    ]
-
-# Ruta para obtener un usuario por id
-@router.get(
-
-    "/{id}",
-    response_model = UserOut
-)
-async def get_user_by_id(id:int, token:str = Depends(oauth2_scheme)):
-
-    # 1. Decodifico el token
-    data: TokenData = decode_token(token)
 
     # 2. Compruebo que el usuario tiene permisos de admin
     #if data.role != "admin":
