@@ -9,7 +9,7 @@ from app.models.users import UserOut # Para tipado del usuario actual
 from app.database import insert_animal, get_animal_by_id, update_animal, delete_animal
 
 # Auth -> Para proteger rutas y saber QUIÉN hace la petición
-from app.routers.users import get_current_user_profile # Reusamos la dependencia que valida el token
+from app.routers.users import get_current_user as get_current_user_profile # Reusamos la dependencia que valida el token
 
 router = APIRouter(
     prefix="/animals",

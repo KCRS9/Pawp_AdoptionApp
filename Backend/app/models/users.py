@@ -24,6 +24,6 @@ class UserDb(UserIn):
     id: int
 
 #Class Login: Para poder facilitar el inicio de sesion
-class UserLogin(BaseModel):
+class UserLogin(UserBase):
     email: str
     password: str
