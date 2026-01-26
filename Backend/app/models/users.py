@@ -12,16 +12,18 @@ class UserIn(UserBase):
     password: str
 
 #Clase OUT: Lo que devolvemos al frontend
-class UserOut(BaseModel):
+# En app/models/users.py
+class UserOut(UserBase):
     id: int
-    username: str
     name: str
+    username: str
+    email: str
 
 #Clase DB: Lo que guardamos en la base de datos
 class UserDb(UserIn):
     id: int
 
 #Class Login: Para poder facilitar el inicio de sesion
-class UserLogin(UserBase):
+class UserLogin(BaseModel):
     email: str
     password: str

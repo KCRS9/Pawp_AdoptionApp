@@ -174,3 +174,38 @@ async def get_profile(token: str = Depends(oauth2_scheme)):
     
     # 3. Devuelvo el usuario
     return UserOut(id = userFound[0].id, name = userFound[0].name, username = userFound[0].username)
+
+   # Al final de app/routers/users.py
+
+async def get_current_user_profile(token: str = Depends(oauth2_scheme)) -> UserOut:
+    """
+    Dependencia para obtener el usuario actual desde el token JWT.
+    Reutilizable en otros routers.
+    """
+    # 1. Decodificar el token
+    data: TokenData = decode_token(token)
+    
+    # 2. Validar que el email existe en el token
+    if data.email is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token: email not found"
+        )
+    
+    # 3. Buscar el usuario en la base de datos
+    user = get_user_by_email(data.email)  # Ahora data.email es str, no str | None
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # 4. Devolver el usuario completo con el role
+    return UserOut(
+        id=user.id,
+        name=user.name,
+        username=user.username,
+        email=user.email,
+        role=user.role
+    )
