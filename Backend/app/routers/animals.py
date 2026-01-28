@@ -16,32 +16,37 @@ router = APIRouter(
     tags=["Animals"]
 )
 
-# -----------------------------------------------------------------------------
 # 1. CREAR ANIMAL (Solo Shelter)
-# -----------------------------------------------------------------------------
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_animal(
     animal: AnimalIn, 
     current_user: UserOut = Depends(get_current_user_profile)
 ):
-    # RBAC: Verificación de Rol
+    # 1. RBAC(Role Based Access Control) Genérico
     if current_user.role != "shelter":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo las protectoras pueden registrar animales."
         )
 
-    # Inyección del shelter_id automático (seguridad)
-    animal_id = insert_animal(animal, shelter_id=current_user.id)
+    # 2. Validación de Perfil de Protectora (NUEVO)
+    # El usuario tiene rol 'shelter', pero tiene que tener un shelter_id
+    if current_user.shelter_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, # O 403
+            detail="Tu usuario es de tipo protectora, pero aún no has vinculado un perfil de Protectora. Crea la protectora primero."
+        )
+
+    # 3. Inserción Directa
+    # Usamos el shelter_id del usuario logueado.
+    animal_id = insert_animal(animal, shelter_id=current_user.shelter_id)
     
     return {"id": animal_id, "message": "Animal creado correctamente"}
 
-# -----------------------------------------------------------------------------
 # 2. EDITAR ANIMAL (Solo Shelter) - PUT (Reemplazo)
-# -----------------------------------------------------------------------------
 @router.put("/{animal_id}", status_code=status.HTTP_200_OK)
 async def edit_animal(
-    animal_id: int,
+    animal_id: str,
     animal_data: AnimalIn,
     current_user: UserOut = Depends(get_current_user_profile)
 ):
@@ -54,21 +59,18 @@ async def edit_animal(
     if not existing_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
 
-    # (Opcional) Verificar que el animal pertenece a ESTA protectora
-    # if existing_animal.shelter_id != current_user.id:
-    #    raise HTTPException(status_code=403, detail="No puedes editar animales de otra protectora")
+    if current_user.shelter_id and existing_animal.shelter_id != current_user.shelter_id:
+       raise HTTPException(status_code=403, detail="No puedes editar animales de otra protectora")
 
     # 2. Ejecutar Update
     update_animal(animal_id, animal_data)
     
     return {"message": "Animal actualizado correctamente"}
 
-# -----------------------------------------------------------------------------
 # 3. BORRAR ANIMAL (Solo Shelter)
-# -----------------------------------------------------------------------------
 @router.delete("/{animal_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_animal(
-    animal_id: int,
+    animal_id: str,
     current_user: UserOut = Depends(get_current_user_profile)
 ):
     # RBAC
@@ -79,6 +81,9 @@ async def remove_animal(
     existing_animal = get_animal_by_id(animal_id)
     if not existing_animal:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
+
+    if current_user.shelter_id and existing_animal.shelter_id != current_user.shelter_id:
+       raise HTTPException(status_code=403, detail="No puedes editar animales de otra protectora")
 
     # 2. Eliminar
     delete_animal(animal_id)
