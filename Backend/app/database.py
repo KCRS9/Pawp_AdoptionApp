@@ -1,7 +1,8 @@
 import mariadb
-from app.models.users import UserIn, UserDb
-from app.auth.auth import get_hash_password
+import uuid
+from app.models.users import UserDb, UserIn
 from app.models.animals import AnimalIn, AnimalDb
+from app.auth.auth import get_hash_password
 
 # Configuración de la conexión a la base de datos
 db_config = {
@@ -12,71 +13,81 @@ db_config = {
     "database": "animal_shelter_db"
 }
 
-# Función para insertar un usuario en la base de datos
-def insert_user(user: UserIn) -> int:
+# USUARIOS (Tabla: USERS)
 
-    with mariadb.connect(**db_config) as conn:
-        
-        with conn.cursor() as cursor:
-    
-            sql = "INSERT INTO `user` (name, email, password, role, location) VALUES (?, ?, ?, ?, ?)"
-    
-            values = (user.name, user.email, user.password, user.role, user.location)
-    
-            cursor.execute(sql, values)
-            conn.commit()
+def insert_user(user: UserIn) -> str:
+    user_id = str(uuid.uuid4())
 
-            #Devuelve el id del usuario insertado con la funcion lastrowid
-            return cursor.lastrowid 
-
-# Funcion para obtener un usuario por email
-def get_user_by_email(email: str) -> UserDb | None:
-
-    with mariadb.connect(**db_config) as conn:
-
-        with conn.cursor() as cursor:
-            # No usamos * por si en el futuro añadimos mas columnas
-            sql = "SELECT id, name, email, password, role, location FROM `user` WHERE email = ?"
-        
-            cursor.execute(sql, (email,))
-        
-            result = cursor.fetchone()
-
-            # Si encuentra el usuario devuelve un objeto UserDb
-            if result:
-                return UserDb(
-                    id=result[0],
-                    name=result[1],
-                    email=result[2],
-                    password=result[3],
-                    role=result[4],
-                    location=result[5]
-                )
-    # Si no encuentra el usuario devuelve None
-    return None
-
-def insert_animal(animal: AnimalIn, shelter_id: int) -> int:
-    """
-    Inserta un animal vinculado a una protectora (shelter_id).
-    Por defecto status será 'Available' (si así está definido en BD) o lo pasamos explícito.
-    """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO ANIMAL (name, species, breed, age, size, description, health, shelter_id, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Available')
+                INSERT INTO USERS (id, name, email, password, role, location, profile_image) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """
-            # El orden de los values DEBE coincidir con los ? de arriba
             values = (
+                user_id, 
+                user.name, 
+                user.email, 
+                user.password, 
+                user.role, 
+                user.location,
+                user.profile_image
+            )
+            
+            cursor.execute(sql, values)
+            conn.commit()
+            
+            return user_id
+
+def get_user_by_email(email: str) -> UserDb | None:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT id, name, email, password, role, location, profile_image, shelter_id 
+                FROM USERS 
+                WHERE email = ?
+            """
+            cursor.execute(sql, (email,))
+            row = cursor.fetchone()
+            
+            if row:
+                return UserDb(
+                    id=str(row[0]),
+                    name=row[1],
+                    email=row[2],
+                    password=row[3],
+                    role=row[4],
+                    location=row[5],
+                    profile_image=row[6],
+                    shelter_id=str(row[7]) if row[7] else None
+                )
+    return None
+
+# OPERACIONES DE ANIMALES
+
+def insert_animal(animal: AnimalIn, shelter_id: str) -> str:
+    
+    animal_id = str(uuid.uuid4())
+
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO ANIMAL (id, name, species, breed, age, size, description, health, shelter_id, status, profile_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Available', ?)
+            """
+            values = (
+                animal_id,
                 animal.name, animal.species, animal.breed, animal.age, 
-                animal.size, animal.description, animal.health, shelter_id
+                animal.size, animal.description, animal.health, 
+                shelter_id,
+                animal.profile_image
             )
             cursor.execute(sql, values)
             conn.commit()
-            return cursor.lastrowid
+            return animal_id
 
-def get_animal_by_id(id: int) -> AnimalDb | None:
-    """ Recupera un animal por su ID entero. """
+def get_animal_by_id(id: str) -> AnimalDb | None:
+    """ Recupera un animal por su ID string (UUID). """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter_id FROM ANIMAL WHERE id = ?"
@@ -91,27 +102,24 @@ def get_animal_by_id(id: int) -> AnimalDb | None:
                 )
             return None
 
-def update_animal(id: int, animal: AnimalIn) -> bool:
-    """ Actualiza TODOS los campos editables del animal (PUT). """
+def update_animal(id: str, animal: AnimalIn) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
                 UPDATE ANIMAL 
-                SET name=?, species=?, breed=?, age=?, size=?, description=?, health=?
+                SET name=?, species=?, breed=?, age=?, size=?, description=?, health=?, profile_image=?
                 WHERE id = ?
             """
             values = (
                 animal.name, animal.species, animal.breed, animal.age,
-                animal.size, animal.description, animal.health, 
+                animal.size, animal.description, animal.health, animal.profile_image,
                 id
             )
             cursor.execute(sql, values)
             conn.commit()
-            # rowcount > 0 significa que se modificó algo (o al menos encontró la fila)
             return cursor.rowcount >= 0
 
-def delete_animal(id: int) -> bool:
-    """ Borra un animal de la base de datos. """
+def delete_animal(id: str) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = "DELETE FROM ANIMAL WHERE id = ?"
