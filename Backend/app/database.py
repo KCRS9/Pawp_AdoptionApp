@@ -2,6 +2,7 @@ import mariadb
 from app.models.users import UserIn, UserDb
 from app.auth.auth import get_hash_password
 from app.models.animals import AnimalIn, AnimalDb
+from app.models.shelters import ShelterIn, ShelterDb
 
 # Configuración de la conexión a la base de datos
 db_config = {
@@ -116,5 +117,81 @@ def delete_animal(id: int) -> bool:
         with conn.cursor() as cursor:
             sql = "DELETE FROM ANIMAL WHERE id = ?"
             cursor.execute(sql, (id,))
+            conn.commit()
+            return cursor.rowcount > 0
+        
+
+
+
+def insert_shelter(shelter: ShelterIn) -> str:
+    """
+    Genera UUID, inserta la protectora y devuelve el ID.
+    """
+    shelter_id = str(uuid.uuid4())
+
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO SHELTER (id, name, address, contact, website, description, profile_image)
+                VALUES (?, ?, ?, ?, ?, ?, NULL)
+            """
+            values = (
+                shelter_id,
+                shelter.name,
+                shelter.address,
+                shelter.contact,
+                shelter.website,
+                shelter.description
+            )
+            cursor.execute(sql, values)
+            conn.commit()
+            return shelter_id
+
+def update_user_shelter_link(user_id: str, shelter_id: str) -> bool:
+    """
+    Vincula un usuario existente con una protectora recien creada.
+    """
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE USERS SET shelter_id = ? WHERE id = ?"
+            cursor.execute(sql, (shelter_id, user_id))
+            conn.commit()
+            return cursor.rowcount > 0
+
+def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
+    """ Recupera una protectora por ID (Pública) """
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "SELECT id, name, address, contact, website, description, profile_image FROM SHELTER WHERE id = ?"
+            cursor.execute(sql, (shelter_id,))
+            row = cursor.fetchone()
+            
+            if row:
+                return ShelterDb(
+                    id=str(row[0]),
+                    name=row[1],
+                    address=row[2],
+                    contact=row[3],
+                    website=row[4],
+                    description=row[5],
+                    profile_image=row[6]
+                )
+            return None
+
+def update_shelter(shelter_id: str, shelter: ShelterIn) -> bool:
+    """ Actualiza datos de la protectora """
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                UPDATE SHELTER 
+                SET name=?, address=?, contact=?, website=?, description=?
+                WHERE id = ?
+            """
+            values = (
+                shelter.name, shelter.address, shelter.contact, 
+                shelter.website, shelter.description, 
+                shelter_id
+            )
+            cursor.execute(sql, values)
             conn.commit()
             return cursor.rowcount > 0
