@@ -16,8 +16,6 @@ class UserIn(UserBase):
 class UserOut(UserBase):
     id: int
     name: str
-    username: str
-    email: str
 
 #Clase DB: Lo que guardamos en la base de datos
 class UserDb(UserIn):

@@ -26,7 +26,7 @@ class AnimalIn(AnimalBase):
 # -----------------------------------------------------------
 class AnimalOut(AnimalBase):
     id: int
-    shelter_id: int
+    shelter: int
     status: str      # Aquí sí mostramos el estado
 
 # -----------------------------------------------------------
@@ -34,5 +34,5 @@ class AnimalOut(AnimalBase):
 # -----------------------------------------------------------
 class AnimalDb(AnimalIn):
     id: int
-    shelter_id: int
+    shelter: int
     status: str

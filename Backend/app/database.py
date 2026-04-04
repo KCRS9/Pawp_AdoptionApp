@@ -2,7 +2,9 @@ import mariadb
 from app.models.users import UserIn, UserDb
 from app.auth.auth import get_hash_password
 from app.models.animals import AnimalIn, AnimalDb
+from app.models.adoptions import AdoptionIn,AdoptionUpdate
 from app.models.shelters import ShelterIn, ShelterDb
+import uuid
 
 # Configuración de la conexión a la base de datos
 db_config = {
@@ -56,7 +58,7 @@ def get_user_by_email(email: str) -> UserDb | None:
     # Si no encuentra el usuario devuelve None
     return None
 
-def insert_animal(animal: AnimalIn, shelter_id: int) -> int:
+def insert_animal(animal: AnimalIn, shelter: int) -> int:
     """
     Inserta un animal vinculado a una protectora (shelter_id).
     Por defecto status será 'Available' (si así está definido en BD) o lo pasamos explícito.
@@ -70,7 +72,7 @@ def insert_animal(animal: AnimalIn, shelter_id: int) -> int:
             # El orden de los values DEBE coincidir con los ? de arriba
             values = (
                 animal.name, animal.species, animal.breed, animal.age, 
-                animal.size, animal.description, animal.health, shelter_id
+                animal.size, animal.description, animal.health, shelter
             )
             cursor.execute(sql, values)
             conn.commit()
@@ -193,5 +195,55 @@ def update_shelter(shelter_id: str, shelter: ShelterIn) -> bool:
                 shelter_id
             )
             cursor.execute(sql, values)
+            conn.commit()
+            return cursor.rowcount > 0
+        
+
+# Adoptions
+
+def insert_adoption(user_id: int, adoption: AdoptionIn) -> int:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO ADOPTION (user, shelter, animal, status, date, time, text)
+                VALUES (?, ?, ?, 'pending', ?, ?, ?)
+            """
+            values = (user_id, adoption.shelter, adoption.animal, adoption.date, adoption.time, adoption.text)
+            cursor.execute(sql, values)
+            conn.commit()
+            return cursor.lastrowid
+        
+
+
+def get_adoptions_by_shelter(shelter: int):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            # Shelter podran consultar solicitudes
+            sql = "SELECT user, animal, date FROM ADOPTION WHERE shelter = ?"
+            cursor.execute(sql, (shelter,))
+            rows = cursor.fetchall()
+            return [{"user": r[0], "animal": r[1], "date": r[2]} for r in rows]
+        
+
+
+def get_adoption_by_id(adoption_id: int):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "SELECT user, animal, date, status, text, shelter FROM ADOPTION WHERE id = ?"
+            cursor.execute(sql, (adoption_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    "user": row[0], "animal": row[1], "date": row[2], 
+                    "status": row[3], "text": row[4], "shelter_id": row[5]
+                }
+            return None
+        
+
+def update_adoption_db(adoption_id: int, data: AdoptionUpdate) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE ADOPTION SET status = ?, text = ? WHERE id = ?"
+            cursor.execute(sql, (data.status, data.text, adoption_id))
             conn.commit()
             return cursor.rowcount > 0
