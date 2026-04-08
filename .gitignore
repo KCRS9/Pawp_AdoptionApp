@@ -1,3 +1,12 @@
 .DS_Store/
 __pycache__
 .DS_Store
+
+# Frontend - Kotlin Multiplatform / Compose
+Frontend/.gradle/
+Frontend/.idea/
+Frontend/build/
+Frontend/composeApp/build/
+Frontend/local.properties
+Frontend/**/*.iml
+Frontend/.kotlin/
