@@ -10,3 +10,5 @@ Frontend/composeApp/build/
 Frontend/local.properties
 Frontend/**/*.iml
 Frontend/.kotlin/
+Documentacion/
+prov/
