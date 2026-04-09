@@ -125,14 +125,9 @@ class RegisterViewModel(
                 }
             }
         }
-
-        fun resetState() {
-            _state.value = RegisterState()
-        }
     }
-
-
-
-
-
+    fun resetState() {
+        _state.value = RegisterState()
+    }
+    
 }
