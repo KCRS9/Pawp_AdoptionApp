@@ -3,6 +3,7 @@ package ies.sequeros.dam
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
+import com.russhwolf.settings.Settings
 import ies.sequeros.dam.di.appModule
 import org.koin.compose.KoinApplication
 import org.koin.dsl.module
@@ -18,7 +19,7 @@ fun main() = application {
             modules(
                 appModule,
                 module{
-                    single{
+                    single<Settings>{
                         PreferencesSettings(Preferences.userRoot().node("pawp"))
                     }
                 }
