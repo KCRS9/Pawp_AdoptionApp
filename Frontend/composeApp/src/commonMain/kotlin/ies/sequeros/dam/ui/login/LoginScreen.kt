@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ies.sequeros.dam.ui.components.LoginComponent
+import ies.sequeros.dam.ui.components.login.LoginComponent
 import org.koin.compose.viewmodel.koinViewModel
 
 
