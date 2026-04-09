@@ -143,6 +143,7 @@ android {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-client-logging:3.3.3")
     debugImplementation(libs.compose.uiTooling)
 }
 
