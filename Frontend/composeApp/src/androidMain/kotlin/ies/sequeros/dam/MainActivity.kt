@@ -6,6 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.russhwolf.settings.SharedPreferencesSettings
+import ies.sequeros.dam.di.appModule
+import org.koin.compose.KoinApplication
+import org.koin.core.KoinApplication
+import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,7 +18,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            KoinApplication(application = {
+                modules(
+                    appModule,
+                    module {
+                        single {
+                            SharedPreferencesSettings(
+                                getSharedPreferences("pawp_prefs", MODE_PRIVATE)
+                            )
+                        }
+                    }
+
+                )
+            }){
+                App()
+            }
         }
     }
 }
