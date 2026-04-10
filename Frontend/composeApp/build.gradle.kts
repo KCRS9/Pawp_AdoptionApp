@@ -79,7 +79,9 @@ kotlin {
             implementation(libs.material3.adaptive.navigation)
 
             // Iconos extendidos de Material (más allá de los básicos)
-            implementation(libs.material.icons.extended)
+            // compose.materialIconsExtended es provisto directamente por el plugin de Compose
+            // Multiplatform y usa la versión correcta automáticamente
+            implementation(compose.materialIconsExtended)
         }
 
         // --- Dependencias exclusivas de Android ---
@@ -141,6 +143,7 @@ android {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-client-logging:3.3.3")
     debugImplementation(libs.compose.uiTooling)
 }
 
