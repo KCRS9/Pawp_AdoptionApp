@@ -24,7 +24,7 @@ class LoginViewModel(
         _state.update {
             it.copy(
                 email = email,
-                emailError = if(email.contains("a")) null else "Email no válido",
+                emailError = if(email.contains("@")) null else "Email no válido",
                 errorMessage = null
             )
         }

@@ -29,7 +29,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.register.RegisterState
+import ies.sequeros.dam.ui.theme.PawpPurple
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
 import pawp_adoption.composeapp.generated.resources.logo_pawp
@@ -61,18 +63,15 @@ fun RegisterComponent(
             verticalArrangement = Arrangement.Center
         ) {
 
-            Image(
-                painter = painterResource(Res.drawable.logo_pawp),
-                contentDescription = "Logo Pawp",
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 8.dp)
-            )
+            PawpCard(showImage = true)
+
+            Spacer(Modifier.height(20.dp))
 
             Text(
-                text = "Crear Cuenta",
+                text = "Registrate",
                 style = MaterialTheme.typography.displaySmall,
-                modifier = Modifier.padding(bottom = 8.dp)
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
             // Nombre
@@ -166,17 +165,26 @@ fun RegisterComponent(
                     onClick = onBackClick,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp),
-                    enabled = !state.isLoading
+                    enabled = !state.isLoading,
+                    border   = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = PawpPurple
+                    )
                 ){
-                    Text(text = "Volver")
+                    Text(text = "Volver",
+                        color = PawpPurple)
                 }
 
                 Button(
                     onClick = onRegisterClick,
                     modifier = Modifier.weight(1f),
                     enabled = state.isValid && !state.isLoading,
-                    shape = RoundedCornerShape(8.dp)
-                ) {
+                    shape = RoundedCornerShape(8.dp),
+                    border   = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = PawpPurple)
+
+                    ) {
                     if (state.isLoading) {
 
                         CircularProgressIndicator(
@@ -185,7 +193,8 @@ fun RegisterComponent(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Registrarse")
+                        Text("Registrarse",
+                        color = PawpPurple)
                     }
                 }
 
