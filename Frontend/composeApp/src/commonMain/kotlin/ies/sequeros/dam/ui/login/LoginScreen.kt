@@ -26,7 +26,7 @@ fun LoginScreen (
     LoginComponent(
         state = state,
         onEmailChenge = viewModel::onEmailChange,
-        onPasswordChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = viewModel::login,
         onRegisterClick = onGoToRegister
     )
