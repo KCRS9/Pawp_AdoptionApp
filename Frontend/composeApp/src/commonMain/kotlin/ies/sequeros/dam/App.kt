@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.login.LoginScreen
 import ies.sequeros.dam.ui.register.RegisterScreen
+import ies.sequeros.dam.ui.theme.PawpTheme
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,7 +35,8 @@ fun App() {
 
     var authScreen by remember { mutableStateOf("login") }
 
-    MaterialTheme {
+    PawpTheme {
+    // MaterialTheme {
         Surface {
             when (isLoggedIn){
 
