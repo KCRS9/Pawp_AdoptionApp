@@ -34,6 +34,7 @@ class UserSessionManager(
     fun logout(){
 
         println("LOG [UserSessionManager]: Cerrando sesión.")
+        tokenStorage.clear() // borra el JWT del almacenamiento persistente
         _isLoggedIn.value = false
     }
 }

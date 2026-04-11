@@ -1,9 +1,12 @@
 package ies.sequeros.dam.di
 
+import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
 import ies.sequeros.dam.domain.repositories.IAuthRepository
+import ies.sequeros.dam.domain.repositories.IUserRepository
 import ies.sequeros.dam.infrastructure.RestAuthRepository
+import ies.sequeros.dam.infrastructure.RestUserRepository
 import ies.sequeros.dam.infrastructure.ktor.createHttpClient
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
 import ies.sequeros.dam.ui.appsettings.AppSettings
@@ -15,11 +18,11 @@ import org.koin.dsl.module
 
 val appModule = module {
 
+    //val baseUrl = "http://10.0.2.2:8000"
     val baseUrl = "http://localhost:8000"
 
     // --- Infraestructura ---
     single {
-
         val sessionManager: UserSessionManager = get()
         createHttpClient(
             tokenStorage = get(),
@@ -27,23 +30,21 @@ val appModule = module {
         )
     }
 
-    single{
-
-        TokenStorage(get())
-    }
-
+    single{ TokenStorage(get()) }
     single<IAuthRepository> { RestAuthRepository(get(), get(), baseUrl) }
+    single<IUserRepository> { RestUserRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
 
     factory { LoginUseCase(get()) }
     factory { RegisterUseCase(get()) }
+    factory { GetCurrentUserUseCase(get()) }
 
     // --- Presentación ---
 
     single { AppSettings() }
-    factory { AppViewModel(get(), get()) }
+    factory { AppViewModel(get(), get(), get()) }
     factory { LoginViewModel( get(), get()) }
     factory { RegisterViewModel(get()) }
 }
