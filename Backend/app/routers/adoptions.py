@@ -57,3 +57,34 @@ async def update_adoption_status(
         raise HTTPException(status_code=404, detail="No se pudo actualizar la solicitud")
         
     return {"message": "Estado de adopción actualizado"}
+
+
+
+@router.patch("/{adoption_id}/status")
+async def change_adoption_status(
+    adoption_id: int, 
+    new_status: str, # Puede ser 'approved' o 'rejected'
+    current_user = Depends(get_current_user)
+):
+    # 1. Verificamos que sea una protectora
+    if current_user.role != "shelter":
+        raise HTTPException(
+            status_code=403, 
+            detail="Solo las protectoras pueden gestionar solicitudes."
+        )
+
+    # 2. (Opcional pero recomendado) Verificar que la adopción pertenece a SU protectora
+    adoption = get_adoption_by_id(adoption_id)
+    if not adoption:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+    
+    if adoption["shelter_id"] != current_user.shelter: # <-- Usando 'shelter'
+        raise HTTPException(status_code=403, detail="Esta solicitud no pertenece a tu protectora")
+
+    # 3. Actualizar
+    success = update_adoption_db(adoption_id, new_status)
+    
+    if not success:
+        raise HTTPException(status_code=400, detail="No se pudo actualizar el estado")
+
+    return {"message": f"Solicitud {new_status} correctamente"}

@@ -32,7 +32,7 @@ async def create_animal(
         )
 
     # Inyección del shelter_id automático (seguridad)
-    animal_id = insert_animal(animal, shelter_id=current_user.id)
+    animal_id = insert_animal(animal, current_user.shelter)
     
     return {"id": animal_id, "message": "Animal creado correctamente"}
 

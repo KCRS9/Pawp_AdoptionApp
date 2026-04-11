@@ -28,7 +28,7 @@ class ShelterOut(ShelterBase):
 # Clase DB: Mapeo completo de la Tabla
 # -----------------------------------------------------------
 class ShelterDb(ShelterIn):
-    id: str             # UUID
+    id: int            # UUID
     profile_image: Optional[str] = None
 
 

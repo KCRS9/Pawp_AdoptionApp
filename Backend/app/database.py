@@ -22,7 +22,7 @@ def insert_user(user: UserIn) -> int:
         
         with conn.cursor() as cursor:
     
-            sql = "INSERT INTO `user` (name, email, password, role, location) VALUES (?, ?, ?, ?, ?)"
+            sql = "INSERT INTO `USER` (name, email, password, role, location) VALUES (?, ?, ?, ?, ?)"
     
             values = (user.name, user.email, user.password, user.role, user.location)
     
@@ -39,7 +39,7 @@ def get_user_by_email(email: str) -> UserDb | None:
 
         with conn.cursor() as cursor:
             # No usamos * por si en el futuro añadimos mas columnas
-            sql = "SELECT id, name, email, password, role, location FROM `user` WHERE email = ?"
+            sql = "SELECT id, name, email, password, role, location FROM USER WHERE email = ?"
         
             cursor.execute(sql, (email,))
         
@@ -66,13 +66,21 @@ def insert_animal(animal: AnimalIn, shelter: int) -> int:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO ANIMAL (name, species, breed, age, size, description, health, shelter_id, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Available')
+                INSERT INTO ANIMAL (name, species, breed, age, size, description, status, health, shelter)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             # El orden de los values DEBE coincidir con los ? de arriba
             values = (
-                animal.name, animal.species, animal.breed, animal.age, 
-                animal.size, animal.description, animal.health, shelter
+                animal.name, 
+                animal.species, 
+                animal.breed, 
+                animal.age, 
+                animal.size, 
+                animal.description,  
+                'available',
+                animal.health,
+                shelter
+               
             )
             cursor.execute(sql, values)
             conn.commit()
@@ -82,7 +90,7 @@ def get_animal_by_id(id: int) -> AnimalDb | None:
     """ Recupera un animal por su ID entero. """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter_id FROM ANIMAL WHERE id = ?"
+            sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter FROM ANIMAL WHERE id = ?"
             cursor.execute(sql, (id,))
             row = cursor.fetchone()
             
@@ -90,7 +98,7 @@ def get_animal_by_id(id: int) -> AnimalDb | None:
                 return AnimalDb(
                     id=row[0], name=row[1], species=row[2], breed=row[3],
                     age=row[4], size=row[5], description=row[6], health=row[7],
-                    status=row[8], shelter_id=row[9]
+                    status=row[8], shelter=row[9]
                 )
             return None
 
@@ -125,7 +133,7 @@ def delete_animal(id: int) -> bool:
 
 
 
-def insert_shelter(shelter: ShelterIn) -> str:
+def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
     """
     Genera UUID, inserta la protectora y devuelve el ID.
     """
@@ -134,20 +142,20 @@ def insert_shelter(shelter: ShelterIn) -> str:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO SHELTER (id, name, address, contact, website, description, profile_image)
-                VALUES (?, ?, ?, ?, ?, ?, NULL)
+                INSERT INTO SHELTER (name, address, contact, website, description, admin)
+                VALUES (?, ?, ?, ?, ?, ?)
             """
             values = (
-                shelter_id,
                 shelter.name,
                 shelter.address,
                 shelter.contact,
                 shelter.website,
-                shelter.description
+                shelter.description,
+                admin_id
             )
             cursor.execute(sql, values)
             conn.commit()
-            return shelter_id
+            return cursor.lastrowid
 
 def update_user_shelter_link(user_id: str, shelter_id: str) -> bool:
     """
@@ -164,7 +172,7 @@ def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
     """ Recupera una protectora por ID (Pública) """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "SELECT id, name, address, contact, website, description, profile_image FROM SHELTER WHERE id = ?"
+            sql = "SELECT id, name, address, contact, website, description, admin FROM SHELTER WHERE id = ?"
             cursor.execute(sql, (shelter_id,))
             row = cursor.fetchone()
             
@@ -176,7 +184,7 @@ def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
                     contact=row[3],
                     website=row[4],
                     description=row[5],
-                    profile_image=row[6]
+                    admin=row[6]
                 )
             return None
 
@@ -206,9 +214,9 @@ def insert_adoption(user_id: int, adoption: AdoptionIn) -> int:
         with conn.cursor() as cursor:
             sql = """
                 INSERT INTO ADOPTION (user, shelter, animal, status, date, time, text)
-                VALUES (?, ?, ?, 'pending', ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """
-            values = (user_id, adoption.shelter, adoption.animal, adoption.date, adoption.time, adoption.text)
+            values = (user_id, adoption.shelter, adoption.animal, 'pending', adoption.date, adoption.time, adoption.text)
             cursor.execute(sql, values)
             conn.commit()
             return cursor.lastrowid
@@ -240,10 +248,10 @@ def get_adoption_by_id(adoption_id: int):
             return None
         
 
-def update_adoption_db(adoption_id: int, data: AdoptionUpdate) -> bool:
+def update_adoption_db(adoption_id: int, new_status) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "UPDATE ADOPTION SET status = ?, text = ? WHERE id = ?"
-            cursor.execute(sql, (data.status, data.text, adoption_id))
+            sql = "UPDATE ADOPTION SET status = ?, WHERE id = ?"
+            cursor.execute(sql, (new_status, adoption_id))
             conn.commit()
             return cursor.rowcount > 0

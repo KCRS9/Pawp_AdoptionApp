@@ -5,6 +5,7 @@ class UserBase(BaseModel):
     email: str
     location: str
     role: str = "user"
+    shelter: int | None = None
 
 #Clase IN: datos para crear un usuario
 class UserIn(UserBase):
