@@ -21,14 +21,14 @@ class ShelterIn(ShelterBase):
 # Clase OUTPUT: Para devolver al frontend
 # -----------------------------------------------------------
 class ShelterOut(ShelterBase):
-    id: str             # UUID
+    id: int            # UUID
     profile_image: Optional[str] = None
 
 # -----------------------------------------------------------
 # Clase DB: Mapeo completo de la Tabla
 # -----------------------------------------------------------
 class ShelterDb(ShelterIn):
-    id: str             # UUID
+    id: int            # UUID
     profile_image: Optional[str] = None
 
 

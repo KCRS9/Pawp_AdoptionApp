@@ -22,16 +22,16 @@ async def create_shelter(
         raise HTTPException(status_code=403, detail="Solo los usuarios tipo 'protectora' pueden crear fichas.")
 
     # 2. Validar que no tenga ya una asignada
-    if current_user.shelter_id is not None:
-        raise HTTPException(status_code=400, detail="Tu usuario ya administra una protectora.")
+    #if current_user.shelter_id is not None:
+        #raise HTTPException(status_code=400, detail="Tu usuario ya administra una protectora.")
 
     # 3. Crear Protectora
-    new_shelter_id = insert_shelter(shelter)
+    new_shelter_id = insert_shelter(shelter,admin_id=current_user.id)
 
     # 4. Vincular al Usuario
-    success = update_user_shelter_link(current_user.id, new_shelter_id)
-    if not success:
-        raise HTTPException(status_code=500, detail="Error al vincular la protectora con el usuario.")
+    #success = update_user_shelter_link(current_user.id, new_shelter_id)
+    #if not success:
+        #raise HTTPException(status_code=500, detail="Error al vincular la protectora con el usuario.")
 
     return {"id": new_shelter_id, "message": "Protectora creada y vinculada correctamente"}
 
