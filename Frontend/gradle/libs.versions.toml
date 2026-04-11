@@ -1,0 +1,117 @@
+[versions]
+agp = "8.11.2"
+android-compileSdk = "36"
+android-minSdk = "24"
+android-targetSdk = "36"
+androidx-activity = "1.13.0"
+androidx-appcompat = "1.7.1"
+androidx-core = "1.18.0"
+androidx-espresso = "3.7.0"
+androidx-lifecycle = "2.10.0"
+androidx-testExt = "1.3.0"
+composeHotReload = "1.0.0"
+composeMultiplatform = "1.10.3"
+junit = "4.13.2"
+kotlin = "2.3.20"
+kotlinx-coroutines = "1.10.2"
+material3 = "1.10.0-alpha05"
+
+# Nuevas Versions
+ktor = "3.3.3"                         # Cliente HTTP multiplataforma
+koin = "4.1.2-Beta1"                   # Inyección de dependencias
+kotlinx-serialization = "1.9.0"        # Serialización JSON
+kotlinx-datetime = "0.6.1"             # Fechas multiplataforma
+multiplatform-settings = "1.3.0"       # Almacenamiento key-value (para el token)
+coil = "3.3.0"                         # Carga de imágenes asíncrona
+navigation-compose = "2.9.1"           # Navegación entre pantallas
+security-crypto = "1.1.0-alpha06"      # Cifrado del token en Android
+material3-adaptive = "1.0.0"           # Layouts responsivos (móvil/tablet/escritorio)
+
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
+androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
+compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
+kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+# Nuevas Libraries
+# --- NUEVO: Ktor (cliente HTTP) ---
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+# Plugin para enviar/recibir JSON automáticamente
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+# Convierte objetos Kotlin a/desde JSON usando kotlinx.serialization
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+# Plugin para añadir el token Bearer en cada petición automáticamente
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+# Ver en la consola las peticiones y respuestas HTTP (muy útil para depurar)
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+# Motor HTTP para Android y Desktop (JVM)
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+# Motor HTTP para JavaScript (navegador/Web)
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+
+# --- NUEVO: Koin (inyección de dependencias) ---
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+# Integración de Koin con Compose (para usar koinViewModel() en los Composables)
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+# Permite obtener ViewModels inyectados por Koin desde la navegación
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
+
+# --- NUEVO: Serialización y utilidades ---
+# Convierte clases Kotlin (@Serializable) a JSON y viceversa
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+# Tipos de fecha/hora que funcionan en todas las plataformas
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+# Almacenamiento clave-valor multiplataforma (para guardar el JWT)
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+# Sin coroutines integradas en settings (versión base)
+multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+
+# --- NUEVO: Imágenes ---
+# Librería para cargar imágenes desde URLs de forma asíncrona
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+# Usa Ktor como cliente HTTP interno para descargar las imágenes
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+
+# --- NUEVO: Navegación ---
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+
+# --- NUEVO: Seguridad (solo Android) ---
+# Cifra el token JWT usando AES-256 en Android (EncryptedSharedPreferences)
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
+
+# --- NUEVO: Layouts responsivos ---
+# Adapta la UI automáticamente según el tamaño de pantalla (móvil, tablet, escritorio)
+material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "material3-adaptive" }
+material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "material3-adaptive" }
+material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
+# Iconos adicionales de Material (flechas, favoritos, etc.)
+material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "composeMultiplatform" }
+
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+
+# --- Nuevos Plugins ---
+# Necesario para que Kotlin pueda serializar/deserializar clases con @Serializable
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
