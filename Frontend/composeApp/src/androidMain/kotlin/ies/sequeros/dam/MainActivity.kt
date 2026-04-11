@@ -7,9 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.russhwolf.settings.SharedPreferencesSettings
+import com.russhwolf.settings.Settings
 import ies.sequeros.dam.di.appModule
 import org.koin.compose.KoinApplication
-import org.koin.core.KoinApplication
 import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 modules(
                     appModule,
                     module {
-                        single {
+                        single<Settings> {
                             SharedPreferencesSettings(
                                 getSharedPreferences("pawp_prefs", MODE_PRIVATE)
                             )
