@@ -53,8 +53,7 @@ fun PawpCard(
                 ) {
                     Text(
                         text  = "PAWP",
-                        // displaySmall → Poppins SemiBold 32sp (definido en Theme.kt)
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineLarge,
                         color = Color.White
                     )
                     Text(
