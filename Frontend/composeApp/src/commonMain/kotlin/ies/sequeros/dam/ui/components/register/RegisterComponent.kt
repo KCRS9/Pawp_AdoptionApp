@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -176,25 +178,23 @@ fun RegisterComponent(
                 }
 
                 Button(
-                    onClick = onRegisterClick,
+                    onClick  = onRegisterClick,
                     modifier = Modifier.weight(1f),
-                    enabled = state.isValid && !state.isLoading,
-                    shape = RoundedCornerShape(8.dp),
-                    border   = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = PawpPurple)
-
-                    ) {
+                    enabled  = state.isValid && !state.isLoading,
+                    shape    = RoundedCornerShape(8.dp),
+                    colors   = ButtonDefaults.buttonColors(
+                        containerColor = PawpPurple,
+                        contentColor   = Color.White
+                    )
+                ) {
                     if (state.isLoading) {
-
                         CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier    = Modifier.size(20.dp),
+                            color       = Color.White,
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Registrarse",
-                        color = PawpPurple)
+                        Text("Registrarse")
                     }
                 }
 

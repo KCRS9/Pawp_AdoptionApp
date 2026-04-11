@@ -20,3 +20,12 @@ val PawpTextDark = Color(0xFF5F5B5B)
 
 /** Base para la transparencia de los campos de texto */
 val PawpFieldBg = Color(0xFFD8D8D8)
+
+/** Rojo para badges de notificaciones y alertas */
+val PawpAlert = Color(0xFFFF5E5E)
+
+/** Gris para iconos y labels inactivos en BottomNavigation */
+val PawpNavInactive = Color(0xFFCAC9C9)
+
+/** Gris muy claro para separadores y bordes suaves */
+val PawpSeparator = Color(0xFFD9D9D9)

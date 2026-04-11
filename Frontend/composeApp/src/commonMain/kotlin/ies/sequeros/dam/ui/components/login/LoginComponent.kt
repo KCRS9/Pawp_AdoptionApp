@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.login.LoginState
 import ies.sequeros.dam.ui.theme.PawpPurple
+import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import ies.sequeros.dam.ui.theme.PawpPurpleLight
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
@@ -53,7 +55,7 @@ fun LoginComponent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PawpPurpleLight),
+            .background(PawpPurple),
         contentAlignment = Alignment.Center
     ){
 
@@ -125,15 +127,16 @@ fun LoginComponent(
                 Spacer(Modifier.height(12.dp))
             }
 
-            Button(
+            ElevatedButton(
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = state.isValid && !state.isLoading,
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PawpPurple,
+                    containerColor = PawpPurpleDark,
                     contentColor = Color.White
-                )
+                ),
+
             ){
                 if(state.isLoading){
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
+import ies.sequeros.dam.ui.home.HomeScreen
 import ies.sequeros.dam.ui.login.LoginScreen
 import ies.sequeros.dam.ui.register.RegisterScreen
 import ies.sequeros.dam.ui.theme.PawpTheme
@@ -42,7 +43,7 @@ fun App() {
 
                 null -> {/*Un SplashScreen*/}
                 
-                true -> {}
+                true -> HomeScreen()
 
                 else -> {
                     when(authScreen){

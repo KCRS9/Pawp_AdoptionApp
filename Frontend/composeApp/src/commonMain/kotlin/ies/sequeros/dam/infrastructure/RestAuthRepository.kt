@@ -10,6 +10,7 @@ import ies.sequeros.dam.infrastructure.mappers.toDomain
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -63,13 +64,12 @@ class RestAuthRepository(
         println("LOG [RestAuthRepository]: Iniciando login para $email")
 
         val response = client.post("$baseUrl/users/login/") {
-
-            contentType(ContentType.Application.FormUrlEncoded)
-
-            setBody(Parameters.build {
-                append("username", email)   // FastAPI llama "username" al campo de identificación
-                append("password", password)
-            })
+            // Es necesario usar FormDataContent, ya que encapsula Parameters en un formato que todos los motores de Ktor entienden (JVM, JS, WasmJS).
+            setBody(FormDataContent(
+                Parameters.build {
+                    append("username", email)   // FastAPI llama "username" al campo de identificación
+                    append("password", password)
+            }))
         }
 
         if (!response.status.isSuccess()) {

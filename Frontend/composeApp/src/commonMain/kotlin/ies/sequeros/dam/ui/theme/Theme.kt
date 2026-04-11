@@ -11,8 +11,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.Typography
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import pawp_adoption.composeapp.generated.resources.Poppins_extrabold
 import pawp_adoption.composeapp.generated.resources.Res
+import pawp_adoption.composeapp.generated.resources.poppins_medium
 import pawp_adoption.composeapp.generated.resources.poppins_regular
 import pawp_adoption.composeapp.generated.resources.poppins_semibold
 
@@ -55,38 +58,61 @@ fun PawpTheme(
     darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-
     val poppins = FontFamily(
-
-        Font(Res.font.poppins_regular, FontWeight.Normal),
-        Font(Res.font.poppins_semibold, FontWeight.SemiBold)
+        Font(Res.font.poppins_regular,   FontWeight.Normal),
+        Font(Res.font.poppins_medium,    FontWeight.Medium),
+        Font(Res.font.poppins_semibold,  FontWeight.SemiBold),
+        Font(Res.font.Poppins_extrabold, FontWeight.ExtraBold)
     )
 
-    // Tipografía de Material3 con Poppins
     val typography = Typography(
-        // Títulos grandes
+        // Títulos de pantalla: "Iniciar Sesión", "Crear Cuenta" (SemiBold 32sp)
         displaySmall = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.SemiBold,
             fontSize   = TitleFontSize
         ),
-        // Texto de cuerpo principal
+        // Título de la card PAWP y encabezados destacados (ExtraBold 32sp)
+        headlineLarge = TextStyle(
+            fontFamily = poppins,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize   = TitleFontSize
+        ),
+        // Subtítulos de sección (SemiBold 17sp)
+        headlineSmall = TextStyle(
+            fontFamily = poppins,
+            fontWeight = FontWeight.SemiBold,
+            fontSize   = 17.sp
+        ),
+        // Texto de cuerpo con peso medio (Medium 16sp)
+        bodyLarge = TextStyle(
+            fontFamily = poppins,
+            fontWeight = FontWeight.Medium,
+            fontSize   = BodyFontSize
+        ),
+        // Texto de cuerpo principal (Regular 16sp)
         bodyMedium = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.Normal,
             fontSize   = BodyFontSize
         ),
-        // Labels y texto pequeño
+        // Labels y texto pequeño (Regular 14sp)
         bodySmall = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.Normal,
             fontSize   = SmallFontSize
         ),
-        // Texto de botones
+        // Texto de botones (SemiBold 16sp)
         labelLarge = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.SemiBold,
             fontSize   = BodyFontSize
+        ),
+        // Labels de BottomNavigation (Regular 12sp)
+        labelSmall = TextStyle(
+            fontFamily = poppins,
+            fontWeight = FontWeight.Normal,
+            fontSize   = 12.sp
         )
     )
 
@@ -98,7 +124,6 @@ fun PawpTheme(
         content     = content
     )
 }
-
 @Composable
 fun loginTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
     // Fondo del campo
