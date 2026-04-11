@@ -36,3 +36,15 @@ data class ErrorResponseDto(
 
     val detail: String
 )
+
+@Serializable
+data class UserProfileDto(
+    val id: String,
+    val name: String,
+    val username: String,
+    val email: String,
+    val location: String,
+    val role: String,
+    @SerialName("profile_image") val profileImage: String? = null,
+    @SerialName("shelter_id") val shelterId: String? = null
+)
