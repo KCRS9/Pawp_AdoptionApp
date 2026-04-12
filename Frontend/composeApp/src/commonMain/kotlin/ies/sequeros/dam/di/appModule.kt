@@ -45,6 +45,6 @@ val appModule = module {
 
     single { AppSettings() }
     factory { AppViewModel(get(), get(), get()) }
-    factory { LoginViewModel( get(), get()) }
+    factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get()) }
 }

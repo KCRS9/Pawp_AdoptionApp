@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.comandos.LoginCommand
 import ies.sequeros.dam.application.usecases.LoginUseCase
-import ies.sequeros.dam.ui.appsettings.UserSessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,8 +12,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
 
-    private val loginUseCase: LoginUseCase,
-    private val sessionManager: UserSessionManager
+    private val loginUseCase: LoginUseCase
+
 ): ViewModel() {
 
 //    init {
@@ -85,8 +84,6 @@ class LoginViewModel(
                         state.value.password
                     )
                 )
-
-                sessionManager.notifyLogin()
 
                 _state.update {
 

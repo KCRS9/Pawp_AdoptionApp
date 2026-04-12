@@ -32,6 +32,7 @@ data class LoginResponseDto(
 )
 
 // Respuesta de error del backend
+@Serializable
 data class ErrorResponseDto(
 
     val detail: String
@@ -41,7 +42,7 @@ data class ErrorResponseDto(
 data class UserProfileDto(
     val id: String,
     val name: String,
-    val username: String,
+    val username: String? = null,
     val email: String,
     val location: String,
     val role: String,
