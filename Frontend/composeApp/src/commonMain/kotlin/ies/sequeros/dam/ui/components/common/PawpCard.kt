@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ies.sequeros.dam.ui.theme.PawpPurple
+import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
 import pawp_adoption.composeapp.generated.resources.logo_pawp
@@ -38,7 +39,7 @@ fun PawpCard(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(16.dp))
-                .background(PawpPurple)
+                .background(PawpPurpleDark)
                 .padding(10.dp)
         ) {
             PawpCardCircles()

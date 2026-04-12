@@ -20,7 +20,7 @@ class AppViewModel(
     // Tema de la app
     val themeMode = settings.themeMode
 
-    fun setTheme(mode: ThemeMode) = settings.setThemeMode(mode)
+    fun setThemeMode(mode: ThemeMode) = settings.setThemeMode(mode)
 
     //Sesión
     val isLoggedIn = sessionManager.isLoggedIn.stateIn(
