@@ -10,12 +10,7 @@ class AnimalBase(BaseModel):
     size: str        # Ej: "Small", "Medium", "Large"
     description: str
     health: str      # Ej: "Vaccinated", "Neutered"
-<<<<<<< Updated upstream
     profile_image: Optional[str] = None # NUEVO
-=======
-    profile_image: str | None = None
-    # status y shelter NO están aquí porque no son comunes a todos los inputs
->>>>>>> Stashed changes
 
 # Clase INPUT: Lo que recibimos al Crear/Editar
 class AnimalIn(AnimalBase):

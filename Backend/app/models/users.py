@@ -6,13 +6,7 @@ class UserBase(BaseModel):
     email: str
     location: int
     role: str = "user"
-<<<<<<< Updated upstream
     profile_image: Optional[str] = None # NUEVO
-=======
-    shelter: int | None = None
-    profile_image: str | None = None
-    description: str | None = None
->>>>>>> Stashed changes
 
 #Clase IN: datos para crear un usuario
 class UserIn(UserBase):
