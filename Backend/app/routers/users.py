@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models.users import UserIn, UserOut, UserUpdate
+from app.models.users import UserIn, UserOut, UserUpdate,UserDb
 from app.database import insert_user, get_user_by_email,update_user_db
+import shutil
 from app.auth.auth import (
     get_hash_password, 
     verify_password, 
@@ -119,3 +120,28 @@ async def update_my_user(
     if success:
         return {"message": "Perfil actualizado correctamente"}
     raise HTTPException(status_code=500, detail="Error al actualizar")
+
+
+@router.post("/me/avatar")
+async def upload_avatar(
+    avatar: UploadFile = File(...),
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Definir la ruta donde se guardará
+    file_extension = avatar.filename.split(".")[-1]
+    file_name = f"avatar_{current_user.id}.{file_extension}"
+    file_path = f"app/static/images/{file_name}"
+
+    # 2. Guardar el archivo físicamente en el servidor
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(avatar.file, buffer)
+
+    # 3. Actualizar la base de datos con la URL de la imagen
+    # Guardamos la ruta relativa para que el frontend pueda acceder
+    image_url = f"/static/images/{file_name}"
+    success = update_user_db(current_user.id, {"profile_image": image_url})
+
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al actualizar la foto en la base de datos")
+
+    return {"message": "Foto de perfil actualizada", "profile_image": image_url}

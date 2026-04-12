@@ -10,7 +10,7 @@ CREATE TABLE `LOCALITY` (
 );
 
 CREATE TABLE `USER` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` char(36) NOT NULL ,
   `name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -24,20 +24,20 @@ CREATE TABLE `USER` (
 );
 
 CREATE TABLE `SHELTER` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `address` varchar(255) NOT NULL,
   `contact` varchar(100) NOT NULL,
   `website` varchar(150) NOT NULL,
   `description` text NOT NULL,
-  `admin` int NOT NULL,
+  `admin` char(36),
   `profile_image` varchar(255) NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`admin`) REFERENCES `USER`(`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `ANIMAL` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `species` varchar(100) NOT NULL,
   `breed` varchar(100) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE `ANIMAL` (
   `size` enum('small','medium','large') NOT NULL,
   `description` text,
   `status` enum('available','adopted','reserved','other') NOT NULL,
-  `shelter` int NOT NULL,
+  `shelter` char(36) NOT NULL,
   `health` text,
   `profile_image` varchar(255) NULL,
   PRIMARY KEY (`id`),
@@ -55,9 +55,9 @@ CREATE TABLE `ANIMAL` (
 CREATE TABLE `POST` (
 `id` int NOT NULL AUTO_INCREMENT,
 `photo` varchar(255) NOT NULL,
-`animal` int NOT NULL,
+`animal` char(36) NULL,
 `likes` int NOT NULL DEFAULT 0,
-`user` int NOT NULL,
+`user` char(36) NOT NULL,
 `text` text,
 `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`),
@@ -67,7 +67,7 @@ FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE SET NULL
 
 CREATE TABLE `COMMENT` (
 `id` int NOT NULL AUTO_INCREMENT,
-`user` int NOT NULL,
+`user` char(36) NOT NULL,
 `post` int NOT NULL,
 `text` text NOT NULL,
 `date` datetime NOT NULL,
@@ -78,8 +78,8 @@ FOREIGN KEY (`post`) REFERENCES `POST`(`id`) ON DELETE CASCADE
 
 CREATE TABLE `FAVORITE` (
 `id` int NOT NULL AUTO_INCREMENT,
-`user` int NOT NULL,
-`animal` int NOT NULL,
+`user` char(36) NOT NULL,
+`animal` char(36) NOT NULL,
 PRIMARY KEY (`id`),
 FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE
@@ -87,9 +87,9 @@ FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE
 
 CREATE TABLE `ADOPTION` (
 `id` int NOT NULL AUTO_INCREMENT,
-`user` int NOT NULL,
-`shelter` int NOT NULL,
-`animal` int NOT NULL,
+`user` char(36) NOT NULL,
+`shelter` char(36) NOT NULL,
+`animal` char(36) NOT NULL,
 `status` enum('pending','approved','rejected','completed') NOT NULL,
 `date` date NOT NULL,
 `time` time NOT NULL,
@@ -102,9 +102,9 @@ FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
 
 CREATE TABLE `RESERVATION` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `user` int NOT NULL,
-  `animal` int NOT NULL,
-  `shelter` int NOT NULL,
+  `user` char(36) NOT NULL,
+  `animal` char(36) NOT NULL,
+  `shelter` char(36) NOT NULL,
   `date` date NOT NULL,
   `time` time NOT NULL,
   `status` enum('pending','confirmed','cancelled','completed') NOT NULL,

@@ -18,20 +18,26 @@ db_config = {
 # USUARIOS (Tabla: USERS)
 
 def insert_user(user: UserIn) -> str:
-    """Inserta usuario y devuelve el ID autoincremental."""
+    user_id = str(uuid.uuid4()) # Generamos el UUID como texto
+    hashed_password = get_hash_password(user.password)
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO `USER` (name, email, password, role, location, description, profile_image) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO `USER` (id,name, email, password, role, location, profile_image) 
+                VALUES (?, ?, ?, ?, ?, ?,?)
             """
             values = (
-                user.name, user.email, user.password, user.role, 
-                user.location, user.description, user.profile_image
+                user_id,
+                user.name, 
+                user.email, 
+                hashed_password,
+                user.role, 
+                user.location, 
+                user.profile_image
             )
             cursor.execute(sql, values)
             conn.commit()
-            return cursor.lastrowid
+            return user_id
 
     
 def get_user_by_email(email: str) -> UserDb | None:
