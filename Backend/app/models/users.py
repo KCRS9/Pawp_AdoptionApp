@@ -4,9 +4,15 @@ from typing import Optional
 #Clase BASE: datos comunes para crear y mostrar 
 class UserBase(BaseModel):
     email: str
-    location: str
+    location: int
     role: str = "user"
+<<<<<<< Updated upstream
     profile_image: Optional[str] = None # NUEVO
+=======
+    shelter: int | None = None
+    profile_image: str | None = None
+    description: str | None = None
+>>>>>>> Stashed changes
 
 #Clase IN: datos para crear un usuario
 class UserIn(UserBase):
@@ -30,3 +36,10 @@ class UserDb(UserIn):
 class UserLogin(UserBase):
     email: str
     password: str
+
+
+class UserUpdate(BaseModel): #Para el PATCH
+    name: str | None = None
+    location: int | None = None
+    description: str | None = None
+    profile_image: str | None = None

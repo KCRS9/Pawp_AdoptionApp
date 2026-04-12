@@ -20,6 +20,60 @@ db_config = {
 def insert_user(user: UserIn) -> str:
     user_id = str(uuid.uuid4())
 
+<<<<<<< Updated upstream
+=======
+            #Devuelve el id del usuario insertado con la funcion lastrowid
+            return cursor.lastrowid 
+
+# Funcion para obtener un usuario por email
+def get_user_by_email(email: str) -> UserDb | None:
+
+    with mariadb.connect(**db_config) as conn:
+
+        with conn.cursor() as cursor:
+            # No usamos * por si en el futuro añadimos mas columnas
+            sql = "SELECT id, name, email, password, role, location FROM USER WHERE email = ?"
+        
+            cursor.execute(sql, (email,))
+        
+            result = cursor.fetchone()
+
+            # Si encuentra el usuario devuelve un objeto UserDb
+            if result:
+                return UserDb(
+                    id=result[0],
+                    name=result[1],
+                    email=result[2],
+                    password=result[3],
+                    role=result[4],
+                    location=result[5]
+                )
+    # Si no encuentra el usuario devuelve None
+    return None
+
+
+def update_user_db(user_id: int, data: dict) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            
+            parts = [f"{key} = ?" for key in data.keys()]
+            sql = f"UPDATE `USER` SET {', '.join(parts)} WHERE id = ?"
+            
+            values = list(data.values())
+            values.append(user_id)
+            
+            cursor.execute(sql, tuple(values))
+            conn.commit()
+            return cursor.rowcount > 0
+
+
+
+def insert_animal(animal: AnimalIn, shelter: int) -> int:
+    """
+    Inserta un animal vinculado a una protectora (shelter_id).
+    Por defecto status será 'Available' (si así está definido en BD) o lo pasamos explícito.
+    """
+>>>>>>> Stashed changes
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
@@ -254,3 +308,11 @@ def update_adoption_db(adoption_id: int, new_status) -> bool:
             cursor.execute(sql, (new_status, adoption_id))
             conn.commit()
             return cursor.rowcount > 0
+        
+
+
+def get_all_localities():
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, name FROM LOCALITY ORDER BY name ASC")
+            return [{"id": r[0], "name": r[1]} for r in cursor.fetchall()]

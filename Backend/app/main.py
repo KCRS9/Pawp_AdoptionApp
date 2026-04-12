@@ -5,6 +5,7 @@ from app.routers import shelters
 from app.routers import adoptions
 from app.routers import animals
 from app.routers import uploads
+from app.routers import localities
 import os
 from fastapi.staticfiles import StaticFiles
 
@@ -14,6 +15,7 @@ app.include_router(shelters.router)
 app.include_router(adoptions.router)
 app.include_router(animals.router)
 app.include_router(uploads.router)
+app.include_router(localities.router)
 
 
 # Al principio, después de crear app = FastAPI()

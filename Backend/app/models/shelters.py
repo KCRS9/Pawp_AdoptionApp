@@ -10,6 +10,7 @@ class ShelterBase(BaseModel):
     contact: str
     website: Optional[str] = None
     description: Optional[str] = None
+    profile_image: str | None = None
 
 # -----------------------------------------------------------
 # Clase INPUT: Para crear/editar
