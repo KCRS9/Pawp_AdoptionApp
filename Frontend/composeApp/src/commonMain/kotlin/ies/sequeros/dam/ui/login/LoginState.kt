@@ -2,8 +2,8 @@ package ies.sequeros.dam.ui.login
 
 data class LoginState(
 
-    val email: String = "",
-    val password: String = "",
+    val email: String = "admin@admin.com",
+    val password: String = "12345678",
 
     val isLoading: Boolean = false,
     val isLoginSuccess: Boolean = false,

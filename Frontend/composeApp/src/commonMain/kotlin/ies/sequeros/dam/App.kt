@@ -3,6 +3,7 @@ package ies.sequeros.dam
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
+import ies.sequeros.dam.ui.appsettings.ThemeMode
 import ies.sequeros.dam.ui.home.HomeScreen
 import ies.sequeros.dam.ui.login.LoginScreen
 import ies.sequeros.dam.ui.register.RegisterScreen
@@ -33,10 +35,21 @@ fun App() {
 
     val appViewModel: AppViewModel = koinViewModel()
     val isLoggedIn by appViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val themeMode by appViewModel.themeMode.collectAsStateWithLifecycle()
 
     var authScreen by remember { mutableStateOf("login") }
 
-    PawpTheme {
+    // isSystemInDarkTheme() lee la preferencia del sistema operativo
+    val systemIsDark = isSystemInDarkTheme()
+
+    val isDark = when (themeMode){
+
+        ThemeMode.SYSTEM -> systemIsDark
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+
+    PawpTheme (darkTheme = isDark ) {
     // MaterialTheme {
         Surface {
             when (isLoggedIn){

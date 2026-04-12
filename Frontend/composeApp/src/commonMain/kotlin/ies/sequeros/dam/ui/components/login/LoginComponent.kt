@@ -55,7 +55,7 @@ fun LoginComponent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PawpPurple),
+            .background(PawpPurpleDark),
         contentAlignment = Alignment.Center
     ){
 

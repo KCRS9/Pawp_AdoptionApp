@@ -17,7 +17,7 @@ class UserIn(UserBase):
 class UserOut(UserBase):
     id: str
     name: str
-    username: str
+    username: Optional[str] = None
     email: str
     shelter_id: Optional[str] = None
 

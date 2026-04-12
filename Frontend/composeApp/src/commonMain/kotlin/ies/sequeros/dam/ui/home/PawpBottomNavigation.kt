@@ -54,8 +54,8 @@ fun PawpBottomNavigation(
             .padding(top = 28.dp)
     ){
         NavigationBar(
-            // containerColor = MaterialTheme.colorScheme.surface,
-            containerColor = Color.Transparent,
+            containerColor = MaterialTheme.colorScheme.surface,
+            //containerColor = Color.Transparent,
             tonalElevation = 4.dp
         ) {
 
