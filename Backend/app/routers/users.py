@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from app.models.users import UserIn, UserOut, UserUpdate,UserDb
-from app.database import insert_user, get_user_by_email,update_user_db
+from app.database import insert_user, get_user_by_email,update_user_db, update_user_me
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -44,12 +44,9 @@ async def create_user(userIn: UserIn):
             detail = "The user already exists"
         )
     
-    # 2. Hasheo la contraseña
-    hashed_pas = get_hash_password(userIn.password)
-    userIn.password = hashed_pas
 
     try:
-        # 3. Inserto el usuario
+        # 4. Inserto el usuario
         user_id = insert_user(userIn)
         return {"id": user_id, "message": "User created successfully"}
 
@@ -145,3 +142,21 @@ async def upload_avatar(
         raise HTTPException(status_code=500, detail="Error al actualizar la foto en la base de datos")
 
     return {"message": "Foto de perfil actualizada", "profile_image": image_url}
+
+
+
+@router.patch("/me")
+def patch_user_me(user_data: UserUpdate, current_user: UserDb = Depends(get_current_user)):
+    # 1. Convertimos lo que llega en un diccionario y quitamos lo que sea "None"
+    datos_a_cambiar = user_data.model_dump(exclude_unset=True)
+
+    if not datos_a_cambiar:
+        raise HTTPException(status_code=400, detail="No has enviado nada para cambiar")
+
+    # 2. Llamamos a la base de datos
+    actualizado = update_user_me(current_user.id, datos_a_cambiar)
+    
+    if actualizado:
+        return {"message": "Perfil actualizado correctamente"}
+    
+    raise HTTPException(status_code=500, detail="Error al actualizar")

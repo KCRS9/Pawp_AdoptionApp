@@ -33,7 +33,7 @@ class UserLogin(UserBase):
 
 
 class UserUpdate(BaseModel): #Para el PATCH
-    name: str | None = None
-    location: int | None = None
-    description: str | None = None
+    name: Optional[str] = None
+    location: Optional[int] = None
+    description: Optional[str] = None
     profile_image: str | None = None

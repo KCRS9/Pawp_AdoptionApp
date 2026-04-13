@@ -23,8 +23,8 @@ def insert_user(user: UserIn) -> str:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO `USER` (id,name, email, password, role, location, profile_image) 
-                VALUES (?, ?, ?, ?, ?, ?,?)
+                INSERT INTO `USERS` (id,name, email, password, role, location, description, profile_image) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
                 user_id,
@@ -32,7 +32,8 @@ def insert_user(user: UserIn) -> str:
                 user.email, 
                 hashed_password,
                 user.role, 
-                user.location, 
+                user.location,
+                None, 
                 user.profile_image
             )
             cursor.execute(sql, values)
@@ -44,15 +45,21 @@ def get_user_by_email(email: str) -> UserDb | None:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             # Añadimos los campos nuevos a la consulta
-            sql = "SELECT id, name, email, password, role, location, description, profile_image FROM `USER` WHERE email = ?"
+            sql = "SELECT id, name, email, password, role, location, description, profile_image FROM `USERS` WHERE email = ?"
             cursor.execute(sql, (email,))
             result = cursor.fetchone()
 
             if result:
                 return UserDb(
-                    id=result[0], name=result[1], email=result[2],
-                    password=result[3], role=result[4], location=result[5],
-                    description=result[6], profile_image=result[7]
+                    id=result[0], 
+                    name=result[1], 
+                    email=result[2],
+                    password=result[3], 
+                    role=result[4], 
+                    location=result[5],
+                    description=result[6], 
+                    profile_image=result[7],
+                    shelter_id =None
                 )
     return None
 
@@ -62,7 +69,7 @@ def update_user_db(user_id: int, data: dict) -> bool:
         with conn.cursor() as cursor:
             
             parts = [f"{key} = ?" for key in data.keys()]
-            sql = f"UPDATE `USER` SET {', '.join(parts)} WHERE id = ?"
+            sql = f"UPDATE `USERS` SET {', '.join(parts)} WHERE id = ?"
             
             values = list(data.values())
             values.append(user_id)
@@ -165,7 +172,7 @@ def update_user_shelter_link(user_id: str, shelter_id: str) -> bool:
     """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "UPDATE USER SET shelter_id = ? WHERE id = ?"
+            sql = "UPDATE USERS SET shelter_id = ? WHERE id = ?"
             cursor.execute(sql, (shelter_id, user_id))
             conn.commit()
             return cursor.rowcount > 0
@@ -265,3 +272,22 @@ def get_all_localities():
         with conn.cursor() as cursor:
             cursor.execute("SELECT id, name FROM LOCALITY ORDER BY name ASC")
             return [{"id": r[0], "name": r[1]} for r in cursor.fetchall()]
+        
+
+
+def update_user_me(user_id: str, update_data: dict):
+    # Se crea la parte de: "name = ?, location = ?"
+    partes_sql = [f"{campo} = ?" for campo in update_data.keys()]
+    query_string = ", ".join(partes_sql)
+    
+    # Los valores para los '?' + el ID para el WHERE
+    valores = list(update_data.values())
+    valores.append(user_id)
+
+    sql = f"UPDATE USERS SET {query_string} WHERE id = ?"
+
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(sql, valores)
+            conn.commit()
+            return cursor.rowcount > 0

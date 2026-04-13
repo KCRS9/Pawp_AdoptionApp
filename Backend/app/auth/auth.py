@@ -1,5 +1,6 @@
 import bcrypt
 
+from fastapi import HTTPException, status
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -29,13 +30,13 @@ def get_hash_password(plain_pw: str) -> str:
     # Codifica la contraseña a bytes
     pw_bytes = plain_pw.encode("utf-8")
     
-    # Genera una sal
+    
     salt = bcrypt.gensalt()
     
     # Hashea la contraseña
     hashed_pw = bcrypt.hashpw(password=pw_bytes, salt=salt)
     
-    return hashed_pw
+    return hashed_pw.decode("utf-8")
 
 
 # Funcion para verificar la contraseña
@@ -44,12 +45,14 @@ def verify_password(plain_pw, hashed_pw) -> bool:
     # Codifica la contraseña a bytes
     plain_pw_bytes = plain_pw.encode("utf-8")
     
-    # Codifica el hash a bytes
-    hashed_pw_bytes = hashed_pw.encode("utf-8")
-    
-    # Verifica la contraseña y devuelve True si es correcta
-    # bcrypt.checkpw() es una funcion que verifica si la contraseña es correcta
-    return bcrypt.checkpw(password = plain_pw_bytes, hashed_password=hashed_pw_bytes)
+    # El hash que viene de la base de datos DEBE ser bytes para bcrypt
+    # Si viene como string (que es lo normal), lo pasamos a bytes
+    if isinstance(hashed_pw, str):
+        hashed_pw_bytes = hashed_pw.encode("utf-8")
+    else:
+        hashed_pw_bytes = hashed_pw
+        
+    return bcrypt.checkpw(plain_pw_bytes, hashed_pw_bytes)
 
 
 # Funcion para crear el token

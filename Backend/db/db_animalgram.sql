@@ -9,7 +9,7 @@ CREATE TABLE `LOCALITY` (
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `USER` (
+CREATE TABLE `USERS` (
   `id` char(36) NOT NULL ,
   `name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
@@ -27,13 +27,15 @@ CREATE TABLE `SHELTER` (
   `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `address` varchar(255) NOT NULL,
+  `location` int NOT NULL,
   `contact` varchar(100) NOT NULL,
   `website` varchar(150) NOT NULL,
   `description` text NOT NULL,
   `admin` char(36),
   `profile_image` varchar(255) NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`admin`) REFERENCES `USER`(`id`) ON DELETE CASCADE
+  FOREIGN KEY (`admin`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`location`) REFERENCES `LOCALITY`(`id`)
 );
 
 CREATE TABLE `ANIMAL` (
@@ -61,7 +63,7 @@ CREATE TABLE `POST` (
 `text` text,
 `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`),
-FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
+FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE SET NULL
 );
 
@@ -72,7 +74,7 @@ CREATE TABLE `COMMENT` (
 `text` text NOT NULL,
 `date` datetime NOT NULL,
 PRIMARY KEY (`id`),
-FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
+FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`post`) REFERENCES `POST`(`id`) ON DELETE CASCADE
 );
 
@@ -81,7 +83,7 @@ CREATE TABLE `FAVORITE` (
 `user` char(36) NOT NULL,
 `animal` char(36) NOT NULL,
 PRIMARY KEY (`id`),
-FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
+FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE
 );
 
@@ -95,7 +97,7 @@ CREATE TABLE `ADOPTION` (
 `time` time NOT NULL,
 `text` text NOT NULL,
 PRIMARY KEY (`id`),
-FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
+FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
 );
@@ -110,7 +112,7 @@ CREATE TABLE `RESERVATION` (
   `status` enum('pending','confirmed','cancelled','completed') NOT NULL,
   `text` text NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`user`) REFERENCES `USER`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
 );
