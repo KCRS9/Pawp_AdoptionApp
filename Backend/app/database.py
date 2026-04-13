@@ -18,81 +18,92 @@ db_config = {
 # USUARIOS (Tabla: USERS)
 
 def insert_user(user: UserIn) -> str:
-    user_id = str(uuid.uuid4())
-
+    user_id = str(uuid.uuid4()) # Generamos el UUID como texto
+    hashed_password = get_hash_password(user.password)
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO USERS (id, name, email, password, role, location, profile_image) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO `USERS` (id,name, email, password, role, location, description, profile_image) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
-                user_id, 
+                user_id,
                 user.name, 
                 user.email, 
-                user.password, 
+                hashed_password,
                 user.role, 
                 user.location,
+                None, 
                 user.profile_image
             )
-            
             cursor.execute(sql, values)
             conn.commit()
-            
             return user_id
 
+    
 def get_user_by_email(email: str) -> UserDb | None:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = """
-                SELECT id, name, email, password, role, location, profile_image, shelter_id 
-                FROM USERS 
-                WHERE email = ?
-            """
+            # Añadimos los campos nuevos a la consulta
+            sql = "SELECT id, name, email, password, role, location, description, profile_image FROM `USERS` WHERE email = ?"
             cursor.execute(sql, (email,))
-            row = cursor.fetchone()
-            
-            if row:
+            result = cursor.fetchone()
+
+            if result:
                 return UserDb(
-                    id=str(row[0]),
-                    name=row[1],
-                    email=row[2],
-                    password=row[3],
-                    role=row[4],
-                    location=row[5],
-                    profile_image=row[6],
-                    shelter_id=str(row[7]) if row[7] else None
+                    id=result[0], 
+                    name=result[1], 
+                    email=result[2],
+                    password=result[3], 
+                    role=result[4], 
+                    location=result[5],
+                    description=result[6], 
+                    profile_image=result[7],
+                    shelter_id =None
                 )
     return None
 
-# OPERACIONES DE ANIMALES
 
-def insert_animal(animal: AnimalIn, shelter_id: str) -> str:
-    
-    animal_id = str(uuid.uuid4())
+def update_user_db(user_id: int, data: dict) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            
+            parts = [f"{key} = ?" for key in data.keys()]
+            sql = f"UPDATE `USERS` SET {', '.join(parts)} WHERE id = ?"
+            
+            values = list(data.values())
+            values.append(user_id)
+            
+            cursor.execute(sql, tuple(values))
+            conn.commit()
+            return cursor.rowcount > 0
+
+
+
+def insert_animal(animal: AnimalIn, shelter: int) -> int:
+    """
+    Inserta un animal vinculado a una protectora (shelter_id).
+    Por defecto status será 'Available' (si así está definido en BD) o lo pasamos explícito.
+    """
 
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
+            # Corregido: Usamos los campos reales de la tabla ANIMAL
             sql = """
-                INSERT INTO ANIMAL (id, name, species, breed, age, size, description, health, shelter_id, status, profile_image)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Available', ?)
+                INSERT INTO ANIMAL (name, species, breed, age, size, description, status, shelter, health, profile_image) 
+                VALUES (?, ?, ?, ?, ?, ?, 'available', ?, ?, ?)
             """
-            values = (
-                animal_id,
-                animal.name, animal.species, animal.breed, animal.age, 
-                animal.size, animal.description, animal.health, 
-                shelter_id,
-                animal.profile_image
-            )
+            values = (animal.name, animal.species, animal.breed, animal.age, 
+                      animal.size, animal.description, shelter, animal.health, animal.profile_image)
             cursor.execute(sql, values)
             conn.commit()
-            return animal_id
+            return cursor.lastrowid
+
 
 def get_animal_by_id(id: str) -> AnimalDb | None:
-    """ Recupera un animal por su ID string (UUID). """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter FROM ANIMAL WHERE id = ?"
+            sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter, profile_image FROM ANIMAL WHERE id = ?"
             cursor.execute(sql, (id,))
             row = cursor.fetchone()
             
@@ -100,7 +111,7 @@ def get_animal_by_id(id: str) -> AnimalDb | None:
                 return AnimalDb(
                     id=row[0], name=row[1], species=row[2], breed=row[3],
                     age=row[4], size=row[5], description=row[6], health=row[7],
-                    status=row[8], shelter=row[9]
+                    status=row[8], shelter=row[9], profile_image=row[10]
                 )
             return None
 
@@ -136,7 +147,6 @@ def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
     """
     Genera UUID, inserta la protectora y devuelve el ID.
     """
-    shelter_id = str(uuid.uuid4())
 
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
@@ -250,7 +260,34 @@ def get_adoption_by_id(adoption_id: int):
 def update_adoption_db(adoption_id: int, new_status) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "UPDATE ADOPTION SET status = ?, WHERE id = ?"
+            sql = "UPDATE ADOPTION SET status = ? WHERE id = ?"
             cursor.execute(sql, (new_status, adoption_id))
+            conn.commit()
+            return cursor.rowcount > 0
+        
+
+
+def get_all_localities():
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, name FROM LOCALITY ORDER BY name ASC")
+            return [{"id": r[0], "name": r[1]} for r in cursor.fetchall()]
+        
+
+
+def update_user_me(user_id: str, update_data: dict):
+    # Se crea la parte de: "name = ?, location = ?"
+    partes_sql = [f"{campo} = ?" for campo in update_data.keys()]
+    query_string = ", ".join(partes_sql)
+    
+    # Los valores para los '?' + el ID para el WHERE
+    valores = list(update_data.values())
+    valores.append(user_id)
+
+    sql = f"UPDATE USERS SET {query_string} WHERE id = ?"
+
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(sql, valores)
             conn.commit()
             return cursor.rowcount > 0

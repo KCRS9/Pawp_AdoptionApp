@@ -4,7 +4,7 @@ from typing import Optional
 #Clase BASE: datos comunes para crear y mostrar 
 class UserBase(BaseModel):
     email: str
-    location: str
+    location: int
     role: str = "user"
     profile_image: Optional[str] = None # NUEVO
 
@@ -30,3 +30,10 @@ class UserDb(UserIn):
 class UserLogin(UserBase):
     email: str
     password: str
+
+
+class UserUpdate(BaseModel): #Para el PATCH
+    name: Optional[str] = None
+    location: Optional[int] = None
+    description: Optional[str] = None
+    profile_image: str | None = None
