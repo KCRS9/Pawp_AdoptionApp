@@ -8,7 +8,7 @@ fun RegisterResponseDto.toDomain(
 
     name: String,
     email: String,
-    location: String,
+    location: Int,
     role: String
 ): User{
 

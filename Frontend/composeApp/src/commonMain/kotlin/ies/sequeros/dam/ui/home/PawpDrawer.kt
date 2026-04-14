@@ -98,7 +98,7 @@ fun PawpDrawer(
                 onClick = onMyAdoptionsClick
             )
 
-            // PROTECTORAS
+            // PROTECTORAS Y ADMINISTRADORES
             if(currentUser?.role == "shelter" || currentUser?.role == "admin") {
 
                 HorizontalDivider(horizontalDivider)
