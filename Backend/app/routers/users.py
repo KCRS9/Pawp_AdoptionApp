@@ -46,7 +46,7 @@ async def create_user(userIn: UserIn):
     
 
     try:
-        # 4. Inserto el usuario
+        # 2. Inserto el usuario
         user_id = insert_user(userIn)
         return {"id": user_id, "message": "User created successfully"}
 

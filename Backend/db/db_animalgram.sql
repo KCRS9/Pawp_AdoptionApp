@@ -10,7 +10,7 @@ CREATE TABLE `LOCALITY` (
 );
 
 CREATE TABLE `USERS` (
-  `id` char(36) NOT NULL ,
+  `id` VARCHAR(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -24,14 +24,14 @@ CREATE TABLE `USERS` (
 );
 
 CREATE TABLE `SHELTER` (
-  `id` char(36) NOT NULL,
+  `id` VARCHAR(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   `address` varchar(255) NOT NULL,
   `location` int NOT NULL,
   `contact` varchar(100) NOT NULL,
   `website` varchar(150) NOT NULL,
   `description` text NOT NULL,
-  `admin` char(36),
+  `admin`  varchar(100) NOT NULL,
   `profile_image` varchar(255) NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`admin`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
@@ -39,7 +39,7 @@ CREATE TABLE `SHELTER` (
 );
 
 CREATE TABLE `ANIMAL` (
-  `id` char(36) NOT NULL,
+  `id` VARCHAR(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   `species` varchar(100) NOT NULL,
   `breed` varchar(100) NOT NULL,
