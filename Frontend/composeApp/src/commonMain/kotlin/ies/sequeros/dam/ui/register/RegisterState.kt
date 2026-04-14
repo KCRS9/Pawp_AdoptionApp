@@ -1,11 +1,18 @@
 package ies.sequeros.dam.ui.register
 
+import ies.sequeros.dam.domain.models.Locality
+
 data class RegisterState(
     val name: String = "",
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    val location: String = "",
+
+    //Listar localidades
+    val locationId: Int? = null,
+    val locationName: String = "",
+    val localities: List<Locality> = emptyList(),
+    val isLoadingLocalities: Boolean = false,
 
     val isLoading: Boolean = false,
     val isRegisterSuccess: Boolean = false,

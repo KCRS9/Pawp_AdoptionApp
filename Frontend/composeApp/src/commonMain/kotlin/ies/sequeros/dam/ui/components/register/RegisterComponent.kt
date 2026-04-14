@@ -25,10 +25,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.WhitePoint
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -36,11 +39,17 @@ import androidx.compose.ui.unit.dp
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.register.RegisterState
 import ies.sequeros.dam.ui.theme.PawpPurple
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
+import ies.sequeros.dam.domain.models.Locality
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
 import pawp_adoption.composeapp.generated.resources.logo_pawp
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterComponent(
     state: RegisterState,
@@ -48,10 +57,12 @@ fun RegisterComponent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmPasswordChange: (String) -> Unit,
-    onLocationChange: (String) -> Unit,
+    onLocationSelect: (id: Int, name: String) -> Unit,
     onRegisterClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+
+    var locationExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -137,15 +148,37 @@ fun RegisterComponent(
             Spacer(Modifier.height(8.dp))
 
             // Ubicación
-            OutlinedTextField(
-                value = state.location,
-                onValueChange = onLocationChange,
-                label = { Text("Ubicación") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.locationError != null,
-                supportingText = { state.locationError?.let { Text(it) } },
-                singleLine = true
-            )
+            ExposedDropdownMenuBox(
+                expanded = locationExpanded,
+                onExpandedChange = { locationExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value          = state.locationName,
+                    onValueChange  = {},
+                    readOnly       = true,
+                    label          = { Text("Provincia") },
+                    trailingIcon   = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded) },
+                    modifier       = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                    isError        = state.locationError != null,
+                    supportingText = { state.locationError?.let { Text(it) } }
+                )
+                ExposedDropdownMenu(
+                    expanded         = locationExpanded,
+                    onDismissRequest = { locationExpanded = false }
+                ) {
+                    state.localities.forEach { locality ->
+                        DropdownMenuItem(
+                            text    = { Text(locality.name) },
+                            onClick = {
+                                onLocationSelect(locality.id, locality.name)
+                                locationExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             Spacer(Modifier.height(24.dp))
 
