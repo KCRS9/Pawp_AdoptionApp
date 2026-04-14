@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.star
 import ies.sequeros.dam.domain.models.User
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
+import ies.sequeros.dam.ui.toRoleLabel
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
 import pawp_adoption.composeapp.generated.resources.shelter_avatar
@@ -69,7 +70,9 @@ fun PawpDrawer(
     var settingsExpanded by remember { mutableStateOf(false) }
     val horizontalDivider = Modifier.padding(vertical = 8.dp)
 
-    ModalDrawerSheet {
+    ModalDrawerSheet(
+        drawerContainerColor = MaterialTheme.colorScheme.surface
+    ) {
 
         Column(
             modifier = Modifier
@@ -96,7 +99,7 @@ fun PawpDrawer(
             )
 
             // PROTECTORAS
-            if(currentUser?.role == "shelter"){
+            if(currentUser?.role == "shelter" || currentUser?.role == "admin") {
 
                 HorizontalDivider(horizontalDivider)
                 DrawerSectionLabel(text = "Protectora")
@@ -210,7 +213,7 @@ private fun DrawerHeader(currentUser: User?){
                 Spacer(Modifier.height(2.dp))
 
                 Text(
-                    text = currentUser?.role?.replaceFirstChar { it.uppercase() } ?: "",
+                    text = currentUser?.role?.toRoleLabel() ?: "",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.75f)
                 )
