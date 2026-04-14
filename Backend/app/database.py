@@ -148,15 +148,19 @@ def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
     Genera UUID, inserta la protectora y devuelve el ID.
     """
 
+    new_id = str(uuid.uuid4())
+
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO SHELTER (name, address, contact, website, description, admin)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO SHELTER (id, name, address, location, contact, website, description, admin)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
+                new_id,
                 shelter.name,
                 shelter.address,
+                shelter.location,
                 shelter.contact,
                 shelter.website,
                 shelter.description,
@@ -164,7 +168,7 @@ def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
             )
             cursor.execute(sql, values)
             conn.commit()
-            return cursor.lastrowid
+            return new_id
 
 def update_user_shelter_link(user_id: str, shelter_id: str) -> bool:
     """

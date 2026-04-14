@@ -16,13 +16,14 @@ class ShelterBase(BaseModel):
 # Clase INPUT: Para crear/editar
 # -----------------------------------------------------------
 class ShelterIn(ShelterBase):
-    pass
+    location: int
 
 # -----------------------------------------------------------
 # Clase OUTPUT: Para devolver al frontend
 # -----------------------------------------------------------
 class ShelterOut(ShelterBase):
     id: int            # UUID
+    location: int
     profile_image: Optional[str] = None
 
 # -----------------------------------------------------------
