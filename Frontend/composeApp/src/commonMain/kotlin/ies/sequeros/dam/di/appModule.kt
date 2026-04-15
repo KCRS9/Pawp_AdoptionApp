@@ -1,9 +1,13 @@
 package ies.sequeros.dam.di
 
+import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
+import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
+import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
+import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
 import ies.sequeros.dam.domain.repositories.IUserRepository
@@ -47,6 +51,10 @@ val appModule = module {
     factory { RegisterUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { GetLocalitiesUseCase(get()) }
+    factory { UpdateProfileUseCase(get()) }
+    factory { UpdateAvatarUseCase(get()) }
+    factory { ChangePasswordUseCase(get()) }
+    factory { ChangeEmailUseCase(get()) }
 
     // --- Presentación ---
     single { AppSettings() }
