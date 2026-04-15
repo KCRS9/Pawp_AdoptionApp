@@ -145,18 +145,18 @@ async def upload_avatar(
 
 
 
-@router.patch("/me")
-def patch_user_me(user_data: UserUpdate, current_user: UserDb = Depends(get_current_user)):
+#@router.patch("/me")
+#def patch_user_me(user_data: UserUpdate, current_user: UserDb = Depends(get_current_user)):
     # 1. Convertimos lo que llega en un diccionario y quitamos lo que sea "None"
-    datos_a_cambiar = user_data.model_dump(exclude_unset=True)
+    #datos_a_cambiar = user_data.model_dump(exclude_unset=True)
 
-    if not datos_a_cambiar:
-        raise HTTPException(status_code=400, detail="No has enviado nada para cambiar")
+    #if not datos_a_cambiar:
+        #raise HTTPException(status_code=400, detail="No has enviado nada para cambiar")
 
     # 2. Llamamos a la base de datos
-    actualizado = update_user_me(current_user.id, datos_a_cambiar)
+    #actualizado = update_user_me(current_user.id, datos_a_cambiar)
     
-    if actualizado:
-        return {"message": "Perfil actualizado correctamente"}
+    #if actualizado:
+        #return {"message": "Perfil actualizado correctamente"}
     
-    raise HTTPException(status_code=500, detail="Error al actualizar")
+    #raise HTTPException(status_code=500, detail="Error al actualizar")#

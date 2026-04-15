@@ -20,6 +20,9 @@ class UserOut(UserBase):
     username: Optional[str] = None
     email: str
     shelter_id: Optional[str] = None
+    description: Optional[str] = None
+    location: int
+    role: str
 
 #Clase DB: Lo que guardamos en la base de datos
 class UserDb(UserIn):

@@ -10,13 +10,18 @@ class ShelterBase(BaseModel):
     contact: str
     website: Optional[str] = None
     description: Optional[str] = None
-    profile_image: str | None = None
+    profile_image: Optional[str] = None
 
 # -----------------------------------------------------------
 # Clase INPUT: Para crear/editar
 # -----------------------------------------------------------
-class ShelterIn(ShelterBase):
+class ShelterIn(BaseModel):
+    name: str
     location: int
+    description: str
+    phone: str      
+    email: str       
+    user_id: str
 
 # -----------------------------------------------------------
 # Clase OUTPUT: Para devolver al frontend
