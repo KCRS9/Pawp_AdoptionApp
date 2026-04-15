@@ -3,6 +3,7 @@ package ies.sequeros.dam.ui.appsettings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
+import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -13,7 +14,8 @@ class AppViewModel(
 
     private val settings: AppSettings,
     private val sessionManager: UserSessionManager,
-    private val getCurrentUser: GetCurrentUserUseCase
+    private val getCurrentUser: GetCurrentUserUseCase,
+    private val getLocalities: GetLocalitiesUseCase
 
 ): ViewModel() {
 
@@ -41,7 +43,18 @@ class AppViewModel(
             try {
 
                 val user = getCurrentUser()
-                settings.saveUserProfile(user)
+
+                //Traemos el nombre de la localidad
+                val locationName = try{
+
+                    getLocalities().find { it.id == user.location }?.name
+
+                }catch (e: Exception){
+
+                    println("LOG[AppViewModel]: Error al traer el nombre de la localidad -> ${e.message}")
+                }
+
+                settings.saveUserProfile(user.copy(locationName = locationName.toString()))
 
             }catch (e: Exception){
 
@@ -49,6 +62,9 @@ class AppViewModel(
             }
         }
     }
+
+    // Función para recargar el usuario
+    fun refreshCurrentUser() = fetchCurrentUser()
     fun notifyLogin() {
 
         sessionManager.notifyLogin()

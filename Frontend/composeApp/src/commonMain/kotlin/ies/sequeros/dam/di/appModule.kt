@@ -50,7 +50,7 @@ val appModule = module {
 
     // --- Presentación ---
     single { AppSettings() }
-    factory { AppViewModel(get(), get(), get()) }
+    factory { AppViewModel(get(), get(), get(), get()) }
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
 }
