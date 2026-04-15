@@ -19,6 +19,8 @@ import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.home.dialog.ThemeDialog
 import ies.sequeros.dam.ui.inicio.InicioScreen
 import ies.sequeros.dam.ui.mensajes.MensajesScreen
+import ies.sequeros.dam.ui.profile.ProfileScreen
+
 import ies.sequeros.dam.ui.protectoras.ProtectorasScreen
 import ies.sequeros.dam.ui.social.SocialScreen
 import kotlinx.coroutines.launch
@@ -31,6 +33,11 @@ enum class HomeTab {
     PROTECTORAS
 }
 
+enum class HomeDestination {
+    TABS,
+    PROFILE
+}
+
 @Composable
 fun HomeScreen() {
 
@@ -40,6 +47,7 @@ fun HomeScreen() {
 
     var selectedTab     by remember { mutableStateOf(HomeTab.INICIO) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var homeDestination by remember { mutableStateOf(HomeDestination.TABS) }
 
     // DrawerState controla si el panel lateral está abierto o cerrado
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -62,13 +70,16 @@ fun HomeScreen() {
         drawerState   = drawerState,
         drawerContent = {
             PawpDrawer(
-                currentUser           = currentUser,
-                onMyProfileClick      = { scope.launch { drawerState.close() } },
-                onMyAdoptionsClick    = { scope.launch { drawerState.close() } },
-                onMyAnimalsClick      = { scope.launch { drawerState.close() } },
+                currentUser = currentUser,
+                onMyProfileClick = {
+                    homeDestination = HomeDestination.PROFILE
+                    scope.launch { drawerState.close()}
+                                        },
+                onMyAdoptionsClick = { scope.launch { drawerState.close() } },
+                onMyAnimalsClick = { scope.launch { drawerState.close() } },
                 onRegisterAnimalClick = { scope.launch { drawerState.close() } },
-                onAdminPanelClick     = { scope.launch { drawerState.close() } },
-                onNotificationsClick  = { scope.launch { drawerState.close() } },
+                onAdminPanelClick = { scope.launch { drawerState.close() } },
+                onNotificationsClick = { scope.launch { drawerState.close() } },
                 onThemeClick = {
                     showThemeDialog = true
                     scope.launch { drawerState.close() }
@@ -82,35 +93,50 @@ fun HomeScreen() {
         }
     ) {
 
-        // ── Contenido principal ──────────────────────────────────────────────────
-        Scaffold(
-            topBar = {
-                PawpTopBar(
-                    onMenuClick         = { scope.launch { drawerState.open() } },
-                    onNotificationClick = { },
-                    onAvatarClick       = { }
-                )
-            },
-            bottomBar = {
-                PawpBottomNavigation(
-                    selectedTab   = selectedTab,
-                    onTabSelected = { selectedTab = it },
-                    onAddClick    = { }
-                )
+        when (homeDestination){
+
+            HomeDestination.PROFILE -> {
+                ProfileScreen(onBack = {
+                    homeDestination = HomeDestination.TABS
+                })
             }
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                when (selectedTab) {
-                    HomeTab.INICIO      -> InicioScreen()
-                    HomeTab.SOCIAL      -> SocialScreen()
-                    HomeTab.MENSAJES    -> MensajesScreen()
-                    HomeTab.PROTECTORAS -> ProtectorasScreen()
+
+            HomeDestination.TABS -> {
+                // ── Contenido principal ──────────────────────────────────────────────────
+                Scaffold(
+                    topBar = {
+                        PawpTopBar(
+                            onMenuClick         = { scope.launch { drawerState.open() } },
+                            onNotificationClick = { },
+                            onAvatarClick       = { }
+                        )
+                    },
+                    bottomBar = {
+                        PawpBottomNavigation(
+                            selectedTab   = selectedTab,
+                            onTabSelected = { selectedTab = it },
+                            onAddClick    = { }
+                        )
+                    }
+                ) { innerPadding ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        when (selectedTab) {
+                            HomeTab.INICIO -> InicioScreen()
+                            HomeTab.SOCIAL      -> SocialScreen()
+                            HomeTab.MENSAJES    -> MensajesScreen()
+                            HomeTab.PROTECTORAS -> ProtectorasScreen()
+                        }
+                    }
                 }
             }
+
+
         }
+
+
     }
 }
