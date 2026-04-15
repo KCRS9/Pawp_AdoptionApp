@@ -35,7 +35,10 @@ enum class HomeTab {
 
 enum class HomeDestination {
     TABS,
-    PROFILE
+    PROFILE,
+    EDIT_PROFILE,
+    CHANGE_PASSWORD,
+    CHANGE_EMAIL
 }
 
 @Composable
@@ -87,10 +90,16 @@ fun HomeScreen() {
                 onLogoutClick = {
                     scope.launch { drawerState.close() }
                     appViewModel.logout()
-                    // App.kt observa isLoggedIn y mostrará LoginScreen automáticamente
+
                 },
-                onChangeEmailClick = { scope.launch { drawerState.close() } },
-                onChangePasswordClick = { scope.launch { drawerState.close() } }
+                onChangeEmailClick = {
+                    homeDestination = HomeDestination.CHANGE_PASSWORD
+                    scope.launch { drawerState.close() }
+                },
+                onChangePasswordClick = {
+                    homeDestination = HomeDestination.CHANGE_PASSWORD
+                    scope.launch { drawerState.close() }
+                }
             )
         }
     ) {
@@ -110,7 +119,8 @@ fun HomeScreen() {
                         PawpTopBar(
                             onMenuClick         = { scope.launch { drawerState.open() } },
                             onNotificationClick = { },
-                            onAvatarClick       = { }
+                            onAvatarClick       = { homeDestination = HomeDestination.PROFILE},
+                            profileImage = currentUser?.profileImage
                         )
                     },
                     bottomBar = {
@@ -136,7 +146,11 @@ fun HomeScreen() {
                 }
             }
 
+            HomeDestination.EDIT_PROFILE -> {}
 
+            HomeDestination.CHANGE_PASSWORD -> {}
+
+            HomeDestination.CHANGE_EMAIL -> {}
         }
 
 

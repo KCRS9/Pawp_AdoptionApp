@@ -1,12 +1,10 @@
 package ies.sequeros.dam.ui.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
@@ -18,19 +16,16 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
-import pawp_adoption.composeapp.generated.resources.Res
-import pawp_adoption.composeapp.generated.resources.shelter_avatar
+import ies.sequeros.dam.ui.components.common.UserAvatar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PawpTopBar(
     onMenuClick: ()-> Unit,
     onNotificationClick: ()-> Unit,
-    onAvatarClick: ()-> Unit
-
+    onAvatarClick: ()-> Unit,
+    profileImage: String? = null
 ) {
 
     TopAppBar(
@@ -55,15 +50,23 @@ fun PawpTopBar(
 
             Spacer(Modifier.width(4.dp))
 
-            Image(
-                painter            = painterResource(Res.drawable.shelter_avatar),
-                contentDescription = "Mi Perfil",
-                modifier           = Modifier
+//            Image(
+//                painter            = painterResource(Res.drawable.shelter_avatar),
+//                contentDescription = "Mi Perfil",
+//                modifier           = Modifier
+//                    .padding(end = 12.dp)
+//                    .size(36.dp)
+//                    .clip(CircleShape)
+//                    .clickable { onAvatarClick() }
+//            )
+
+            Box(
+                modifier = Modifier
                     .padding(end = 12.dp)
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .clickable { onAvatarClick() }
-            )
+                    .clickable{onAvatarClick()}
+            ){
+                UserAvatar(imageUrl = profileImage, size = 36.dp)
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
