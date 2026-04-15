@@ -88,7 +88,9 @@ fun HomeScreen() {
                     scope.launch { drawerState.close() }
                     appViewModel.logout()
                     // App.kt observa isLoggedIn y mostrará LoginScreen automáticamente
-                }
+                },
+                onChangeEmailClick = { scope.launch { drawerState.close() } },
+                onChangePasswordClick = { scope.launch { drawerState.close() } }
             )
         }
     ) {

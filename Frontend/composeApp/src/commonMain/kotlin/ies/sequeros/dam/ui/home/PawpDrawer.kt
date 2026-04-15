@@ -19,9 +19,11 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Pets
@@ -48,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.star
 import ies.sequeros.dam.domain.models.User
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
-import ies.sequeros.dam.ui.toRoleLabel
+import ies.sequeros.dam.ui.extensions.toRoleLabel
 import org.jetbrains.compose.resources.painterResource
 import pawp_adoption.composeapp.generated.resources.Res
 import pawp_adoption.composeapp.generated.resources.shelter_avatar
@@ -64,7 +66,9 @@ fun PawpDrawer(
     onAdminPanelClick: () -> Unit,
     onNotificationsClick:() -> Unit,
     onThemeClick: () -> Unit,
-    onLogoutClick:() -> Unit
+    onLogoutClick:() -> Unit,
+    onChangePasswordClick: () -> Unit,
+    onChangeEmailClick: () -> Unit,
 ) {
 
     var settingsExpanded by remember { mutableStateOf(false) }
@@ -152,11 +156,24 @@ fun PawpDrawer(
                 )
 
                 DrawerSubItem(
+                    icon = Icons.Filled.Lock,
+                    label = "Cambiar Contraseña",
+                    onClick = onChangePasswordClick
+                )
+
+                DrawerSubItem(
+                    icon = Icons.Filled.Email,
+                    label = "Cambiar Correo",
+                    onClick = onChangeEmailClick
+                )
+
+                DrawerSubItem(
                     icon    = Icons.Filled.Notifications,
                     label   = "Notificaciones",
                     onClick = onNotificationsClick
                 )
             }
+
 
             HorizontalDivider(horizontalDivider)
 

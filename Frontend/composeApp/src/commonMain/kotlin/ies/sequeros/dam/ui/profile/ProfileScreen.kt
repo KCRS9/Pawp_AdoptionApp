@@ -35,7 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.theme.PawpPurple
-import ies.sequeros.dam.ui.toRoleLabel
+import ies.sequeros.dam.ui.extensions.toRoleLabel
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
