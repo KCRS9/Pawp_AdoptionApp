@@ -18,15 +18,15 @@ async def create_shelter(
     current_user: UserOut = Depends(get_current_user_profile)
 ):
     # 1. Validar Rol
-    if current_user.role != "shelter":
-        raise HTTPException(status_code=403, detail="Solo los usuarios tipo 'protectora' pueden crear fichas.")
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Solo los administradores pueden crear protectoras.")
 
     # 2. Validar que no tenga ya una asignada
     #if current_user.shelter_id is not None:
         #raise HTTPException(status_code=400, detail="Tu usuario ya administra una protectora.")
 
     # 3. Crear Protectora
-    new_shelter_id = insert_shelter(shelter,admin_id=current_user.id)
+    new_shelter_id = insert_shelter(shelter)
 
     # 4. Vincular al Usuario
     #success = update_user_shelter_link(current_user.id, new_shelter_id)

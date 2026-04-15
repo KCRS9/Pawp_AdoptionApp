@@ -143,7 +143,7 @@ def delete_animal(id: str) -> bool:
 
 
 
-def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
+def insert_shelter(shelter: ShelterIn) -> str:
     """
     Genera UUID, inserta la protectora y devuelve el ID.
     """
@@ -153,18 +153,20 @@ def insert_shelter(shelter: ShelterIn, admin_id: int) -> str:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO SHELTER (id, name, address, location, contact, website, description, admin)
+                INSERT INTO SHELTER (id, name, address, location, description, contact, website, admin)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
                 new_id,
                 shelter.name,
-                shelter.address,
+                "Dirección no proporcionada",
                 shelter.location,
-                shelter.contact,
-                shelter.website,
                 shelter.description,
-                admin_id
+                shelter.phone,
+                shelter.email,
+                shelter.user_id
+                
+               
             )
             cursor.execute(sql, values)
             conn.commit()
