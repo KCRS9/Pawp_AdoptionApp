@@ -107,9 +107,16 @@ fun HomeScreen() {
         when (homeDestination){
 
             HomeDestination.PROFILE -> {
-                ProfileScreen(onBack = {
-                    homeDestination = HomeDestination.TABS
-                })
+                ProfileScreen(
+                    onBack = {
+                        homeDestination = HomeDestination.TABS
+                    },
+                    onEditClick ={
+                        homeDestination = HomeDestination.EDIT_PROFILE
+                    }
+
+                )
+
             }
 
             HomeDestination.TABS -> {
