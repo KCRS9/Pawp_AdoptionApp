@@ -47,7 +47,8 @@ class RestUserRepository(
             location = dto.location,
             role = dto.role,
             profileImage = dto.profileImage,
-            shelterId = dto.shelterId
+            shelterId = dto.shelterId,
+            description = dto.description
         )
     }
 }

@@ -8,7 +8,7 @@ interface IAuthRepository {
         name: String,
         email: String,
         password: String,
-        location: String,
+        location: Int,
         role: String
     ): User
 

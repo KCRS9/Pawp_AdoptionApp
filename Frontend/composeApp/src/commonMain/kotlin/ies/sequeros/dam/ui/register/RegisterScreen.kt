@@ -23,13 +23,13 @@ fun RegisterScreen(
     }
 
     RegisterComponent(
-        state                   = state,
-        onNameChange            = viewModel::onNameChange,
-        onEmailChange           = viewModel::onEmailChange,
-        onPasswordChange        = viewModel::onPasswordChange,
+        state = state,
+        onNameChange = viewModel::onNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
-        onLocationChange        = viewModel::onLocationChange,
-        onRegisterClick         = viewModel::register,
-        onBackClick             = onGoToLogin
+        onLocationSelect = viewModel::onLocationSelect,
+        onRegisterClick = viewModel::register,
+        onBackClick = onGoToLogin
     )
 }
