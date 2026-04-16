@@ -19,6 +19,7 @@ import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.home.dialog.ThemeDialog
 import ies.sequeros.dam.ui.inicio.InicioScreen
 import ies.sequeros.dam.ui.mensajes.MensajesScreen
+import ies.sequeros.dam.ui.profile.EditProfileScreen
 import ies.sequeros.dam.ui.profile.ProfileScreen
 
 import ies.sequeros.dam.ui.protectoras.ProtectorasScreen
@@ -153,7 +154,11 @@ fun HomeScreen() {
                 }
             }
 
-            HomeDestination.EDIT_PROFILE -> {}
+            HomeDestination.EDIT_PROFILE -> {
+                EditProfileScreen(
+                    onBack = {homeDestination = HomeDestination.PROFILE}
+                )
+            }
 
             HomeDestination.CHANGE_PASSWORD -> {}
 
