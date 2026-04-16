@@ -33,7 +33,7 @@ def insert_user(user: UserIn) -> str:
                 hashed_password,
                 user.role, 
                 user.location,
-                None, 
+                user.description, 
                 user.profile_image
             )
             cursor.execute(sql, values)

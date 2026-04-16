@@ -17,12 +17,12 @@ class UserIn(UserBase):
 class UserOut(UserBase):
     id: str
     name: str
-    username: Optional[str] = None
     email: str
     shelter_id: Optional[str] = None
     description: Optional[str] = None
     location: int
     role: str
+    profile_image: Optional[str] = None
 
 #Clase DB: Lo que guardamos en la base de datos
 class UserDb(UserIn):
