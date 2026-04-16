@@ -1,7 +1,5 @@
 package ies.sequeros.dam.ui.components.register
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,17 +37,10 @@ import androidx.compose.ui.unit.dp
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.register.RegisterState
 import ies.sequeros.dam.ui.theme.PawpPurple
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
-import ies.sequeros.dam.domain.models.Locality
-import org.jetbrains.compose.resources.painterResource
-import pawp_adoption.composeapp.generated.resources.Res
-import pawp_adoption.composeapp.generated.resources.logo_pawp
+import ies.sequeros.dam.ui.components.common.LocalityDropdown
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun RegisterComponent(
     state: RegisterState,
@@ -61,8 +52,6 @@ fun RegisterComponent(
     onRegisterClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-
-    var locationExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -148,37 +137,13 @@ fun RegisterComponent(
             Spacer(Modifier.height(8.dp))
 
             // Ubicación
-            ExposedDropdownMenuBox(
-                expanded = locationExpanded,
-                onExpandedChange = { locationExpanded = it }
-            ) {
-                OutlinedTextField(
-                    value          = state.locationName,
-                    onValueChange  = {},
-                    readOnly       = true,
-                    label          = { Text("Provincia") },
-                    trailingIcon   = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded) },
-                    modifier       = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                    isError        = state.locationError != null,
-                    supportingText = { state.locationError?.let { Text(it) } }
-                )
-                ExposedDropdownMenu(
-                    expanded         = locationExpanded,
-                    onDismissRequest = { locationExpanded = false }
-                ) {
-                    state.localities.forEach { locality ->
-                        DropdownMenuItem(
-                            text    = { Text(locality.name) },
-                            onClick = {
-                                onLocationSelect(locality.id, locality.name)
-                                locationExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
+            LocalityDropdown(
+                localities = state.localities,
+                selectedName = state.locationName,
+                onSelect = onLocationSelect,
+                isError = state.locationError != null,
+                errorMessage = state.locationError
+            )
 
             Spacer(Modifier.height(24.dp))
 
@@ -233,12 +198,7 @@ fun RegisterComponent(
                         Text("Registrarse")
                     }
                 }
-
-
             }
-
-
-
         }
     }
 }

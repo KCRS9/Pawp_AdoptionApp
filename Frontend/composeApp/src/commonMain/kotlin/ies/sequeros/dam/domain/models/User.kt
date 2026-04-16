@@ -9,5 +9,6 @@ data class User(
     val role: String,
     val profileImage: String?,
     val shelterId: String?,
-    val description: String? = null
+    val description: String? = null,
+    val locationName: String? = null
 )

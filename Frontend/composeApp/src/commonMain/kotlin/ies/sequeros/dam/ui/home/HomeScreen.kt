@@ -19,9 +19,12 @@ import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.home.dialog.ThemeDialog
 import ies.sequeros.dam.ui.inicio.InicioScreen
 import ies.sequeros.dam.ui.mensajes.MensajesScreen
+import ies.sequeros.dam.ui.profile.EditProfileScreen
 import ies.sequeros.dam.ui.profile.ProfileScreen
 
 import ies.sequeros.dam.ui.protectoras.ProtectorasScreen
+import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
+import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
 import ies.sequeros.dam.ui.social.SocialScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -35,7 +38,10 @@ enum class HomeTab {
 
 enum class HomeDestination {
     TABS,
-    PROFILE
+    PROFILE,
+    EDIT_PROFILE,
+    CHANGE_PASSWORD,
+    CHANGE_EMAIL
 }
 
 @Composable
@@ -87,7 +93,15 @@ fun HomeScreen() {
                 onLogoutClick = {
                     scope.launch { drawerState.close() }
                     appViewModel.logout()
-                    // App.kt observa isLoggedIn y mostrará LoginScreen automáticamente
+
+                },
+                onChangeEmailClick = {
+                    homeDestination = HomeDestination.CHANGE_EMAIL
+                    scope.launch { drawerState.close() }
+                },
+                onChangePasswordClick = {
+                    homeDestination = HomeDestination.CHANGE_PASSWORD
+                    scope.launch { drawerState.close() }
                 }
             )
         }
@@ -96,19 +110,27 @@ fun HomeScreen() {
         when (homeDestination){
 
             HomeDestination.PROFILE -> {
-                ProfileScreen(onBack = {
-                    homeDestination = HomeDestination.TABS
-                })
+                ProfileScreen(
+                    onBack = {
+                        homeDestination = HomeDestination.TABS
+                    },
+                    onEditClick ={
+                        homeDestination = HomeDestination.EDIT_PROFILE
+                    }
+
+                )
+
             }
 
             HomeDestination.TABS -> {
-                // ── Contenido principal ──────────────────────────────────────────────────
+                // Contenido principal
                 Scaffold(
                     topBar = {
                         PawpTopBar(
                             onMenuClick         = { scope.launch { drawerState.open() } },
                             onNotificationClick = { },
-                            onAvatarClick       = { }
+                            onAvatarClick       = { homeDestination = HomeDestination.PROFILE},
+                            profileImage = currentUser?.profileImage
                         )
                     },
                     bottomBar = {
@@ -134,8 +156,14 @@ fun HomeScreen() {
                 }
             }
 
+            HomeDestination.EDIT_PROFILE -> {
+                EditProfileScreen(onBack = {homeDestination = HomeDestination.PROFILE}) }
 
-        }
+            HomeDestination.CHANGE_PASSWORD -> {
+                ChangePasswordScreen(onBack = {homeDestination = HomeDestination.TABS}) }
+
+            HomeDestination.CHANGE_EMAIL -> {
+                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS }) } }
 
 
     }

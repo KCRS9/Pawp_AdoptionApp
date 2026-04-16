@@ -1,14 +1,28 @@
 package ies.sequeros.dam.infrastructure
 
+import ies.sequeros.dam.application.comandos.ChangeEmailCommand
+import ies.sequeros.dam.application.comandos.ChangePasswordCommand
+import ies.sequeros.dam.application.comandos.UpdateProfileCommand
 import ies.sequeros.dam.domain.models.User
 import ies.sequeros.dam.domain.repositories.IUserRepository
 import ies.sequeros.dam.infrastructure.dtos.ErrorResponseDto
 import ies.sequeros.dam.infrastructure.dtos.UserProfileDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class RestUserRepository(
 
@@ -51,4 +65,115 @@ class RestUserRepository(
             description = dto.description
         )
     }
+
+    override suspend fun updateProfile(command: UpdateProfileCommand){
+
+        val body = buildJsonObject {
+            command.name?.let { put("name", it) }
+            command.locationId?.let { put("location", it) }
+            command.description?.let { put("description", it) }
+        }
+
+        val response = client.patch ("$baseUrl/users/me/"){
+
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+
+        if (!response.status.isSuccess()) {
+            val detail = try { response.body<ErrorResponseDto>().detail }
+            catch (e: Exception) { "Error al actualizar el perfil" }
+            throw Exception(detail)
+        }
+    }
+
+    override suspend fun updateAvatar(imageBytes: ByteArray, fileName: String) {
+
+        val response = client.post("$baseUrl/users/me/avatar") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            key   = "avatar",
+                            value = imageBytes,
+                            headers = Headers.build {
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"avatar\"; filename=\"$fileName\""
+                                )
+                                append(
+                                    HttpHeaders.ContentType,
+                                    ContentType.Image.JPEG.toString())
+                            }
+                        )
+                    }
+                )
+            )
+        }
+
+        if(!response.status.isSuccess()){
+
+            val detail =
+                try {
+                    response.body<ErrorResponseDto>().detail
+                }catch (e: Exception){
+                    "Error al actualizar la foto ${e.message}"
+                }
+
+            throw Exception(detail)
+        }
+    }
+
+    override suspend fun changePassword(command: ChangePasswordCommand) {
+
+        val body = buildJsonObject {
+            put("old_password", command.oldPassword)
+            put("new_password", command.newPassword)
+        }
+
+        val response = client.patch("$baseUrl/users/me/password") {
+
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+
+        if (!response.status.isSuccess()) {
+
+            val detail =
+                try {
+                    response.body<ErrorResponseDto>().detail }
+                catch (e: Exception) {
+                    "Error al cambiar la contraseña: ${e.message}"
+                }
+
+            throw Exception(detail)
+        }
+    }
+
+    override suspend fun changeEmail(command: ChangeEmailCommand) {
+
+        val body = buildJsonObject {
+            put("new_email", command.newEmail)
+            put("password", command.password)
+        }
+
+        val response = client.patch("$baseUrl/users/me/email") {
+
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+
+        if (!response.status.isSuccess()) {
+
+            val detail =
+                try {
+                    response.body<ErrorResponseDto>().detail
+                } catch (e: Exception) {
+                    "Error al cambiar el correo. ${e.message}"
+                }
+
+            throw Exception(detail)
+        }
+    }
+
 }

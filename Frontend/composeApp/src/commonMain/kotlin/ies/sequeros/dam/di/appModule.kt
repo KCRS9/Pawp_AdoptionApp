@@ -1,9 +1,13 @@
 package ies.sequeros.dam.di
 
+import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
+import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
+import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
+import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
 import ies.sequeros.dam.domain.repositories.IUserRepository
@@ -16,7 +20,10 @@ import ies.sequeros.dam.ui.appsettings.AppSettings
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.appsettings.UserSessionManager
 import ies.sequeros.dam.ui.login.LoginViewModel
+import ies.sequeros.dam.ui.profile.EditProfileViewModel
 import ies.sequeros.dam.ui.register.RegisterViewModel
+import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailViewModel
+import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordViewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -47,10 +54,17 @@ val appModule = module {
     factory { RegisterUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { GetLocalitiesUseCase(get()) }
+    factory { UpdateProfileUseCase(get()) }
+    factory { UpdateAvatarUseCase(get()) }
+    factory { ChangePasswordUseCase(get()) }
+    factory { ChangeEmailUseCase(get()) }
+    factory { EditProfileViewModel(get(), get(), get(), get()) }
+    factory { ChangePasswordViewModel(get()) }
+    factory { ChangeEmailViewModel(get()) }
 
     // --- Presentación ---
     single { AppSettings() }
-    factory { AppViewModel(get(), get(), get()) }
+    factory { AppViewModel(get(), get(), get(), get()) }
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
 }

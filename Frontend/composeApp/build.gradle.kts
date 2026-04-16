@@ -82,6 +82,8 @@ kotlin {
             // compose.materialIconsExtended es provisto directamente por el plugin de Compose
             // Multiplatform y usa la versión correcta automáticamente
             implementation(compose.materialIconsExtended)
+
+            implementation(libs.filekit.compose)
         }
 
         // --- Dependencias exclusivas de Android ---
