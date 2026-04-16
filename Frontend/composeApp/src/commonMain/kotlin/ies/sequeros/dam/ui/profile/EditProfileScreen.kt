@@ -51,6 +51,7 @@ import androidx.compose.material3.ButtonDefaults
 fun EditProfileScreen(
     onBack: () -> Unit
 ) {
+
     val viewModel: EditProfileViewModel = koinViewModel()
     val appViewModel: AppViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -197,8 +198,10 @@ fun EditProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (state.isSaving) {
+
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
                 } else {
+
                     Text("Guardar cambios")
                 }
             }

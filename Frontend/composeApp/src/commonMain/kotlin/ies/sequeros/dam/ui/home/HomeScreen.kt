@@ -23,6 +23,8 @@ import ies.sequeros.dam.ui.profile.EditProfileScreen
 import ies.sequeros.dam.ui.profile.ProfileScreen
 
 import ies.sequeros.dam.ui.protectoras.ProtectorasScreen
+import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
+import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
 import ies.sequeros.dam.ui.social.SocialScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -94,7 +96,7 @@ fun HomeScreen() {
 
                 },
                 onChangeEmailClick = {
-                    homeDestination = HomeDestination.CHANGE_PASSWORD
+                    homeDestination = HomeDestination.CHANGE_EMAIL
                     scope.launch { drawerState.close() }
                 },
                 onChangePasswordClick = {
@@ -121,7 +123,7 @@ fun HomeScreen() {
             }
 
             HomeDestination.TABS -> {
-                // ── Contenido principal ──────────────────────────────────────────────────
+                // Contenido principal
                 Scaffold(
                     topBar = {
                         PawpTopBar(
@@ -155,15 +157,13 @@ fun HomeScreen() {
             }
 
             HomeDestination.EDIT_PROFILE -> {
-                EditProfileScreen(
-                    onBack = {homeDestination = HomeDestination.PROFILE}
-                )
-            }
+                EditProfileScreen(onBack = {homeDestination = HomeDestination.PROFILE}) }
 
-            HomeDestination.CHANGE_PASSWORD -> {}
+            HomeDestination.CHANGE_PASSWORD -> {
+                ChangePasswordScreen(onBack = {homeDestination = HomeDestination.TABS}) }
 
-            HomeDestination.CHANGE_EMAIL -> {}
-        }
+            HomeDestination.CHANGE_EMAIL -> {
+                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS }) } }
 
 
     }

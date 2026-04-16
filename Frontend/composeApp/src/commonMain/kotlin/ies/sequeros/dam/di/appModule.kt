@@ -22,6 +22,8 @@ import ies.sequeros.dam.ui.appsettings.UserSessionManager
 import ies.sequeros.dam.ui.login.LoginViewModel
 import ies.sequeros.dam.ui.profile.EditProfileViewModel
 import ies.sequeros.dam.ui.register.RegisterViewModel
+import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailViewModel
+import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordViewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -57,6 +59,8 @@ val appModule = module {
     factory { ChangePasswordUseCase(get()) }
     factory { ChangeEmailUseCase(get()) }
     factory { EditProfileViewModel(get(), get(), get(), get()) }
+    factory { ChangePasswordViewModel(get()) }
+    factory { ChangeEmailViewModel(get()) }
 
     // --- Presentación ---
     single { AppSettings() }
