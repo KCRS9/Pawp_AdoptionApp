@@ -60,7 +60,10 @@ class RestUserRepository(
             email = dto.email,
             location = dto.location,
             role = dto.role,
-            profileImage = dto.profileImage,
+            // Es necesario agregar la Url si no viene con ella
+            profileImage = dto.profileImage?.let {
+                if (it.startsWith("/")) "$baseUrl$it" else it
+            },
             shelterId = dto.shelterId,
             description = dto.description
         )
@@ -74,7 +77,7 @@ class RestUserRepository(
             command.description?.let { put("description", it) }
         }
 
-        val response = client.patch ("$baseUrl/users/me/"){
+        val response = client.patch ("$baseUrl/users/me"){
 
             contentType(ContentType.Application.Json)
             setBody(body)
