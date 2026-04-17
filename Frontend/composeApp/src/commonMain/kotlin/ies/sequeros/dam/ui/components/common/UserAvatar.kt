@@ -35,7 +35,7 @@ fun UserAvatar(
             tint = PawpPurple,
             modifier = modifier.size(size)
         )
-        
+
         if(imageUrl != null){
 
 
