@@ -76,7 +76,7 @@ def update_user_db(user_id: int, data: dict) -> bool:
             
             cursor.execute(sql, tuple(values))
             conn.commit()
-            return cursor.rowcount > 0
+            return cursor.rowcount >= 0
 
 
 
