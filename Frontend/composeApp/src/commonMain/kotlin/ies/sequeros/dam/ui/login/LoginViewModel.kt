@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.comandos.LoginCommand
 import ies.sequeros.dam.application.usecases.LoginUseCase
+import ies.sequeros.dam.utils.ValidationUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +30,7 @@ class LoginViewModel(
         _state.update {
             it.copy(
                 email = email,
-                emailError = if(email.contains("@")) null else "Email no válido",
+                emailError = ValidationUtils.emailError(email),
                 errorMessage = null
             )
         }

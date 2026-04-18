@@ -12,7 +12,7 @@ data class ChangeEmailState(
 ) {
     val isValid: Boolean
 
-        get() = newEmail.contains("@") &&
+        get() = newEmail.isNotBlank() &&
                 password.isNotBlank() &&
                 emailError == null
 }

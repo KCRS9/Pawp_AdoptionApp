@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.comandos.RegisterCommand
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
+import ies.sequeros.dam.utils.ValidationUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,21 +58,30 @@ class RegisterViewModel(
     }
 
     fun onEmailChange(email: String) {
+
         _state.update {
+
             it.copy(
-                email      = email,
-                emailError = if (email.contains("@")) null else "Email no válido"
+                email = email,
+                emailError = ValidationUtils.emailError(email)
             )
+
         }
         validateForm()
     }
 
     fun onPasswordChange(password: String){
+
         _state.update {
+
             it.copy(
                 password = password,
-                passwordError = if (password.length >= 6) null else "Mínimo 6 caracteres",
-                confirmPasswordError = if (it.confirmPassword == password) null else "Las contraseñas no coinciden"
+                passwordError = ValidationUtils.passwordErrorStrong(password),
+                confirmPasswordError = when {
+                    it.confirmPassword.isEmpty() -> null
+                    it.confirmPassword == password -> null
+                    else -> "Las contraseñas no coinciden"
+                }
             )
         }
         validateForm()
