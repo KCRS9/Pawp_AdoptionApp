@@ -12,7 +12,7 @@ data class RegisterRequestDto(
     val email: String,
     val password: String,
     val location: Int,
-    val role: String = "user"
+    val shelter: ShelterRegistrationDto? = null
 )
 
 // Respuesta(POST): /users/signup/
@@ -51,4 +51,14 @@ data class UserProfileDto(
     @SerialName("profile_image") val profileImage: String? = null,
     @SerialName("shelter_id") val shelterId: String? = null,
     val description: String? = null
+)
+
+// DTO para los datos de la protectora dentro del body de POST /users/signup/
+// Nullable en RegisterRequestDto — si no viene, es un registro normal
+@Serializable
+data class ShelterRegistrationDto(
+    val name: String,
+    val description: String,
+    val phone: String,
+    val email: String
 )

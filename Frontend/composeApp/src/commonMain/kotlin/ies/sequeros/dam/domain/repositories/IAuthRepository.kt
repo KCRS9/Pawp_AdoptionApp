@@ -9,7 +9,10 @@ interface IAuthRepository {
         email: String,
         password: String,
         location: Int,
-        role: String
+        shelterName: String? = null,
+        shelterDescription: String? = null,
+        shelterPhone: String? = null,
+        shelterEmail: String? = null
     ): User
 
     suspend fun login(

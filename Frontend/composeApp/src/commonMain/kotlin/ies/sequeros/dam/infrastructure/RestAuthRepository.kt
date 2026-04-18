@@ -6,6 +6,7 @@ import ies.sequeros.dam.infrastructure.dtos.ErrorResponseDto
 import ies.sequeros.dam.infrastructure.dtos.LoginResponseDto
 import ies.sequeros.dam.infrastructure.dtos.RegisterRequestDto
 import ies.sequeros.dam.infrastructure.dtos.RegisterResponseDto
+import ies.sequeros.dam.infrastructure.dtos.ShelterRegistrationDto
 import ies.sequeros.dam.infrastructure.mappers.toDomain
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
 import io.ktor.client.HttpClient
@@ -32,15 +33,26 @@ class RestAuthRepository(
         email: String,
         password: String,
         location: Int,
-        role: String
+        shelterName: String?,
+        shelterDescription: String?,
+        shelterPhone: String?,
+        shelterEmail: String?
     ): User {
 
         println("LOG [RestAuthRepository]: Iniciando registro para $email")
 
+        // Si vienen datos de la protectoera construimos el objeto si no, seria null
+        val shelterDto = if (shelterName != null) ShelterRegistrationDto(
+
+            name        = shelterName,
+            description = shelterDescription ?: "",
+            phone       = shelterPhone ?: "",
+            email       = shelterEmail ?: ""
+        ) else null
+
         val response = client.post("$baseUrl/users/signup/") {
 
-            contentType(ContentType.Application.Json)
-            setBody(RegisterRequestDto(name, email, password, location, role))
+            setBody(RegisterRequestDto(name, email, password, location, shelterDto))
         }
 
         if (!response.status.isSuccess()) {
@@ -51,8 +63,9 @@ class RestAuthRepository(
         }
 
         println("LOG [RestAuthRepository]: Registro exitoso para $email")
-
         val dto = response.body<RegisterResponseDto>()
+        val role = if (shelterName != null) "shelter" else "user"
+
         return dto.toDomain(name, email, location, role)
     }
 
