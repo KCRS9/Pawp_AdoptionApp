@@ -12,6 +12,7 @@ class UserBase(BaseModel):
 class UserIn(UserBase):
     name: str
     password: str
+    description: Optional[str] = None
 
 #Clase OUT: Lo que devolvemos al frontend
 class UserOut(UserBase):
