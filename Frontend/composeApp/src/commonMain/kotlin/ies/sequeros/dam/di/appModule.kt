@@ -74,7 +74,8 @@ val appModule = module {
     factory { GetShelterByIdUseCase(get()) }
 
     // --- Presentación ---
-    single { AppSettings() }
+    // get() resuelve la instancia de Settings registrada por cada plataforma
+    single { AppSettings(get()) }
     factory { AppViewModel(get(), get(), get(), get()) }
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
