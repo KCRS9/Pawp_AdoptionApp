@@ -83,6 +83,57 @@ def update_user_db(user_id: int, data: dict) -> bool:
             cursor.execute(sql, tuple(values))
             conn.commit()
             return cursor.rowcount >= 0
+        
+
+# Mostrar perfil protectora
+def get_full_shelter_profile(shelter_id: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            #Se Obtienen los datos de la protectora y el nombre del admin con JOIN
+            sql_shelter = """
+                SELECT s.id, s.name, s.address, s.location, s.phone, s.email, 
+                       s.website, s.description, s.admin, u.name as admin_name, s.profile_image
+                FROM SHELTER s
+                JOIN USERS u ON s.admin = u.id
+                WHERE s.id = ?
+            """
+            cursor.execute(sql_shelter, (shelter_id,))
+            res = cursor.fetchone()
+            
+            if not res:
+                return None
+
+            # Se Obtienen sus animales disponibles
+            sql_animals = """
+                SELECT id, name, species, profile_image 
+                FROM ANIMAL 
+                WHERE shelter_id = ? AND status = 'available'
+            """
+            cursor.execute(sql_animals, (shelter_id,))
+            animals_list = []
+            for row in cursor.fetchall():
+                animals_list.append({
+                    "id": row[0],
+                    "name": row[1],
+                    "species": row[2],
+                    "profile_image": row[3]
+                })
+
+            # Muestra el resultado
+            return {
+                "id": res[0],
+                "name": res[1],
+                "address": res[2],
+                "location": res[3],
+                "phone": res[4],
+                "email": res[5],
+                "website": res[6],
+                "description": res[7],
+                "admin_id": res[8],
+                "admin_name": res[9],
+                "profile_image": res[10],
+                "animals": animals_list
+            }
 
 
 
