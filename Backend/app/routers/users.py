@@ -2,9 +2,9 @@ from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
 from pydantic import BaseModel
-from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate
+from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate
 from app.models.shelters import ShelterRegistrationData
-from app.database import insert_user, insert_user_with_shelter, get_user_by_email, update_user_db, update_user_me, update_user_email
+from app.database import insert_user, insert_user_with_shelter, get_user_by_email, update_user_db, update_user_me, update_user_email, update_user_password
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -215,3 +215,35 @@ async def change_user_email(
         raise HTTPException(status_code=500, detail="Error al actualizar el correo")
 
     return {"message": "Correo actualizado correctamente"}
+
+
+
+@router.patch("/me/password")
+async def change_user_password(
+    data: PasswordUpdate, 
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Verificar que la contraseña antigua es correcta
+    if not verify_password(data.old_password, current_user.password):
+        raise HTTPException(
+            status_code=400, 
+            detail="La contraseña actual no es correcta"
+        )
+
+    # 2. Valida la longitud de la nueva contraseña
+    if len(data.new_password) < 6:
+        raise HTTPException(
+            status_code=400, 
+            detail="La nueva contraseña debe tener al menos 6 caracteres"
+        )
+
+    # 3. Hashea la nueva contraseña
+    new_hashed_pw = get_hash_password(data.new_password)
+
+    # 4. La actualizar en la base de datos
+    success = update_user_password(current_user.id, new_hashed_pw)
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al actualizar la contraseña")
+
+    return {"message": "Contraseña actualizada correctamente"}

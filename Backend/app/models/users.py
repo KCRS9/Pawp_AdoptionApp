@@ -46,3 +46,7 @@ class UserUpdate(BaseModel): #Para el PATCH
 class EmailUpdate(BaseModel):
     password: str
     new_email: str
+
+class PasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
