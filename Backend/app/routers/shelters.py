@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends
-from app.models.shelters import ShelterIn, ShelterOut
+from app.models.shelters import ShelterIn, ShelterOut, ShelterFullProfile
 from app.models.users import UserOut, UserDb
-from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo
+from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo, get_full_shelter_profile
 from app.routers.users import get_current_user as get_current_user_profile, get_current_user
 import time
 import os
@@ -73,6 +73,7 @@ async def edit_monitor_shelter(
     return {"message": "Protectora actualizada correctamente"}
 
 
+# 4. AÑADIR FOTO DE PERFIL A PROTECTORA
 
 @router.post("/{shelter_id}/logo")
 async def upload_shelter_logo(
@@ -115,3 +116,18 @@ async def upload_shelter_logo(
         raise HTTPException(status_code=500, detail="Error al actualizar la base de datos")
 
     return {"profile_image": image_url}
+
+
+# VER PERFIL DE PROTECTORAS
+
+@router.get("/{shelter_id}", response_model=ShelterFullProfile)
+async def get_shelter_details(shelter_id: str):
+    profile = get_full_shelter_profile(shelter_id)
+    
+    if not profile:
+        raise HTTPException(
+            status_code=404, 
+            detail="Protectora no encontrada"
+        )
+        
+    return profile

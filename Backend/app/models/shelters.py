@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from app.models.animals import AnimalOut
 
 class ShelterRegistrationData(BaseModel):
     name: str
@@ -40,3 +41,24 @@ class ShelterDb(BaseModel):
     description: str
     admin: str
     profile_image: Optional[str] = None
+
+
+class ShelterProfileAnimal(BaseModel):
+    id: str
+    name: str
+    species: str
+    profile_image: Optional[str] = None
+
+class ShelterFullProfile(BaseModel):
+    id: str
+    name: str
+    address: Optional[str] = None
+    location: int
+    phone: str
+    email: str
+    website: Optional[str] = None
+    description: str
+    admin_id: str
+    admin_name: str
+    profile_image: Optional[str] = None
+    animals: list[ShelterProfileAnimal]
