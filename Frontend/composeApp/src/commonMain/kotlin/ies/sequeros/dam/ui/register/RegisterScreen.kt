@@ -30,6 +30,11 @@ fun RegisterScreen(
         onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
         onLocationSelect = viewModel::onLocationSelect,
         onRegisterClick = viewModel::register,
-        onBackClick = onGoToLogin
+        onBackClick = onGoToLogin,
+        onIsShelterChange = viewModel::onIsShelterChange,
+        onShelterNameChange = viewModel::onShelterNameChange,
+        onShelterDescriptionChange = viewModel::onShelterDescriptionChange,
+        onShelterPhoneChange = viewModel::onShelterPhoneChange,
+        onShelterEmailChange = viewModel::onShelterEmailChange,
     )
 }

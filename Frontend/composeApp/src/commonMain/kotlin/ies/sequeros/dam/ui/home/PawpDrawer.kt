@@ -63,6 +63,7 @@ fun PawpDrawer(
     onLogoutClick:() -> Unit,
     onChangePasswordClick: () -> Unit,
     onChangeEmailClick: () -> Unit,
+    onMyShelterClick: () -> Unit,
 ) {
 
     var settingsExpanded by remember { mutableStateOf(false) }
@@ -112,6 +113,12 @@ fun PawpDrawer(
                     icon    = Icons.Filled.AddBox,
                     label   = "Registrar animal",
                     onClick = onRegisterAnimalClick
+                )
+
+                DrawerItem(
+                    icon  = Icons.Filled.Pets,
+                    label = "Mi protectora",
+                    onClick = onMyShelterClick
                 )
             }
             //ADMINISTRADORS

@@ -22,9 +22,11 @@ import ies.sequeros.dam.ui.mensajes.MensajesScreen
 import ies.sequeros.dam.ui.profile.EditProfileScreen
 import ies.sequeros.dam.ui.profile.ProfileScreen
 
-import ies.sequeros.dam.ui.protectoras.ProtectorasScreen
+import ies.sequeros.dam.ui.shelters.ProtectorasScreen
 import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
+import ies.sequeros.dam.ui.shelters.shelterEdit.ShelterEditScreen
+import ies.sequeros.dam.ui.shelters.shelterProfile.ShelterProfileScreen
 import ies.sequeros.dam.ui.social.SocialScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -41,7 +43,9 @@ enum class HomeDestination {
     PROFILE,
     EDIT_PROFILE,
     CHANGE_PASSWORD,
-    CHANGE_EMAIL
+    CHANGE_EMAIL,
+    SHELTER_PROFILE,
+    SHELTER_EDIT
 }
 
 @Composable
@@ -59,6 +63,8 @@ fun HomeScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // rememberCoroutineScope() proporciona el scope para lanzar corutinas en lambdas
     val scope = rememberCoroutineScope()
+
+    var selectedShelterId by remember { mutableStateOf<String?>(null) }
 
     // Diálogo de modo oscuro — se renderiza encima del drawer
     if (showThemeDialog) {
@@ -102,7 +108,13 @@ fun HomeScreen() {
                 onChangePasswordClick = {
                     homeDestination = HomeDestination.CHANGE_PASSWORD
                     scope.launch { drawerState.close() }
-                }
+                },
+
+                onMyShelterClick = {
+                    selectedShelterId = currentUser?.shelterId
+                    homeDestination = HomeDestination.SHELTER_PROFILE
+                    scope.launch { drawerState.close() }
+                },
             )
         }
     ) {
@@ -150,7 +162,15 @@ fun HomeScreen() {
                             HomeTab.INICIO -> InicioScreen()
                             HomeTab.SOCIAL      -> SocialScreen()
                             HomeTab.MENSAJES    -> MensajesScreen()
-                            HomeTab.PROTECTORAS -> ProtectorasScreen()
+
+                            HomeTab.PROTECTORAS -> ProtectorasScreen(
+
+                                onShelterClick = { shelterId ->
+
+                                    selectedShelterId = shelterId
+                                    homeDestination = HomeDestination.SHELTER_PROFILE
+                                }
+                            )
                         }
                     }
                 }
@@ -163,8 +183,24 @@ fun HomeScreen() {
                 ChangePasswordScreen(onBack = {homeDestination = HomeDestination.TABS}) }
 
             HomeDestination.CHANGE_EMAIL -> {
-                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS }) } }
+                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS }) }
 
+            HomeDestination.SHELTER_PROFILE -> {
+                val isOwnShelter = currentUser?.shelterId != null &&
+                                   currentUser?.shelterId == selectedShelterId
+                ShelterProfileScreen(
+                    shelterId   = selectedShelterId ?: "",
+                    onBack      = { homeDestination = HomeDestination.TABS },
+                    onEditClick = if (isOwnShelter) {
+                        { homeDestination = HomeDestination.SHELTER_EDIT }
+                    } else null
+                )
+            }
 
+            HomeDestination.SHELTER_EDIT -> {
+                // Volvemos al perfil de la protectora, no a los tabs
+                ShelterEditScreen(onBack = { homeDestination = HomeDestination.SHELTER_PROFILE })
+            }
+        }
     }
 }
