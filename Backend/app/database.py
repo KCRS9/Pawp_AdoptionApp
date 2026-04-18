@@ -361,3 +361,12 @@ def update_user_email(user_id: str, new_email: str) -> bool:
             cursor.execute(sql, (new_email, user_id))
             conn.commit()
             return cursor.rowcount > 0
+        
+# Actualizar contraseña
+def update_user_password(user_id: str, hashed_password: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE `USERS` SET password = ? WHERE id = ?"
+            cursor.execute(sql, (hashed_password, user_id))
+            conn.commit()
+            return cursor.rowcount > 0
