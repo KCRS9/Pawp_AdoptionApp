@@ -62,12 +62,18 @@ fun RegisterComponent(
     onShelterEmailChange: (String) -> Unit,
 ) {
 
-    var emailTouched by remember { mutableStateOf(false) }
-    var passwordTouched by remember { mutableStateOf(false) }
+    var emailFocused           by remember { mutableStateOf(false) }
+    var emailTouched           by remember { mutableStateOf(false) }
+    var passwordFocused        by remember { mutableStateOf(false) }
+    var passwordTouched        by remember { mutableStateOf(false) }
+    var confirmPasswordFocused by remember { mutableStateOf(false) }
     var confirmPasswordTouched by remember { mutableStateOf(false) }
 
-    var shelterNameTouched by remember { mutableStateOf(false) }
+    var shelterNameFocused  by remember { mutableStateOf(false) }
+    var shelterNameTouched  by remember { mutableStateOf(false) }
+    var shelterEmailFocused by remember { mutableStateOf(false) }
     var shelterEmailTouched by remember { mutableStateOf(false) }
+    var shelterPhoneFocused by remember { mutableStateOf(false) }
     var shelterPhoneTouched by remember { mutableStateOf(false) }
 
     Box(
@@ -116,7 +122,10 @@ fun RegisterComponent(
                 label = { Text("Email") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) emailTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) emailFocused = true
+                        else if (emailFocused) emailTouched = true
+                    },
                 isError = emailTouched && state.emailError != null,
                 supportingText = { if (emailTouched) state.emailError?.let { Text(it) } },
                 singleLine = true,
@@ -133,7 +142,10 @@ fun RegisterComponent(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) passwordTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) passwordFocused = true
+                        else if (passwordFocused) passwordTouched = true
+                    },
                 isError = passwordTouched && state.passwordError != null,
                 supportingText = { if (passwordTouched) state.passwordError?.let { Text(it) } },
                 singleLine = true,
@@ -150,7 +162,10 @@ fun RegisterComponent(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) confirmPasswordTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) confirmPasswordFocused = true
+                        else if (confirmPasswordFocused) confirmPasswordTouched = true
+                    },
                 isError = confirmPasswordTouched && state.confirmPasswordError != null,
                 supportingText = { if (confirmPasswordTouched) state.confirmPasswordError?.let { Text(it) } },
                 singleLine = true,
@@ -219,7 +234,10 @@ fun RegisterComponent(
                         label = { Text("Nombre de la protectora") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onFocusChanged { if (!it.isFocused) shelterNameTouched = true },
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterNameFocused = true
+                                else if (shelterNameFocused) shelterNameTouched = true
+                            },
                         isError = shelterNameTouched && state.shelterNameError != null,
                         supportingText = { if (shelterNameTouched) state.shelterNameError?.let { Text(it) } },
                         singleLine = true
@@ -233,7 +251,10 @@ fun RegisterComponent(
                         label = { Text("Teléfono de contacto") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onFocusChanged { if (!it.isFocused) shelterPhoneTouched = true },
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterPhoneFocused = true
+                                else if (shelterPhoneFocused) shelterPhoneTouched = true
+                            },
                         isError = shelterPhoneTouched && state.shelterPhoneError != null,
                         supportingText = { if (shelterPhoneTouched) state.shelterPhoneError?.let { Text(it) } },
                         singleLine = true,
@@ -248,7 +269,10 @@ fun RegisterComponent(
                         label = { Text("Correo de la protectora") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onFocusChanged { if (!it.isFocused) shelterEmailTouched = true },
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterEmailFocused = true
+                                else if (shelterEmailFocused) shelterEmailTouched = true
+                            },
                         isError = shelterEmailTouched && state.shelterEmailError != null,
                         supportingText = { if (shelterEmailTouched) state.shelterEmailError?.let { Text(it) } },
                         singleLine = true,
