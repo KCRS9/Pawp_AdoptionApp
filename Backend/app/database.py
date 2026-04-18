@@ -3,7 +3,7 @@ import uuid
 from app.models.users import UserDb, UserIn
 from app.models.animals import AnimalIn, AnimalDb
 from app.models.adoptions import AdoptionIn,AdoptionUpdate
-from app.models.shelters import ShelterIn, ShelterDb
+from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData
 from app.auth.auth import get_hash_password
 
 # Configuración de la conexión a la base de datos
@@ -44,22 +44,28 @@ def insert_user(user: UserIn) -> str:
 def get_user_by_email(email: str) -> UserDb | None:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            # Añadimos los campos nuevos a la consulta
-            sql = "SELECT id, name, email, password, role, location, description, profile_image FROM `USERS` WHERE email = ?"
+            sql = """
+                SELECT u.id, u.name, u.email, u.password, u.role,
+                       u.location, u.description, u.profile_image,
+                       s.id AS shelter_id
+                FROM USERS u
+                LEFT JOIN SHELTER s ON s.admin = u.id
+                WHERE u.email = ?
+            """
             cursor.execute(sql, (email,))
             result = cursor.fetchone()
 
             if result:
                 return UserDb(
-                    id=result[0], 
-                    name=result[1], 
+                    id=result[0],
+                    name=result[1],
                     email=result[2],
-                    password=result[3], 
-                    role=result[4], 
+                    password=result[3],
+                    role=result[4],
                     location=result[5],
-                    description=result[6], 
+                    description=result[6],
                     profile_image=result[7],
-                    shelter_id =None
+                    shelter_id=result[8]
                 )
     return None
 
@@ -147,74 +153,122 @@ def insert_shelter(shelter: ShelterIn) -> str:
     """
     Genera UUID, inserta la protectora y devuelve el ID.
     """
-
     new_id = str(uuid.uuid4())
 
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
+            # He actualizado las columnas al nuevo esquema: 'contact' → 'phone',
+            # 'website' → 'email', y añadido 'website' para la web pública.
+            # También quito el hardcoded "Dirección no proporcionada" — ahora
+            # address es nullable en la BD, así que guardamos lo que venga (puede ser None).
             sql = """
-                INSERT INTO SHELTER (id, name, address, location, description, contact, website, admin)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO SHELTER (id, name, address, location, phone, email, website, description, admin)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
             values = (
                 new_id,
                 shelter.name,
-                "Dirección no proporcionada",
+                shelter.address,
                 shelter.location,
-                shelter.description,
                 shelter.phone,
                 shelter.email,
+                shelter.website,
+                shelter.description,
                 shelter.user_id
-                
-               
             )
             cursor.execute(sql, values)
             conn.commit()
             return new_id
 
-def update_user_shelter_link(user_id: str, shelter_id: str) -> bool:
+def insert_user_with_shelter(user: UserIn, shelter_data: ShelterRegistrationData) -> str:
     """
-    Vincula un usuario existente con una protectora recien creada.
+    Crea un usuario con role='shelter' y su protectora vinculada en una sola transacción.
+    Si cualquiera de los dos INSERT falla, se hace rollback y no queda nada a medias.
     """
+    user_id = str(uuid.uuid4())
+    shelter_id = str(uuid.uuid4())
+    hashed_password = get_hash_password(user.password)
+
     with mariadb.connect(**db_config) as conn:
-        with conn.cursor() as cursor:
-            sql = "UPDATE USERS SET shelter_id = ? WHERE id = ?"
-            cursor.execute(sql, (shelter_id, user_id))
-            conn.commit()
-            return cursor.rowcount > 0
+        try:
+            with conn.cursor() as cursor:
+                # Primero creo el usuario. El role viene ya como "shelter" desde el endpoint.
+                cursor.execute(
+                    """
+                    INSERT INTO USERS (id, name, email, password, role, location, description, profile_image)
+                    VALUES (?, ?, ?, ?, 'shelter', ?, ?, NULL)
+                    """,
+                    (user_id, user.name, user.email, hashed_password, user.location, user.description)
+                )
+
+                # Luego creo la protectora vinculada a ese usuario.
+                # 'address' lo dejo NULL porque en el registro inicial el admin
+                # puede no tener la dirección todavía — la rellenará desde "Editar protectora".
+                # 'location' la copio del usuario para no pedirla dos veces en el formulario.
+                cursor.execute(
+                    """
+                    INSERT INTO SHELTER (id, name, address, location, phone, email, description, admin)
+                    VALUES (?, ?, NULL, ?, ?, ?, ?, ?)
+                    """,
+                    (shelter_id, shelter_data.name, user.location,
+                     shelter_data.phone, shelter_data.email,
+                     shelter_data.description, user_id)
+                )
+
+                conn.commit()
+                return user_id
+
+        except Exception as e:
+            conn.rollback()
+            raise e
 
 def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
     """ Recupera una protectora por ID (Pública) """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "SELECT id, name, address, contact, website, description, admin FROM SHELTER WHERE id = ?"
+            # He actualizado el SELECT para usar los nuevos nombres de columna
+            # y añadido 'location', 'website' y 'profile_image' que antes no se traían.
+            sql = """
+                SELECT id, name, address, location, phone, email, website, description, admin, profile_image
+                FROM SHELTER
+                WHERE id = ?
+            """
             cursor.execute(sql, (shelter_id,))
             row = cursor.fetchone()
-            
+
             if row:
                 return ShelterDb(
                     id=str(row[0]),
                     name=row[1],
                     address=row[2],
-                    contact=row[3],
-                    website=row[4],
-                    description=row[5],
-                    admin=row[6]
+                    location=row[3],
+                    phone=row[4],
+                    email=row[5],
+                    website=row[6],
+                    description=row[7],
+                    admin=row[8],
+                    profile_image=row[9]
                 )
-            return None
+    return None
 
 def update_shelter(shelter_id: str, shelter: ShelterIn) -> bool:
     """ Actualiza datos de la protectora """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
+            # He actualizado los campos al nuevo esquema y añadido 'website'
+            # para que el admin pueda poner también la web pública de la protectora.
             sql = """
-                UPDATE SHELTER 
-                SET name=?, address=?, contact=?, website=?, description=?
+                UPDATE SHELTER
+                SET name=?, address=?, phone=?, email=?, website=?, description=?
                 WHERE id = ?
             """
             values = (
-                shelter.name, shelter.address, shelter.contact, 
-                shelter.website, shelter.description, 
+                shelter.name,
+                shelter.address,
+                shelter.phone,
+                shelter.email,
+                shelter.website,
+                shelter.description,
                 shelter_id
             )
             cursor.execute(sql, values)

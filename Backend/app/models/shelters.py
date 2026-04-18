@@ -1,53 +1,42 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# -----------------------------------------------------------
-# Clase BASE: Campos comunes
-# -----------------------------------------------------------
-class ShelterBase(BaseModel):
+class ShelterRegistrationData(BaseModel):
     name: str
-    address: str
-    contact: str
-    website: Optional[str] = None
-    description: Optional[str] = None
-    profile_image: Optional[str] = None
+    description: str
+    phone: str
+    email: str
 
-# -----------------------------------------------------------
-# Clase INPUT: Para crear/editar
-# -----------------------------------------------------------
+
 class ShelterIn(BaseModel):
     name: str
     location: int
     description: str
-    phone: str      
-    email: str       
+    phone: str
+    email: str
+    website: Optional[str] = None
+    address: Optional[str] = None
     user_id: str
 
-# -----------------------------------------------------------
-# Clase OUTPUT: Para devolver al frontend
-# -----------------------------------------------------------
-class ShelterOut(ShelterBase):
-    id: int            # UUID
+class ShelterOut(BaseModel):
+    id: str
+    name: str
+    address: Optional[str] = None
     location: int
+    phone: str
+    email: str
+    website: Optional[str] = None
+    description: str
     profile_image: Optional[str] = None
 
-# -----------------------------------------------------------
-# Clase DB: Mapeo completo de la Tabla
-# -----------------------------------------------------------
-class ShelterDb(ShelterIn):
-    id: int            # UUID
+class ShelterDb(BaseModel):
+    id: str
+    name: str
+    address: Optional[str] = None
+    location: int
+    phone: str
+    email: str
+    website: Optional[str] = None
+    description: str
+    admin: str
     profile_image: Optional[str] = None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
