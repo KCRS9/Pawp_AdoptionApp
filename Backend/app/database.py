@@ -297,3 +297,13 @@ def update_user_me(user_id: str, update_data: dict):
             cursor.execute(sql, valores)
             conn.commit()
             return cursor.rowcount > 0
+        
+
+# Actualizar email
+def update_user_email(user_id: str, new_email: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE `USERS` SET email = ? WHERE id = ?"
+            cursor.execute(sql, (new_email, user_id))
+            conn.commit()
+            return cursor.rowcount > 0

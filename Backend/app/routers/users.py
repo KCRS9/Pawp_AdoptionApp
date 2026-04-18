@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models.users import UserIn, UserOut, UserUpdate,UserDb
-from app.database import insert_user, get_user_by_email,update_user_db, update_user_me
+from app.models.users import UserIn, UserOut, UserUpdate,UserDb, EmailUpdate
+from app.database import insert_user, get_user_by_email,update_user_db, update_user_me, update_user_email
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -160,3 +160,32 @@ async def upload_avatar(
         #return {"message": "Perfil actualizado correctamente"}
     
     #raise HTTPException(status_code=500, detail="Error al actualizar")#
+
+
+
+@router.patch("/me/email")
+async def change_user_email(
+    data: EmailUpdate, 
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Verificar que la contraseña coincide con el hash del usuario
+    if not verify_password(data.password, current_user.password):
+        raise HTTPException(
+            status_code=400, 
+            detail="La contraseña no es correcta"
+        )
+
+    # 2. Verificar que el nuevo correo no esté registrado por otro
+    if get_user_by_email(data.new_email) is not None:
+        raise HTTPException(
+            status_code=400, 
+            detail="Este correo ya está registrado"
+        )
+
+    # 3. Actualizar el correo en la base de datos
+    success = update_user_email(current_user.id, data.new_email)
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al actualizar el correo")
+
+    return {"message": "Correo actualizado correctamente"}

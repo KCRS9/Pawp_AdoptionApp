@@ -12,6 +12,7 @@ class UserBase(BaseModel):
 class UserIn(UserBase):
     name: str
     password: str
+    description: Optional[str] = None
 
 #Clase OUT: Lo que devolvemos al frontend
 class UserOut(UserBase):
@@ -40,3 +41,8 @@ class UserUpdate(BaseModel): #Para el PATCH
     location: Optional[int] = None
     description: Optional[str] = None
     profile_image: str | None = None
+
+
+class EmailUpdate(BaseModel):
+    password: str
+    new_email: str
