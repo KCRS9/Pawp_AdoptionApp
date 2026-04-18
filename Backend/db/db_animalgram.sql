@@ -119,6 +119,34 @@ CREATE TABLE `RESERVATION` (
 );
 
 
-INSERT INTO `LOCALITY` (name) VALUES 
+INSERT INTO `LOCALITY` (name) VALUES
 ('Álava'), ('Albacete'), ('Alicante'), ('Almería'), ('Asturias'), ('Ávila'), ('Badajoz'), ('Baleares'), ('Barcelona'), ('Burgos'), ('Cáceres'), ('Cádiz'), ('Cantabria'), ('Castellón'), ('Ciudad Real'), ('Córdoba'), ('A Coruña'), ('Cuenca'), ('Girona'), ('Granada'), ('Guadalajara'), ('Gipuzkoa'), ('Huelva'), ('Huesca'), ('Jaén'), ('León'), ('Lleida'), ('Lugo'), ('Madrid'), ('Málaga'), ('Murcia'), ('Navarra'), ('Ourense'), ('Palencia'), ('Las Palmas'), ('Pontevedra'), ('La Rioja'), ('Salamanca'), ('Segovia'), ('Sevilla'), ('Soria'), ('Tarragona'), ('Santa Cruz de Tenerife'), ('Teruel'), ('Toledo'), ('Valencia'), ('Valladolid'), ('Bizkaia'), ('Zamora'), ('Zaragoza'), ('Ceuta'), ('Melilla');
+
+-- Usuario administrador por defecto
+-- Contraseña en texto plano: Admin1234 (hasheada con bcrypt)
+INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES (
+    '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',
+    'Admin',
+    'admin@admin.com',
+    '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq',
+    'admin',
+    1,
+    'Administrador de Pawp',
+    NULL
+);
+
+-- Protectora oficial de Pawp asociada al admin
+-- El campo 'admin' referencia al usuario creado arriba
+INSERT INTO `SHELTER` (id, name, address, location, phone, email, website, description, admin, profile_image) VALUES (
+    'b4e2f1a0-cc33-4d55-9e77-f12345678901',
+    'Pawp Protectora',
+    'Calle Adopción 1',
+    1,
+    '600000000',
+    'protectora@pawp.com',
+    NULL,
+    'Protectora oficial de la plataforma Pawp.',
+    '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',
+    NULL
+);
 

@@ -14,12 +14,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
 import ies.sequeros.dam.ui.theme.PawpPurple
@@ -30,15 +34,18 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChangePasswordScreen(onBack: () -> Unit) {
 
     val viewModel: ChangePasswordViewModel = koinViewModel()
+
+    val appViewModel: AppViewModel = koinViewModel()
+    var newPasswordTouched by remember { mutableStateOf(false) }
+    var confirmPasswordTouched by remember { mutableStateOf(false) }
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
     LaunchedEffect(state.isSuccess) {
-
         if (state.isSuccess) {
-
-            snackbarHost.showSnackbar("Contraseña cambiada correctamente.")
-            onBack()
+            snackbarHost.showSnackbar("Contraseña cambiada. Inicia sesión de nuevo.")
+            appViewModel.logout()
         }
     }
 
@@ -74,9 +81,11 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
             onValueChange = viewModel::onNewPasswordChange,
             label = { Text("Nueva contraseña") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            isError = state.newPasswordError != null,
-            supportingText = { state.newPasswordError?.let { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) newPasswordTouched = true },
+            isError = newPasswordTouched && state.newPasswordError != null,
+            supportingText = { if (newPasswordTouched) state.newPasswordError?.let { Text(it) } },
             singleLine = true
         )
 
@@ -85,11 +94,13 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
         OutlinedTextField(
             value = state.confirmPassword,
             onValueChange = viewModel::onConfirmPasswordChange,
-            label  = { Text("Confirmar nueva contraseña") },
+            label = { Text("Confirmar nueva contraseña") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            isError = state.confirmPasswordError != null,
-            supportingText = { state.confirmPasswordError?.let { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) confirmPasswordTouched = true },
+            isError = confirmPasswordTouched && state.confirmPasswordError != null,
+            supportingText = { if (confirmPasswordTouched) state.confirmPasswordError?.let { Text(it) } },
             singleLine = true
         )
 
