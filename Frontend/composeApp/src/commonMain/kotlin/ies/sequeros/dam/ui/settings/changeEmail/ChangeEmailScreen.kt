@@ -37,6 +37,7 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
 
     val viewModel: ChangeEmailViewModel = koinViewModel()
     val appViewModel: AppViewModel = koinViewModel()
+    var emailFocused by remember { mutableStateOf(false) }
     var emailTouched by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
@@ -72,7 +73,10 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
             label = { Text("Nuevo correo electrónico") },
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { if (!it.isFocused) emailTouched = true },
+                .onFocusChanged { fs ->
+                    if (fs.isFocused) emailFocused = true
+                    else if (emailFocused) emailTouched = true
+                },
             isError = emailTouched && state.emailError != null,
             supportingText = { if (emailTouched) state.emailError?.let { Text(it) } },
             singleLine = true,
