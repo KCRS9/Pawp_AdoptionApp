@@ -26,5 +26,16 @@ data class RegisterState(
     val locationError: String? = null,
 
     // Error del servidor
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+
+    // Campos para el registro de protectora
+    // isShelter controla si se muestran los campos adicionales
+    val isShelter: Boolean = false,
+    val shelterName: String = "",
+    val shelterDescription: String  = "",
+    val shelterPhone: String = "",
+    val shelterEmail: String = "",
+    val shelterNameError: String? = null,
+    val shelterPhoneError: String? = null,
+    val shelterEmailError: String? = null
 )

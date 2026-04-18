@@ -108,21 +108,79 @@ class RegisterViewModel(
         validateForm()
     }
 
-    private fun validateForm(){
+    fun onIsShelterChange(value: Boolean) {
 
-        val s = _state.value
+        _state.update { it.copy(isShelter = value) }
+        validateForm()
+    }
+
+    fun onShelterNameChange(value: String) {
+
         _state.update {
             it.copy(
-                isValid =   s.name.isNotBlank() &&
-                            s.email.isNotBlank()&&
-                            s.password.isNotBlank()&&
-                            s.confirmPassword.isNotBlank()&&
-                            s.locationId != null &&
-                            s.nameError == null &&
-                            s.emailError == null &&
-                            s.passwordError == null &&
-                            s.confirmPasswordError == null &&
-                            s.locationError == null
+                shelterName = value,
+                shelterNameError = if (value.length >= 2) null else "Mínimo 2 caracteres"
+            )
+        }
+        validateForm()
+    }
+
+    fun onShelterDescriptionChange(value: String) {
+
+        _state.update { it.copy(shelterDescription = value) }
+        validateForm()
+    }
+
+    fun onShelterPhoneChange(value: String) {
+
+        _state.update {
+            it.copy(
+                shelterPhone = value,
+                shelterPhoneError = if (value.length >= 9) null else "Teléfono no válido"
+            )
+        }
+        validateForm()
+    }
+
+    fun onShelterEmailChange(value: String) {
+
+        _state.update {
+            it.copy(
+                shelterEmail = value,
+                shelterEmailError = ValidationUtils.emailError(value)
+            )
+        }
+        validateForm()
+    }
+
+    private fun validateForm() {
+
+        val s = _state.value
+
+        // Si es protectora, todos sus campos deben ser válidos también
+        val shelterValid = if (s.isShelter) {
+            s.shelterName.isNotBlank() &&
+                    s.shelterDescription.isNotBlank() &&
+                    s.shelterPhone.isNotBlank() &&
+                    s.shelterEmail.isNotBlank() &&
+                    s.shelterNameError == null &&
+                    s.shelterPhoneError == null &&
+                    s.shelterEmailError == null
+        } else true
+
+        _state.update {
+            it.copy(
+                isValid = s.name.isNotBlank()            &&
+                        s.email.isNotBlank()           &&
+                        s.password.isNotBlank()        &&
+                        s.confirmPassword.isNotBlank() &&
+                        s.locationId != null           &&
+                        s.nameError == null            &&
+                        s.emailError == null           &&
+                        s.passwordError == null        &&
+                        s.confirmPasswordError == null &&
+                        s.locationError == null        &&
+                        shelterValid
             )
         }
     }
@@ -139,11 +197,17 @@ class RegisterViewModel(
             try{
 
                 registerUseCase(
+
                     RegisterCommand(
-                        name = _state.value.name,
-                        email = _state.value.email,
-                        password = state.value.password,
-                        location = _state.value.locationId!!
+
+                        name               = _state.value.name,
+                        email              = _state.value.email,
+                        password           = _state.value.password,
+                        location           = _state.value.locationId!!,
+                        shelterName        = _state.value.shelterName.ifBlank { null },
+                        shelterDescription = _state.value.shelterDescription.ifBlank { null },
+                        shelterPhone       = _state.value.shelterPhone.ifBlank { null },
+                        shelterEmail       = _state.value.shelterEmail.ifBlank { null }
                     )
                 )
 

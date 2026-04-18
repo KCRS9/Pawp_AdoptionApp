@@ -12,11 +12,15 @@ class RegisterUseCase(
     suspend operator fun invoke(command: RegisterCommand): User {
 
         return authRepository.register(
+
             name = command.name,
             email = command.email,
             password = command.password,
             location = command.location,
-            role = command.role
+            shelterName = command.shelterName,
+            shelterDescription = command.shelterDescription,
+            shelterPhone = command.shelterPhone,
+            shelterEmail = command.shelterEmail
         )
     }
 }

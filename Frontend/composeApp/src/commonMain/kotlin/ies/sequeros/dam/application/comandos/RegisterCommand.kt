@@ -6,5 +6,8 @@ data class RegisterCommand(
     val email: String,
     val password: String,
     val location: Int,
-    val role: String = "user"
+    val shelterName: String?        = null,
+    val shelterDescription: String? = null,
+    val shelterPhone: String?       = null,
+    val shelterEmail: String?       = null
 )

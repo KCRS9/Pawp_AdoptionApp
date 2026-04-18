@@ -1,5 +1,6 @@
 package ies.sequeros.dam.ui.components.register
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -51,12 +54,27 @@ fun RegisterComponent(
     onConfirmPasswordChange: (String) -> Unit,
     onLocationSelect: (id: Int, name: String) -> Unit,
     onRegisterClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onIsShelterChange: (Boolean) -> Unit,
+    onShelterNameChange: (String) -> Unit,
+    onShelterDescriptionChange: (String) -> Unit,
+    onShelterPhoneChange: (String) -> Unit,
+    onShelterEmailChange: (String) -> Unit,
 ) {
 
+    var emailFocused           by remember { mutableStateOf(false) }
     var emailTouched           by remember { mutableStateOf(false) }
+    var passwordFocused        by remember { mutableStateOf(false) }
     var passwordTouched        by remember { mutableStateOf(false) }
+    var confirmPasswordFocused by remember { mutableStateOf(false) }
     var confirmPasswordTouched by remember { mutableStateOf(false) }
+
+    var shelterNameFocused  by remember { mutableStateOf(false) }
+    var shelterNameTouched  by remember { mutableStateOf(false) }
+    var shelterEmailFocused by remember { mutableStateOf(false) }
+    var shelterEmailTouched by remember { mutableStateOf(false) }
+    var shelterPhoneFocused by remember { mutableStateOf(false) }
+    var shelterPhoneTouched by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -104,7 +122,10 @@ fun RegisterComponent(
                 label = { Text("Email") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) emailTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) emailFocused = true
+                        else if (emailFocused) emailTouched = true
+                    },
                 isError = emailTouched && state.emailError != null,
                 supportingText = { if (emailTouched) state.emailError?.let { Text(it) } },
                 singleLine = true,
@@ -121,7 +142,10 @@ fun RegisterComponent(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) passwordTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) passwordFocused = true
+                        else if (passwordFocused) passwordTouched = true
+                    },
                 isError = passwordTouched && state.passwordError != null,
                 supportingText = { if (passwordTouched) state.passwordError?.let { Text(it) } },
                 singleLine = true,
@@ -138,7 +162,10 @@ fun RegisterComponent(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { if (!it.isFocused) confirmPasswordTouched = true },
+                    .onFocusChanged { fs ->
+                        if (fs.isFocused) confirmPasswordFocused = true
+                        else if (confirmPasswordFocused) confirmPasswordTouched = true
+                    },
                 isError = confirmPasswordTouched && state.confirmPasswordError != null,
                 supportingText = { if (confirmPasswordTouched) state.confirmPasswordError?.let { Text(it) } },
                 singleLine = true,
@@ -168,6 +195,101 @@ fun RegisterComponent(
                 )
 
                 Spacer(Modifier.height(12.dp))
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+// Casilla para activar el registro como protectora
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = state.isShelter,
+                    onCheckedChange = onIsShelterChange,
+                    colors = CheckboxDefaults.colors(checkedColor = PawpPurple)
+                )
+                Text(
+                    text = "Soy una protectora",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+// Los campos de protectora se despliegan con animación al marcar la casilla
+            AnimatedVisibility(visible = state.isShelter) {
+                Column {
+                    Spacer(Modifier.height(4.dp))
+
+                    Text(
+                        text = "Datos de la protectora",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = PawpPurple
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = state.shelterName,
+                        onValueChange = onShelterNameChange,
+                        label = { Text("Nombre de la protectora") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterNameFocused = true
+                                else if (shelterNameFocused) shelterNameTouched = true
+                            },
+                        isError = shelterNameTouched && state.shelterNameError != null,
+                        supportingText = { if (shelterNameTouched) state.shelterNameError?.let { Text(it) } },
+                        singleLine = true
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = state.shelterPhone,
+                        onValueChange = onShelterPhoneChange,
+                        label = { Text("Teléfono de contacto") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterPhoneFocused = true
+                                else if (shelterPhoneFocused) shelterPhoneTouched = true
+                            },
+                        isError = shelterPhoneTouched && state.shelterPhoneError != null,
+                        supportingText = { if (shelterPhoneTouched) state.shelterPhoneError?.let { Text(it) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = state.shelterEmail,
+                        onValueChange = onShelterEmailChange,
+                        label = { Text("Correo de la protectora") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { fs ->
+                                if (fs.isFocused) shelterEmailFocused = true
+                                else if (shelterEmailFocused) shelterEmailTouched = true
+                            },
+                        isError = shelterEmailTouched && state.shelterEmailError != null,
+                        supportingText = { if (shelterEmailTouched) state.shelterEmailError?.let { Text(it) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = state.shelterDescription,
+                        onValueChange = onShelterDescriptionChange,
+                        label = { Text("Descripción") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        maxLines = 5
+                    )
+                }
             }
 
             Row(

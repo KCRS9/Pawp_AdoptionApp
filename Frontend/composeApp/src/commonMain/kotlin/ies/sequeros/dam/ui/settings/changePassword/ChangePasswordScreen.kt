@@ -36,7 +36,9 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
     val viewModel: ChangePasswordViewModel = koinViewModel()
 
     val appViewModel: AppViewModel = koinViewModel()
-    var newPasswordTouched by remember { mutableStateOf(false) }
+    var newPasswordFocused     by remember { mutableStateOf(false) }
+    var newPasswordTouched     by remember { mutableStateOf(false) }
+    var confirmPasswordFocused by remember { mutableStateOf(false) }
     var confirmPasswordTouched by remember { mutableStateOf(false) }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -83,7 +85,10 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { if (!it.isFocused) newPasswordTouched = true },
+                .onFocusChanged { fs ->
+                    if (fs.isFocused) newPasswordFocused = true
+                    else if (newPasswordFocused) newPasswordTouched = true
+                },
             isError = newPasswordTouched && state.newPasswordError != null,
             supportingText = { if (newPasswordTouched) state.newPasswordError?.let { Text(it) } },
             singleLine = true
@@ -98,7 +103,10 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { if (!it.isFocused) confirmPasswordTouched = true },
+                .onFocusChanged { fs ->
+                    if (fs.isFocused) confirmPasswordFocused = true
+                    else if (confirmPasswordFocused) confirmPasswordTouched = true
+                },
             isError = confirmPasswordTouched && state.confirmPasswordError != null,
             supportingText = { if (confirmPasswordTouched) state.confirmPasswordError?.let { Text(it) } },
             singleLine = true
