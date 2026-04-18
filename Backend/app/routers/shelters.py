@@ -1,8 +1,11 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends
 from app.models.shelters import ShelterIn, ShelterOut
-from app.models.users import UserOut
-from app.database import insert_shelter, get_shelter_by_id, update_shelter
-from app.routers.users import get_current_user as get_current_user_profile
+from app.models.users import UserOut, UserDb
+from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo
+from app.routers.users import get_current_user as get_current_user_profile, get_current_user
+import time
+import os
+import shutil
 
 
 router = APIRouter(
@@ -68,3 +71,47 @@ async def edit_monitor_shelter(
         raise HTTPException(status_code=404, detail="No se pudo actualizar (quizás no existe)")
 
     return {"message": "Protectora actualizada correctamente"}
+
+
+
+@router.post("/{shelter_id}/logo")
+async def upload_shelter_logo(
+    shelter_id: str,
+    file: UploadFile = File(...),
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Verifica si la protectora existe
+    shelter = get_shelter_by_id(shelter_id)
+    if not shelter:
+        raise HTTPException(status_code=404, detail="Protectora no encontrada")
+
+    # 2. Verifica que el usuario es el dueño (admin) de la protectora
+    if shelter.admin != current_user.id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para editar esta protectora")
+
+    # 3. Crea la carpeta si no existe
+    upload_dir = "app/static/shelters"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    # 4. Genera el nombre del archivo único con timestamp
+    timestamp = int(time.time())
+    file_extension = file.filename.split(".")[-1]
+    file_name = f"logo_{shelter_id}_{timestamp}.{file_extension}"
+    file_path = os.path.join(upload_dir, file_name)
+
+    # 5. Guarda el archivo físicamente
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al guardar el archivo")
+
+    # 6. Actualiza la URL en la base de datos
+    image_url = f"/static/shelters/{file_name}"
+    success = update_shelter_logo(shelter_id, image_url)
+
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al actualizar la base de datos")
+
+    return {"profile_image": image_url}

@@ -221,6 +221,16 @@ def insert_user_with_shelter(user: UserIn, shelter_data: ShelterRegistrationData
         except Exception as e:
             conn.rollback()
             raise e
+        
+
+def update_shelter_logo(shelter_id: str, logo_url: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE SHELTER SET profile_image = ? WHERE id = ?"
+            cursor.execute(sql, (logo_url, shelter_id))
+            conn.commit()
+            return cursor.rowcount > 0
+        
 
 def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
     """ Recupera una protectora por ID (Pública) """
