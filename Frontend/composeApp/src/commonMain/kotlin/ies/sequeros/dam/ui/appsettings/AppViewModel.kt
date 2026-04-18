@@ -63,8 +63,12 @@ class AppViewModel(
         }
     }
 
-    // Función para recargar el usuario
-    fun refreshCurrentUser() = fetchCurrentUser()
+    // Limpiamos el perfil antes de refrescar para que la UI muestre
+    // CircularProgressIndicator en vez de datos del usuario anterior.
+    fun refreshCurrentUser() {
+        settings.clearUserProfile()
+        fetchCurrentUser()
+    }
     fun notifyLogin() {
 
         settings.clearUserProfile()
