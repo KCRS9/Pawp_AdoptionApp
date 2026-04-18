@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.comandos.ChangePasswordCommand
 import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
+import ies.sequeros.dam.utils.ValidationUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +28,7 @@ class ChangePasswordViewModel(
         _state.update {
             it.copy(
                 newPassword = value,
-                newPasswordError = if (value.length >= 6) null else "Mínimo 6 caracteres",
+                newPasswordError = ValidationUtils.passwordErrorStrong(value),
                 confirmPasswordError = if (it.confirmPassword == value) null else "Las contraseñas no coinciden"
             )
         }
