@@ -47,6 +47,7 @@ import ies.sequeros.dam.domain.models.User
 import ies.sequeros.dam.ui.components.common.UserAvatar
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import ies.sequeros.dam.ui.extensions.toRoleLabel
+import ies.sequeros.dam.ui.extensions.toTitleCase
 
 @Composable
 fun PawpDrawer(
@@ -215,7 +216,7 @@ private fun DrawerHeader(currentUser: User?){
             Column {
 
                 Text(
-                    text = currentUser?.name?: "Cargando...",
+                    text = currentUser?.name?.toTitleCase()?: "Cargando...",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White,
                     maxLines = 1,

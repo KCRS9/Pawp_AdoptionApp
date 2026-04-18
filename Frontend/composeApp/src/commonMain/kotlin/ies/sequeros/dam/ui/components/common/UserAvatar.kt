@@ -1,11 +1,13 @@
 package ies.sequeros.dam.ui.components.common
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -23,23 +25,30 @@ fun UserAvatar(
     modifier: Modifier = Modifier
 ) {
 
-    if(imageUrl != null){
-
-        AsyncImage(
-            model =imageUrl,
-            contentDescription = "Foto de perfil",
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-                .size(size)
-                .clip(CircleShape)
-        )
-    }else{
-
+    Box(
+        modifier = modifier.size(size).clip(CircleShape),
+        contentAlignment = Alignment.Center
+    ){
         Icon(
             imageVector = Icons.Filled.AccountCircle,
             contentDescription = "Foto de perfil",
             tint = PawpPurple,
             modifier = modifier.size(size)
         )
+
+        if(imageUrl != null){
+
+
+            AsyncImage(
+                model =imageUrl,
+                contentDescription = "Foto de perfil",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+            )
+        }
+
     }
+
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ies.sequeros.dam.application.comandos.ChangeEmailCommand
 import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
+import ies.sequeros.dam.utils.ValidationUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +23,7 @@ class ChangeEmailViewModel(
         _state.update {
             it.copy(
                 newEmail   = value,
-                emailError = if (value.contains("@")) null else "Email no válido"
+                emailError = ValidationUtils.emailError(value)
             )
         }
     }

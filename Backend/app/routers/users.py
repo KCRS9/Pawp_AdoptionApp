@@ -124,17 +124,26 @@ async def upload_avatar(
     avatar: UploadFile = File(...),
     current_user: UserDb = Depends(get_current_user)
 ):
-    # 1. Definir la ruta donde se guardará
+    import time
+    import os
+
+    # 1. Nombre único con timestamp → URL distinta en cada subida (invalida caché de Coil)
     file_extension = avatar.filename.split(".")[-1]
-    file_name = f"avatar_{current_user.id}.{file_extension}"
+    timestamp = int(time.time())
+    file_name = f"avatar_{current_user.id}_{timestamp}.{file_extension}"
     file_path = f"app/static/images/{file_name}"
 
-    # 2. Guardar el archivo físicamente en el servidor
+    # 2. Borrar el avatar anterior si existe (evita acumular archivos huérfanos)
+    if current_user.profile_image:
+        old_path = f"app{current_user.profile_image}"   # "/static/images/..." → "app/static/images/..."
+        if os.path.exists(old_path):
+            os.remove(old_path)
+
+    # 3. Guardar el nuevo archivo
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(avatar.file, buffer)
 
-    # 3. Actualizar la base de datos con la URL de la imagen
-    # Guardamos la ruta relativa para que el frontend pueda acceder
+    # 4. Actualizar la base de datos con la nueva URL
     image_url = f"/static/images/{file_name}"
     success = update_user_db(current_user.id, {"profile_image": image_url})
 

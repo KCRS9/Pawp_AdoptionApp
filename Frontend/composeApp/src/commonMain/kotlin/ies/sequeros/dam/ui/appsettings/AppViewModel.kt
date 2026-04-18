@@ -67,6 +67,7 @@ class AppViewModel(
     fun refreshCurrentUser() = fetchCurrentUser()
     fun notifyLogin() {
 
+        settings.clearUserProfile()
         sessionManager.notifyLogin()
         fetchCurrentUser()
     }
