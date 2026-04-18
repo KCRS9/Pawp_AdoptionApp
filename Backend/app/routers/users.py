@@ -1,7 +1,10 @@
 from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models.users import UserIn, UserOut, UserUpdate,UserDb, EmailUpdate
-from app.database import insert_user, get_user_by_email,update_user_db, update_user_me, update_user_email
+from typing import Optional
+from pydantic import BaseModel
+from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate
+from app.models.shelters import ShelterRegistrationData
+from app.database import insert_user, insert_user_with_shelter, get_user_by_email, update_user_db, update_user_me, update_user_email
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -27,33 +30,47 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-# Ruta para crear un usuario
-@router.post(
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    location: int
+    description: Optional[str] = None
+    shelter: Optional[ShelterRegistrationData] = None
 
-    "/signup/", 
-    status_code = status.HTTP_201_CREATED
-)
-async def create_user(userIn: UserIn):
 
-    # 1. Compruebo que el usuario no existe
-    if get_user_by_email(userIn.email) is not None:
+@router.post("/signup/", status_code=status.HTTP_201_CREATED)
+async def create_user(request: SignupRequest):
 
-        # raise es una excepcion que se lanza cuando se cumple una condicion
+    # 1. Compruebo que el correo no está registrado
+    if get_user_by_email(request.email) is not None:
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = "The user already exists"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo ya está registrado"
         )
-    
+
+    user_in = UserIn(
+        name=request.name,
+        email=request.email,
+        password=request.password,
+        location=request.location,
+        description=request.description,
+        role="shelter" if request.shelter else "user"
+    )
 
     try:
-        # 2. Inserto el usuario
-        user_id = insert_user(userIn)
-        return {"id": user_id, "message": "User created successfully"}
+        if request.shelter:
+            
+            user_id = insert_user_with_shelter(user_in, request.shelter)
+        else:
+            user_id = insert_user(user_in)
+
+        return {"id": user_id, "message": "Usuario registrado correctamente"}
 
     except Exception as e:
         raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )
 
 # Ruta para iniciar sesión
