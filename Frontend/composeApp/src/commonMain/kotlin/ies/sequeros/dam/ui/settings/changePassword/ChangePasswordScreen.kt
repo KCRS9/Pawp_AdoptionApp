@@ -1,5 +1,6 @@
 package ies.sequeros.dam.ui.settings.changePassword
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -45,7 +48,12 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
     // Volver al drawer si el cambio fue exitoso
     LaunchedEffect(state.isSuccess) {
 
-        if (state.isSuccess) onBack()
+        //snackbarHost.showSnackbar("Contraseña cambiada correctamente")
+        if (state.isSuccess) {
+            snackbarHost.showSnackbar("Correo actualizado correctamente.")
+            onBack()
+        }
+
     }
 
     // Mostrar error del servidor en Snackbar
@@ -71,70 +79,85 @@ fun ChangePasswordScreen(onBack: () -> Unit) {
 
     ) { innerPadding ->
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 24.dp, vertical = 24.dp)
-        ) {
+                .padding(innerPadding),
+            contentAlignment = Alignment.TopCenter
+        ){
 
-            OutlinedTextField(
-                value = state.oldPassword,
-                onValueChange = viewModel::onOldPasswordChange,
-                label = { Text("Contraseña actual") },
-                visualTransformation  = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 24.dp, vertical = 24.dp)
             )
+            {
 
-            Spacer(Modifier.height(8.dp))
+                PawpCard(showImage = true)
 
-            OutlinedTextField(
-                value = state.newPassword,
-                onValueChange = viewModel::onNewPasswordChange,
-                label = { Text("Nueva contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.newPasswordError != null,
-                supportingText = { state.newPasswordError?.let { Text(it) } },
-                singleLine = true
-            )
+                Spacer(Modifier.height(24.dp))
 
-            Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = state.oldPassword,
+                    onValueChange = viewModel::onOldPasswordChange,
+                    label = { Text("Contraseña actual") },
+                    visualTransformation  = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
 
-            OutlinedTextField(
-                value = state.confirmPassword,
-                onValueChange = viewModel::onConfirmPasswordChange,
-                label = { Text("Confirmar nueva contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.confirmPasswordError != null,
-                supportingText = { state.confirmPasswordError?.let { Text(it) } },
-                singleLine = true
-            )
+                Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = state.newPassword,
+                    onValueChange = viewModel::onNewPasswordChange,
+                    label = { Text("Nueva contraseña") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = state.newPasswordError != null,
+                    supportingText = { state.newPasswordError?.let { Text(it) } },
+                    singleLine = true
+                )
 
-            Button(
-                onClick = viewModel::changePassword,
-                enabled = state.isValid && !state.isLoading,
-                shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PawpPurpleDark,
-                    contentColor   = Color.White
-                ),
+                Spacer(Modifier.height(8.dp))
 
-                modifier = Modifier.fillMaxWidth()
+                OutlinedTextField(
+                    value = state.confirmPassword,
+                    onValueChange = viewModel::onConfirmPasswordChange,
+                    label = { Text("Confirmar nueva contraseña") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = state.confirmPasswordError != null,
+                    supportingText = { state.confirmPasswordError?.let { Text(it) } },
+                    singleLine = true
+                )
 
-            ) {
-                if (state.isLoading) {
+                Spacer(Modifier.height(24.dp))
 
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
-                } else {
+                Button(
+                    onClick = viewModel::changePassword,
+                    enabled = state.isValid && !state.isLoading,
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PawpPurpleDark,
+                        contentColor   = Color.White
+                    ),
 
-                    Text("Guardar contraseña")
+                    modifier = Modifier.fillMaxWidth()
+
+                ) {
+                    if (state.isLoading) {
+
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+                    } else {
+
+                        Text("Guardar contraseña")
+                    }
                 }
             }
+
         }
+
     }
 }

@@ -45,6 +45,7 @@ import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.snapshotFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +64,7 @@ fun EditProfileScreen(
     LaunchedEffect(state.isSaveSuccess) {
 
         if (state.isSaveSuccess) {
+            snackbarHost.showSnackbar("Perfil actualizado correctamente.")
             appViewModel.refreshCurrentUser()
             viewModel.onSaveSuccessHandled()
             onBack()
@@ -70,12 +72,25 @@ fun EditProfileScreen(
     }
 
     // Cuando la foto se sube refrescamos sesión (la pantalla no cierra)
-    LaunchedEffect(state.isPhotoSuccess) {
+//    LaunchedEffect(state.isPhotoSuccess) {
+//
+//        if (state.isPhotoSuccess) {
+//            appViewModel.refreshCurrentUser()
+//            viewModel.onPhotoSuccessHandled()
+//            //snackbarHost.showSnackbar("Foto actualizada correctamente")
+//        }
+//    }
 
-        if (state.isPhotoSuccess) {
-            appViewModel.refreshCurrentUser()
-            viewModel.onPhotoSuccessHandled()
-        }
+    LaunchedEffect(Unit){
+
+        snapshotFlow { state.isPhotoSuccess }
+            .collect { success ->
+                if(success){
+                    viewModel.onPhotoSuccessHandled()
+                    appViewModel.refreshCurrentUser()
+                    snackbarHost.showSnackbar("Foto actualizada correctamente")
+                }
+            }
     }
 
     // Mostrar errores en Snackbar
