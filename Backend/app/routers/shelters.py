@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from app.models.shelters import ShelterIn, ShelterOut
 from app.models.users import UserOut
-from app.database import insert_shelter, update_user_shelter_link, get_shelter_by_id, update_shelter
+from app.database import insert_shelter, get_shelter_by_id, update_shelter
 from app.routers.users import get_current_user as get_current_user_profile
 
 

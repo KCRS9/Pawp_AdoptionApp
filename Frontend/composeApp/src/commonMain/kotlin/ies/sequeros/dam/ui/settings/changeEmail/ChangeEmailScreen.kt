@@ -15,13 +15,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
 import ies.sequeros.dam.ui.theme.PawpPurple
@@ -32,6 +36,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChangeEmailScreen(onBack: () -> Unit) {
 
     val viewModel: ChangeEmailViewModel = koinViewModel()
+    val appViewModel: AppViewModel = koinViewModel()
+    var emailTouched by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
@@ -39,8 +45,8 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
 
         if (state.isSuccess) {
 
-            snackbarHost.showSnackbar("Correo actualizado correctamente.")
-            onBack()
+            snackbarHost.showSnackbar("Correo actualizado. Inicia sesión de nuevo.")
+            appViewModel.logout()
         }
     }
 
@@ -64,9 +70,11 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
             value = state.newEmail,
             onValueChange = viewModel::onEmailChange,
             label = { Text("Nuevo correo electrónico") },
-            modifier = Modifier.fillMaxWidth(),
-            isError = state.emailError != null,
-            supportingText = { state.emailError?.let { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) emailTouched = true },
+            isError = emailTouched && state.emailError != null,
+            supportingText = { if (emailTouched) state.emailError?.let { Text(it) } },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
@@ -74,6 +82,7 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
         Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
+
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
             label = { Text("Contraseña actual") },

@@ -38,6 +38,7 @@ import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.register.RegisterState
 import ies.sequeros.dam.ui.theme.PawpPurple
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.focus.onFocusChanged
 import ies.sequeros.dam.ui.components.common.LocalityDropdown
 
 
@@ -52,6 +53,10 @@ fun RegisterComponent(
     onRegisterClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+
+    var emailTouched           by remember { mutableStateOf(false) }
+    var passwordTouched        by remember { mutableStateOf(false) }
+    var confirmPasswordTouched by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -97,9 +102,11 @@ fun RegisterComponent(
                 value = state.email,
                 onValueChange = onEmailChange,
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.emailError != null,
-                supportingText = { state.emailError?.let { Text(it) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { if (!it.isFocused) emailTouched = true },
+                isError = emailTouched && state.emailError != null,
+                supportingText = { if (emailTouched) state.emailError?.let { Text(it) } },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
@@ -112,9 +119,11 @@ fun RegisterComponent(
                 onValueChange = onPasswordChange,
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.passwordError != null,
-                supportingText = { state.passwordError?.let { Text(it) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { if (!it.isFocused) passwordTouched = true },
+                isError = passwordTouched && state.passwordError != null,
+                supportingText = { if (passwordTouched) state.passwordError?.let { Text(it) } },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
@@ -127,9 +136,11 @@ fun RegisterComponent(
                 onValueChange = onConfirmPasswordChange,
                 label = { Text("Confirmar contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                isError = state.confirmPasswordError != null,
-                supportingText = { state.confirmPasswordError?.let { Text(it) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { if (!it.isFocused) confirmPasswordTouched = true },
+                isError = confirmPasswordTouched && state.confirmPasswordError != null,
+                supportingText = { if (confirmPasswordTouched) state.confirmPasswordError?.let { Text(it) } },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
