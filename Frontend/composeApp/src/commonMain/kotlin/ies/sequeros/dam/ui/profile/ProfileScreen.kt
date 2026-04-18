@@ -74,7 +74,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileContent(
-                
+
                 user         = currentUser!!,
                 isOwnProfile = isOwnProfile,
                 onEditClick  = onEditClick
