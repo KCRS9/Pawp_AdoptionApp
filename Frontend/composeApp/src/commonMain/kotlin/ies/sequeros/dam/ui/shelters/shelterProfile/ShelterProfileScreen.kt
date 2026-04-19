@@ -1,9 +1,24 @@
 package ies.sequeros.dam.ui.shelters.shelterProfile
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,21 +30,23 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.components.common.AnimalMiniCard
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
 import ies.sequeros.dam.ui.components.profile.ProfileStatColumn
 import ies.sequeros.dam.ui.theme.PawpPurple
-import ies.sequeros.dam.ui.theme.PawpSurfaceDark
+import ies.sequeros.dam.ui.theme.pawpOnSurfaceTextColor
+import ies.sequeros.dam.ui.theme.pawpSurfaceColor
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ShelterProfileScreen(
     shelterId: String,
     onBack: () -> Unit,
-    // null = vista de solo lectura (listado público)
-    // non-null = el usuario es admin de esta protectora
     onEditClick: (() -> Unit)? = null,
-    onAdminClick: (String) -> Unit = {}
+    onAdminClick: (String) -> Unit = {},
+    onAnimalClick: (String) -> Unit = {},
+    onVerAnimalesClick: (() -> Unit)? = null
 ) {
     val viewModel: ShelterProfileViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -38,14 +55,14 @@ fun ShelterProfileScreen(
     LaunchedEffect(shelterId) { viewModel.load(shelterId) }
 
     SettingsFormScaffold(
-        title        = state.shelter?.name ?: "Protectora",
-        onBack       = onBack,
+        title = state.shelter?.name ?: "Protectora",
+        onBack = onBack,
         snackbarHost = snackbarHost
     ) {
 
         if (state.isLoading) {
             Box(
-                modifier         = Modifier.fillMaxWidth().padding(top = 48.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
             return@SettingsFormScaffold
@@ -53,29 +70,26 @@ fun ShelterProfileScreen(
 
         val shelter = state.shelter ?: return@SettingsFormScaffold
 
-        // ── Foto de perfil con lápiz opcional (solo para el admin)
         AvatarWithPencil(
-            imageUrl    = shelter.profileImage,
-            size        = 196.dp,
+            imageUrl = shelter.profileImage,
+            size = 196.dp,
             onEditClick = onEditClick,
-            modifier    = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
         Spacer(Modifier.height(16.dp))
 
-        // ── Nombre
         Text(
-            text      = shelter.name,
-            style     = MaterialTheme.typography.headlineSmall,
+            text = shelter.name,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
-            modifier  = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(8.dp))
 
-        // ── Píldora de ubicación + píldora de admin en fila centrada bajo el nombre
         Row(
-            modifier              = Modifier.align(Alignment.CenterHorizontally),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             shelter.locationName?.let { location ->
@@ -84,22 +98,22 @@ fun ShelterProfileScreen(
                     color = PawpPurple.copy(alpha = 0.52f)
                 ) {
                     Text(
-                        text     = location,
-                        style    = MaterialTheme.typography.labelSmall,
-                        color    = Color.White,
+                        text = location,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                     )
                 }
             }
             Surface(
-                shape    = MaterialTheme.shapes.extraLarge,
-                color    = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.extraLarge,
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier.clickable { onAdminClick(shelter.adminId) }
             ) {
                 Text(
-                    text     = "Admin: ${shelter.adminName ?: shelter.adminId}",
-                    style    = MaterialTheme.typography.labelSmall,
-                    color    = MaterialTheme.colorScheme.onSecondaryContainer,
+                    text = "Admin: ${shelter.adminName ?: shelter.adminId}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                 )
             }
@@ -107,46 +121,44 @@ fun ShelterProfileScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // ── Estadísticas (en adopción real, publicaciones y seguidores estéticos)
         Row(
-            modifier              = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStatColumn(label = "En adopción",   value = shelter.animals.size.toString(), onClick = {})
+            ProfileStatColumn(label = "En adopción", value = shelter.animals.size.toString(), onClick = {})
             ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
-            ProfileStatColumn(label = "Seguidores",    value = "0", onClick = {})
+            ProfileStatColumn(label = "Seguidores", value = "0", onClick = {})
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // ── Descripción
-        val descriptionBg = if (isSystemInDarkTheme()) PawpSurfaceDark else Color(0xFFF0F0F0)
+        val descriptionBg = pawpSurfaceColor()
+        val descriptionText = pawpOnSurfaceTextColor()
         Surface(
-            shape    = MaterialTheme.shapes.medium,
-            color    = descriptionBg,
+            shape = MaterialTheme.shapes.medium,
+            color = descriptionBg,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
         ) {
             if (shelter.description.isNotBlank()) {
                 Text(
-                    text     = shelter.description,
-                    style    = MaterialTheme.typography.bodyMedium,
-                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = shelter.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = descriptionText,
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
                 Text(
-                    text      = "Esta protectora aún no tiene descripción.",
-                    style     = MaterialTheme.typography.bodyMedium,
-                    color     = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    text = "Esta protectora aún no tiene descripción.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = descriptionText.copy(alpha = 0.5f),
                     fontStyle = FontStyle.Italic,
-                    modifier  = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp)
                 )
             }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // ── Datos de contacto
         ShelterInfoRow("Teléfono", shelter.phone)
         ShelterInfoRow("Email", shelter.email)
         shelter.address?.let { ShelterInfoRow("Dirección", it) }
@@ -156,17 +168,55 @@ fun ShelterProfileScreen(
         HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
-        // ── Sección de publicaciones (placeholder)
+        // ── Sección animales en adopción
+        if (onVerAnimalesClick != null) {
+            TextButton(onClick = onVerAnimalesClick) {
+                Text("En adopción (${shelter.animals.size})", style = MaterialTheme.typography.titleMedium)
+            }
+        } else {
+            Text(
+                text = "En adopción (${shelter.animals.size})",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        if (shelter.animals.isEmpty()) {
+            Text(
+                text = "Esta protectora aún no tiene animales registrados.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(shelter.animals) { animal ->
+                    AnimalMiniCard(
+                        name = animal.name,
+                        species = animal.species,
+                        gender = animal.gender,
+                        profileImage = animal.profileImage,
+                        modifier = Modifier.width(160.dp),
+                        onClick = { onAnimalClick(animal.id) }
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(16.dp))
+
         Text("Publicaciones", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         Surface(
-            shape    = MaterialTheme.shapes.medium,
-            color    = MaterialTheme.colorScheme.surfaceVariant,
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.fillMaxWidth().height(80.dp)
         ) {
             Box(Modifier.padding(12.dp), contentAlignment = Alignment.CenterStart) {
                 Text(
-                    text  = "Próximamente",
+                    text = "Próximamente",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

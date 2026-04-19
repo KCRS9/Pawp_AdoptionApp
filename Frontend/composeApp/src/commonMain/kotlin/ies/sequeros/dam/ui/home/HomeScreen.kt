@@ -15,13 +15,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailScreen
+import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditScreen
+import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesScreen
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.home.dialog.ThemeDialog
 import ies.sequeros.dam.ui.inicio.InicioScreen
 import ies.sequeros.dam.ui.mensajes.MensajesScreen
 import ies.sequeros.dam.ui.profile.EditProfileScreen
 import ies.sequeros.dam.ui.profile.ProfileScreen
-
 import ies.sequeros.dam.ui.shelters.ProtectorasScreen
 import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
@@ -45,7 +47,10 @@ enum class HomeDestination {
     CHANGE_PASSWORD,
     CHANGE_EMAIL,
     SHELTER_PROFILE,
-    SHELTER_EDIT
+    SHELTER_EDIT,
+    ANIMAL_DETAIL,
+    ANIMAL_EDIT,
+    MIS_ANIMALES
 }
 
 @Composable
@@ -53,23 +58,21 @@ fun HomeScreen() {
 
     val appViewModel: AppViewModel = koinViewModel()
     val currentUser by appViewModel.currentUser.collectAsStateWithLifecycle()
-    val themeMode   by appViewModel.themeMode.collectAsStateWithLifecycle()
+    val themeMode by appViewModel.themeMode.collectAsStateWithLifecycle()
 
-    var selectedTab     by remember { mutableStateOf(HomeTab.INICIO) }
+    var selectedTab by remember { mutableStateOf(HomeTab.INICIO) }
     var showThemeDialog by remember { mutableStateOf(false) }
     var homeDestination by remember { mutableStateOf(HomeDestination.TABS) }
 
-    // DrawerState controla si el panel lateral está abierto o cerrado
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    // rememberCoroutineScope() proporciona el scope para lanzar corutinas en lambdas
     val scope = rememberCoroutineScope()
 
     var selectedShelterId by remember { mutableStateOf<String?>(null) }
+    var selectedAnimalId by remember { mutableStateOf<String?>(null) }
 
-    // Diálogo de modo oscuro — se renderiza encima del drawer
     if (showThemeDialog) {
         ThemeDialog(
-            currentMode    = themeMode,
+            currentMode = themeMode,
             onModeSelected = { mode ->
                 appViewModel.setThemeMode(mode)
                 showThemeDialog = false
@@ -79,17 +82,24 @@ fun HomeScreen() {
     }
 
     ModalNavigationDrawer(
-        drawerState   = drawerState,
+        drawerState = drawerState,
         drawerContent = {
             PawpDrawer(
                 currentUser = currentUser,
                 onMyProfileClick = {
                     homeDestination = HomeDestination.PROFILE
-                    scope.launch { drawerState.close()}
-                                        },
+                    scope.launch { drawerState.close() }
+                },
                 onMyAdoptionsClick = { scope.launch { drawerState.close() } },
-                onMyAnimalsClick = { scope.launch { drawerState.close() } },
-                onRegisterAnimalClick = { scope.launch { drawerState.close() } },
+                onMyAnimalsClick = {
+                    homeDestination = HomeDestination.MIS_ANIMALES
+                    scope.launch { drawerState.close() }
+                },
+                onRegisterAnimalClick = {
+                    selectedAnimalId = null
+                    homeDestination = HomeDestination.ANIMAL_EDIT
+                    scope.launch { drawerState.close() }
+                },
                 onAdminPanelClick = { scope.launch { drawerState.close() } },
                 onNotificationsClick = { scope.launch { drawerState.close() } },
                 onThemeClick = {
@@ -99,7 +109,6 @@ fun HomeScreen() {
                 onLogoutClick = {
                     scope.launch { drawerState.close() }
                     appViewModel.logout()
-
                 },
                 onChangeEmailClick = {
                     homeDestination = HomeDestination.CHANGE_EMAIL
@@ -109,7 +118,6 @@ fun HomeScreen() {
                     homeDestination = HomeDestination.CHANGE_PASSWORD
                     scope.launch { drawerState.close() }
                 },
-
                 onMyShelterClick = {
                     selectedShelterId = currentUser?.shelterId
                     homeDestination = HomeDestination.SHELTER_PROFILE
@@ -119,37 +127,30 @@ fun HomeScreen() {
         }
     ) {
 
-        when (homeDestination){
+        when (homeDestination) {
 
             HomeDestination.PROFILE -> {
                 ProfileScreen(
-                    onBack = {
-                        homeDestination = HomeDestination.TABS
-                    },
-                    onEditClick ={
-                        homeDestination = HomeDestination.EDIT_PROFILE
-                    }
-
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onEditClick = { homeDestination = HomeDestination.EDIT_PROFILE }
                 )
-
             }
 
             HomeDestination.TABS -> {
-                // Contenido principal
                 Scaffold(
                     topBar = {
                         PawpTopBar(
-                            onMenuClick         = { scope.launch { drawerState.open() } },
+                            onMenuClick = { scope.launch { drawerState.open() } },
                             onNotificationClick = { },
-                            onAvatarClick       = { homeDestination = HomeDestination.PROFILE},
+                            onAvatarClick = { homeDestination = HomeDestination.PROFILE },
                             profileImage = currentUser?.profileImage
                         )
                     },
                     bottomBar = {
                         PawpBottomNavigation(
-                            selectedTab   = selectedTab,
+                            selectedTab = selectedTab,
                             onTabSelected = { selectedTab = it },
-                            onAddClick    = { }
+                            onAddClick = { }
                         )
                     }
                 ) { innerPadding ->
@@ -159,14 +160,16 @@ fun HomeScreen() {
                             .padding(innerPadding)
                     ) {
                         when (selectedTab) {
-                            HomeTab.INICIO -> InicioScreen()
-                            HomeTab.SOCIAL      -> SocialScreen()
-                            HomeTab.MENSAJES    -> MensajesScreen()
-
+                            HomeTab.INICIO -> InicioScreen(
+                                onAnimalClick = { id ->
+                                    selectedAnimalId = id
+                                    homeDestination = HomeDestination.ANIMAL_DETAIL
+                                }
+                            )
+                            HomeTab.SOCIAL -> SocialScreen()
+                            HomeTab.MENSAJES -> MensajesScreen()
                             HomeTab.PROTECTORAS -> ProtectorasScreen(
-
                                 onShelterClick = { shelterId ->
-
                                     selectedShelterId = shelterId
                                     homeDestination = HomeDestination.SHELTER_PROFILE
                                 }
@@ -177,30 +180,74 @@ fun HomeScreen() {
             }
 
             HomeDestination.EDIT_PROFILE -> {
-                EditProfileScreen(onBack = {homeDestination = HomeDestination.PROFILE}) }
+                EditProfileScreen(onBack = { homeDestination = HomeDestination.PROFILE })
+            }
 
             HomeDestination.CHANGE_PASSWORD -> {
-                ChangePasswordScreen(onBack = {homeDestination = HomeDestination.TABS}) }
+                ChangePasswordScreen(onBack = { homeDestination = HomeDestination.TABS })
+            }
 
             HomeDestination.CHANGE_EMAIL -> {
-                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS }) }
+                ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS })
+            }
 
             HomeDestination.SHELTER_PROFILE -> {
                 val isOwnShelter = currentUser?.shelterId != null &&
                                    currentUser?.shelterId == selectedShelterId
                 ShelterProfileScreen(
-                    shelterId    = selectedShelterId ?: "",
-                    onBack       = { homeDestination = HomeDestination.TABS },
-                    onEditClick  = if (isOwnShelter) {
-                        { homeDestination = HomeDestination.SHELTER_EDIT }
-                    } else null,
-                    onAdminClick = { homeDestination = HomeDestination.PROFILE }
+                    shelterId = selectedShelterId ?: "",
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onEditClick = if (isOwnShelter) { { homeDestination = HomeDestination.SHELTER_EDIT } } else null,
+                    onAdminClick = { homeDestination = HomeDestination.PROFILE },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onVerAnimalesClick = { homeDestination = HomeDestination.TABS }
                 )
             }
 
             HomeDestination.SHELTER_EDIT -> {
-                // Volvemos al perfil de la protectora, no a los tabs
                 ShelterEditScreen(onBack = { homeDestination = HomeDestination.SHELTER_PROFILE })
+            }
+
+            HomeDestination.ANIMAL_DETAIL -> {
+                val isAdminOfShelter = currentUser?.shelterId != null
+                AnimalDetailScreen(
+                    animalId = selectedAnimalId ?: "",
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onShelterClick = { shelterId ->
+                        selectedShelterId = shelterId
+                        homeDestination = HomeDestination.SHELTER_PROFILE
+                    },
+                    onEditClick = if (isAdminOfShelter) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null
+                )
+            }
+
+            HomeDestination.ANIMAL_EDIT -> {
+                AnimalEditScreen(
+                    animalId = selectedAnimalId,
+                    onBack = {
+                        if (selectedAnimalId != null) homeDestination = HomeDestination.ANIMAL_DETAIL
+                        else homeDestination = HomeDestination.TABS
+                    },
+                    onSaved = { newId ->
+                        selectedAnimalId = newId
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onDeleted = { homeDestination = HomeDestination.SHELTER_PROFILE }
+                )
+            }
+
+            HomeDestination.MIS_ANIMALES -> {
+                MisAnimalesScreen(
+                    shelterId = currentUser?.shelterId ?: "",
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onBack = { homeDestination = HomeDestination.TABS }
+                )
             }
         }
     }
