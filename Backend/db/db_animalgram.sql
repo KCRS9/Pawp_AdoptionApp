@@ -44,15 +44,17 @@ CREATE TABLE `ANIMAL` (
   `name` varchar(100) NOT NULL,
   `species` varchar(100) NOT NULL,
   `breed` varchar(100) NOT NULL,
-  `age` int NOT NULL,
-  `size` enum('small','medium','large') NOT NULL,
-  `description` text,
-  `status` enum('available','adopted','reserved','other') NOT NULL,
-  `shelter` char(36) NOT NULL,
-  `health` text,
+  `birth_date` date,
+  `gender` enum('male','female','unknown') NOT NULL DEFAULT 'unknown',
+  `size` enum('small','medium','large') NOT NULL DEFAULT 'small',
+  `description` text NOT NULL DEFAULT '',
+  `status` enum('available','adopted','reserved','other') NOT NULL DEFAULT 'available',
+  `health` text NOT NULL DEFAULT '',
   `profile_image` varchar(255) NULL,
+  `shelter_id` char(36) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
+  FOREIGN KEY (`shelter_id`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `POST` (

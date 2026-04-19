@@ -1,31 +1,54 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import date as date_type
 
-# Clase BASE: Campos comunes
+
 class AnimalBase(BaseModel):
     name: str
     species: str
-    breed: str
-    age: int
-    size: str        # Ej: "Small", "Medium", "Large"
-    description: str
-    health: str      # Ej: "Vaccinated", "Neutered"
-    profile_image: Optional[str] = None # NUEVO
+    breed: str = ""
+    birth_date: Optional[date_type] = None
+    gender: str = "unknown"
+    size: str = "small"
+    description: str = ""
+    status: str = "available"
+    health: str = ""
 
-# Clase INPUT: Lo que recibimos al Crear/Editar
+
 class AnimalIn(AnimalBase):
-    pass 
-    # Hereda todo. No añadimos nada extra de momento.
-    # El 'status' por defecto se manejará en BD ("Available").
+    pass
 
-# Clase OUTPUT: Lo que devolvemos al frontend
-class AnimalOut(AnimalBase):
+
+class AnimalDb(AnimalBase):
     id: str
     shelter_id: str
-    status: str
+    profile_image: Optional[str] = None
 
-# Clase DB: Mapeo completo de la Tabla
-class AnimalDb(AnimalIn):
+
+class AnimalSummaryOut(BaseModel):
     id: str
-    shelter_id: str
+    name: str
+    species: str
+    breed: str = ""
+    gender: str = "unknown"
+    profile_image: Optional[str] = None
+    shelter_id: str = ""
+    shelter_name: Optional[str] = None
+    location_name: Optional[str] = None
+
+
+class AnimalFullProfile(BaseModel):
+    id: str
+    name: str
+    species: str
+    breed: str
+    birth_date: Optional[date_type] = None
+    gender: str = "unknown"
+    size: str
+    description: str
+    health: str
     status: str
+    profile_image: Optional[str] = None
+    shelter_id: str
+    shelter_name: str
+    location_name: Optional[str] = None

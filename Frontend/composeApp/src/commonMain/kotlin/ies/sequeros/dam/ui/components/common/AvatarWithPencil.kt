@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
@@ -50,10 +51,10 @@ fun AvatarWithPencil(
                 model              = request,
                 contentDescription = "Vista previa",
                 contentScale       = ContentScale.Crop,
-                modifier           = Modifier.size(size).clip(CircleShape)
+                modifier           = Modifier.size(size).shadow(6.dp, CircleShape).clip(CircleShape)
             )
         } else {
-            UserAvatar(imageUrl = imageUrl, size = size)
+            UserAvatar(imageUrl = imageUrl, size = size, shadowElevation = 6.dp)
         }
 
         if (onEditClick != null) {

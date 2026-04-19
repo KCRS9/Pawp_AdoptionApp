@@ -124,6 +124,14 @@ fun PawpTheme(
         content     = content
     )
 }
+/** Fondo gris para recuadros de descripción/datos según el tema actual */
+@Composable
+fun pawpSurfaceColor() = if (androidx.compose.foundation.isSystemInDarkTheme()) PawpSurfaceDark else PawpSurfaceLight
+
+/** Color de texto para recuadros de descripción/datos según el tema actual */
+@Composable
+fun pawpOnSurfaceTextColor() = if (androidx.compose.foundation.isSystemInDarkTheme()) androidx.compose.ui.graphics.Color.White else androidx.compose.ui.graphics.Color.Black
+
 @Composable
 fun loginTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
     // Fondo del campo
