@@ -30,6 +30,14 @@ class ShelterOut(BaseModel):
     description: str
     profile_image: Optional[str] = None
 
+class ShelterUpdateIn(BaseModel):
+    name: str
+    description: str
+    phone: str
+    email: str
+    website: Optional[str] = None
+    address: Optional[str] = None
+
 class ShelterDb(BaseModel):
     id: str
     name: str
@@ -54,6 +62,7 @@ class ShelterFullProfile(BaseModel):
     name: str
     address: Optional[str] = None
     location: int
+    location_name: Optional[str] = None
     phone: str
     email: str
     website: Optional[str] = None
