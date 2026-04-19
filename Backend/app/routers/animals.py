@@ -1,90 +1,102 @@
-from fastapi import APIRouter, status, HTTPException, Depends
-from typing import List
-
-# Modelos
-from app.models.animals import AnimalIn, AnimalOut, AnimalDb
-from app.models.users import UserOut # Para tipado del usuario actual
-
-# Base de Datos
-from app.database import insert_animal, get_animal_by_id, update_animal, delete_animal
-
-# Auth -> Para proteger rutas y saber QUIÉN hace la petición
-from app.routers.users import get_current_user as get_current_user_profile # Reusamos la dependencia que valida el token
-
-router = APIRouter(
-    prefix="/animals",
-    tags=["Animals"]
+import os
+import uuid
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status, Query
+from app.database import (
+    get_animals, get_full_animal_profile,
+    insert_animal, update_animal, delete_animal, update_animal_photo
 )
+from app.models.animals import AnimalIn, AnimalSummaryOut, AnimalFullProfile
+from app.routers.users import get_current_user
 
-# 1. CREAR ANIMAL (Solo Shelter)
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_animal(
-    animal: AnimalIn, 
-    current_user: UserOut = Depends(get_current_user_profile)
+UPLOAD_DIR = "app/static/images"
+router = APIRouter(prefix="/animals", tags=["Animals"])
+
+
+@router.get("/", response_model=list[AnimalSummaryOut])
+async def list_animals(
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, le=200),
+    species: Optional[str] = Query(default=None),
+    shelter_id: Optional[str] = Query(default=None),
+    status: str = Query(default="available"),
+    current_user = Depends(get_current_user)
 ):
-    # 1. RBAC(Role Based Access Control) Genérico
-    if current_user.role != "shelter":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Solo las protectoras pueden registrar animales."
-        )
+    return get_animals(skip=skip, limit=limit, species=species,
+                       shelter_id=shelter_id, status=status)
 
-    # 2. Validación de Perfil de Protectora (NUEVO)
-    # El usuario tiene rol 'shelter', pero tiene que tener un shelter_id
-    if current_user.shelter_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, # O 403
-            detail="Tu usuario es de tipo protectora, pero aún no has vinculado un perfil de Protectora. Crea la protectora primero."
-        )
 
-    # 3. Inserción Directa
-    # Usamos el shelter_id del usuario logueado.
-    animal_id = insert_animal(animal, shelter_id=current_user.shelter_id)
-    
+@router.get("/{animal_id}", response_model=AnimalFullProfile)
+async def get_animal(animal_id: str, current_user = Depends(get_current_user)):
+    animal = get_full_animal_profile(animal_id)
+    if not animal:
+        raise HTTPException(status_code=404, detail="Animal no encontrado")
+    return animal
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_animal(animal: AnimalIn, current_user = Depends(get_current_user)):
+    if current_user.role not in ("shelter", "admin"):
+        raise HTTPException(status_code=403, detail="Solo protectoras pueden registrar animales")
+    if not current_user.shelter_id:
+        raise HTTPException(status_code=400, detail="El usuario no tiene protectora asignada")
+    animal_id = insert_animal(animal, current_user.shelter_id)
     return {"id": animal_id, "message": "Animal creado correctamente"}
 
-# 2. EDITAR ANIMAL (Solo Shelter) - PUT (Reemplazo)
-@router.put("/{animal_id}", status_code=status.HTTP_200_OK)
+
+@router.put("/{animal_id}")
 async def edit_animal(
     animal_id: str,
-    animal_data: AnimalIn,
-    current_user: UserOut = Depends(get_current_user_profile)
+    animal: AnimalIn,
+    current_user = Depends(get_current_user)
 ):
-    # RBAC
-    if current_user.role != "shelter":
-        raise HTTPException(status_code=403, detail="Permiso denegado")
-
-    # 1. Verificar existencia
-    existing_animal = get_animal_by_id(animal_id)
-    if not existing_animal:
+    if current_user.role not in ("shelter", "admin"):
+        raise HTTPException(status_code=403, detail="Sin permiso")
+    existing = get_full_animal_profile(animal_id)
+    if not existing:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
-
-    if current_user.shelter_id and existing_animal.shelter_id != current_user.shelter_id:
-       raise HTTPException(status_code=403, detail="No puedes editar animales de otra protectora")
-
-    # 2. Ejecutar Update
-    update_animal(animal_id, animal_data)
-    
+    if current_user.role == "shelter" and existing["shelter_id"] != current_user.shelter_id:
+        raise HTTPException(status_code=403, detail="Este animal no pertenece a tu protectora")
+    update_animal(animal_id, animal)
     return {"message": "Animal actualizado correctamente"}
 
-# 3. BORRAR ANIMAL (Solo Shelter)
+
 @router.delete("/{animal_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_animal(
-    animal_id: str,
-    current_user: UserOut = Depends(get_current_user_profile)
-):
-    # RBAC
-    if current_user.role != "shelter":
-        raise HTTPException(status_code=403, detail="Permiso denegado")
-
-    # 1. Verificar existencia
-    existing_animal = get_animal_by_id(animal_id)
-    if not existing_animal:
+async def remove_animal(animal_id: str, current_user = Depends(get_current_user)):
+    if current_user.role not in ("shelter", "admin"):
+        raise HTTPException(status_code=403, detail="Sin permiso")
+    existing = get_full_animal_profile(animal_id)
+    if not existing:
         raise HTTPException(status_code=404, detail="Animal no encontrado")
-
-    if current_user.shelter_id and existing_animal.shelter_id != current_user.shelter_id:
-       raise HTTPException(status_code=403, detail="No puedes editar animales de otra protectora")
-
-    # 2. Eliminar
+    if current_user.role == "shelter" and existing["shelter_id"] != current_user.shelter_id:
+        raise HTTPException(status_code=403, detail="Este animal no pertenece a tu protectora")
     delete_animal(animal_id)
-    return # 204 No Content no devuelve body
+
+
+@router.post("/{animal_id}/photo")
+async def upload_animal_photo(
+    animal_id: str,
+    file: UploadFile = File(...),
+    current_user = Depends(get_current_user)
+):
+    if current_user.role not in ("shelter", "admin"):
+        raise HTTPException(status_code=403, detail="Sin permiso")
+    existing = get_full_animal_profile(animal_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Animal no encontrado")
+    if current_user.role == "shelter" and existing["shelter_id"] != current_user.shelter_id:
+        raise HTTPException(status_code=403, detail="Este animal no pertenece a tu protectora")
+
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in (".jpg", ".jpeg", ".png", ".webp"):
+        raise HTTPException(status_code=400, detail="Formato no válido")
+
+    filename = f"{uuid.uuid4()}{ext}"
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    path = os.path.join(UPLOAD_DIR, filename)
+    with open(path, "wb") as f:
+        f.write(await file.read())
+
+    photo_url = f"/static/images/{filename}"
+    update_animal_photo(animal_id, photo_url)
+    return {"profile_image": photo_url}

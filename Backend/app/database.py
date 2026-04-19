@@ -1,7 +1,8 @@
 import mariadb
 import uuid
+import uuid as uuid_lib
 from app.models.users import UserDb, UserIn
-from app.models.animals import AnimalIn, AnimalDb
+from app.models.animals import AnimalIn
 from app.models.adoptions import AdoptionIn,AdoptionUpdate
 from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
@@ -107,19 +108,15 @@ def get_full_shelter_profile(shelter_id: str):
 
             # Se Obtienen sus animales disponibles
             sql_animals = """
-                SELECT id, name, species, profile_image
-                FROM ANIMAL
-                WHERE shelter = ? AND status = 'available'
+                SELECT id, name, species, breed, gender, profile_image
+                FROM ANIMAL WHERE shelter_id = ? AND status = 'available'
             """
             cursor.execute(sql_animals, (shelter_id,))
-            animals_list = []
-            for row in cursor.fetchall():
-                animals_list.append({
-                    "id": row[0],
-                    "name": row[1],
-                    "species": row[2],
-                    "profile_image": row[3]
-                })
+            animals_list = [
+                {"id": r[0], "name": r[1], "species": r[2],
+                 "breed": r[3] or "", "gender": r[4] or "unknown", "profile_image": r[5]}
+                for r in cursor.fetchall()
+            ]
 
             return {
                 "id":            res[0],
@@ -138,66 +135,160 @@ def get_full_shelter_profile(shelter_id: str):
             }
 
 
-
-def insert_animal(animal: AnimalIn, shelter: int) -> int:
-    """
-    Inserta un animal vinculado a una protectora (shelter_id).
-    Por defecto status será 'Available' (si así está definido en BD) o lo pasamos explícito.
-    """
-
+def get_animals(
+    skip: int = 0,
+    limit: int = 20,
+    species: str = None,
+    shelter_id: str = None,
+    status: str = "available"
+) -> list:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            # Corregido: Usamos los campos reales de la tabla ANIMAL
-            sql = """
-                INSERT INTO ANIMAL (name, species, breed, age, size, description, status, shelter, health, profile_image) 
-                VALUES (?, ?, ?, ?, ?, ?, 'available', ?, ?, ?)
+            conditions = ["a.status = ?"]
+            params = [status]
+
+            if species:
+                conditions.append("a.species = ?")
+                params.append(species)
+
+            if shelter_id:
+                conditions.append("a.shelter_id = ?")
+                params.append(shelter_id)
+
+            where = " AND ".join(conditions)
+            sql = f"""
+                SELECT a.id, a.name, a.species, a.breed, a.gender, a.profile_image,
+                       a.shelter_id, s.name, l.name
+                FROM ANIMAL a
+                JOIN SHELTER s ON s.id = a.shelter_id
+                LEFT JOIN LOCALITY l ON l.id = s.location
+                WHERE {where}
+                ORDER BY a.created_at DESC
+                LIMIT ? OFFSET ?
             """
-            values = (animal.name, animal.species, animal.breed, animal.age, 
-                      animal.size, animal.description, shelter, animal.health, animal.profile_image)
-            cursor.execute(sql, values)
-            conn.commit()
-            return cursor.lastrowid
+            params += [limit, skip]
+            cursor.execute(sql, params)
+            rows = cursor.fetchall()
+            return [
+                {
+                    "id": row[0],
+                    "name": row[1],
+                    "species": row[2],
+                    "breed": row[3] or "",
+                    "gender": row[4] or "unknown",
+                    "profile_image": row[5],
+                    "shelter_id": row[6],
+                    "shelter_name": row[7],
+                    "location_name": row[8],
+                }
+                for row in rows
+            ]
 
 
-def get_animal_by_id(id: str) -> AnimalDb | None:
-    with mariadb.connect(**db_config) as conn:
-        with conn.cursor() as cursor:
-            sql = "SELECT id, name, species, breed, age, size, description, health, status, shelter, profile_image FROM ANIMAL WHERE id = ?"
-            cursor.execute(sql, (id,))
-            row = cursor.fetchone()
-            
-            if row:
-                return AnimalDb(
-                    id=row[0], name=row[1], species=row[2], breed=row[3],
-                    age=row[4], size=row[5], description=row[6], health=row[7],
-                    status=row[8], shelter=row[9], profile_image=row[10]
-                )
-            return None
-
-def update_animal(id: str, animal: AnimalIn) -> bool:
+def get_full_animal_profile(animal_id: str) -> dict | None:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                UPDATE ANIMAL 
-                SET name=?, species=?, breed=?, age=?, size=?, description=?, health=?, profile_image=?
+                SELECT a.id, a.name, a.species, a.breed,
+                       a.birth_date, a.gender, a.size, a.description,
+                       a.health, a.status, a.profile_image,
+                       a.shelter_id, s.name, l.name
+                FROM ANIMAL a
+                JOIN SHELTER s ON s.id = a.shelter_id
+                LEFT JOIN LOCALITY l ON l.id = s.location
+                WHERE a.id = ?
+            """
+            cursor.execute(sql, (animal_id,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return {
+                "id": row[0],
+                "name": row[1],
+                "species": row[2],
+                "breed": row[3] or "",
+                "birth_date": str(row[4]) if row[4] else None,
+                "gender": row[5] or "unknown",
+                "size": row[6],
+                "description": row[7] or "",
+                "health": row[8] or "",
+                "status": row[9],
+                "profile_image": row[10],
+                "shelter_id": row[11],
+                "shelter_name": row[12],
+                "location_name": row[13],
+            }
+
+
+def insert_animal(animal, shelter_id: str) -> str:
+    animal_id = str(uuid_lib.uuid4())
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                INSERT INTO ANIMAL
+                    (id, name, species, breed, birth_date, gender, size,
+                     description, status, health, shelter_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            cursor.execute(sql, (
+                animal_id,
+                animal.name,
+                animal.species,
+                animal.breed,
+                animal.birth_date,
+                animal.gender,
+                animal.size,
+                animal.description,
+                animal.status,
+                animal.health,
+                shelter_id,
+            ))
+            conn.commit()
+            return animal_id
+
+
+def update_animal(animal_id: str, animal) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                UPDATE ANIMAL
+                SET name=?, species=?, breed=?, birth_date=?, gender=?,
+                    size=?, description=?, status=?, health=?
                 WHERE id = ?
             """
-            values = (
-                animal.name, animal.species, animal.breed, animal.age,
-                animal.size, animal.description, animal.health, animal.profile_image,
-                id
-            )
-            cursor.execute(sql, values)
+            cursor.execute(sql, (
+                animal.name,
+                animal.species,
+                animal.breed,
+                animal.birth_date,
+                animal.gender,
+                animal.size,
+                animal.description,
+                animal.status,
+                animal.health,
+                animal_id,
+            ))
             conn.commit()
-            return cursor.rowcount >= 0
+            return True
 
-def delete_animal(id: str) -> bool:
+
+def delete_animal(animal_id: str) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "DELETE FROM ANIMAL WHERE id = ?"
-            cursor.execute(sql, (id,))
+            cursor.execute("DELETE FROM ANIMAL WHERE id = ?", (animal_id,))
             conn.commit()
             return cursor.rowcount > 0
+
+
+def update_animal_photo(animal_id: str, photo_url: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE ANIMAL SET profile_image = ? WHERE id = ?",
+                (photo_url, animal_id)
+            )
+            conn.commit()
+            return True
         
 
 

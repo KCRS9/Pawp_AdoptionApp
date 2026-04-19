@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import Optional
-from app.models.animals import AnimalOut
 
 class ShelterRegistrationData(BaseModel):
     name: str
