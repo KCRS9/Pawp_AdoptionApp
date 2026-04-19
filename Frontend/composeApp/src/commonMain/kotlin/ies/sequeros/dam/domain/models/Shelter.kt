@@ -9,6 +9,7 @@ data class Shelter(
     val email: String,
     val website: String?,
     val description: String,
+    val locationName: String? = null,
     val adminId: String,
     val adminName: String?,
     val profileImage: String?,
