@@ -36,7 +36,12 @@ data class AnimalSummaryDto(
     val id: String,
     val name: String,
     val species: String,
-    @SerialName("profile_image") val profileImage: String? = null
+    val breed: String = "",
+    val gender: String = "unknown",
+    @SerialName("profile_image") val profileImage: String?,
+    @SerialName("shelter_id") val shelterId: String = "",
+    @SerialName("shelter_name") val shelterName: String? = null,
+    @SerialName("location_name") val locationName: String? = null
 )
 
 // DTO para PUT /shelters/{id}

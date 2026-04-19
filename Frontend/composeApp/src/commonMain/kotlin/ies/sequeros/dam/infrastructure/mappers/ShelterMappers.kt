@@ -36,5 +36,9 @@ fun AnimalSummaryDto.toDomain() = AnimalSummary(
     id = id,
     name = name,
     species = species,
-    profileImage = profileImage
+    breed = breed,
+    gender = gender,
+    profileImage = profileImage,
+    shelterName = shelterName,
+    locationName = locationName
 )
