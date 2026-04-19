@@ -2,28 +2,40 @@ package ies.sequeros.dam.di
 
 import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
 import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
+import ies.sequeros.dam.application.usecases.CreateAnimalUseCase
+import ies.sequeros.dam.application.usecases.DeleteAnimalUseCase
+import ies.sequeros.dam.application.usecases.GetAnimalByIdUseCase
+import ies.sequeros.dam.application.usecases.GetAnimalsUseCase
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.GetShelterByIdUseCase
 import ies.sequeros.dam.application.usecases.GetSheltersUseCase
+import ies.sequeros.dam.application.usecases.UpdateAnimalPhotoUseCase
+import ies.sequeros.dam.application.usecases.UpdateAnimalUseCase
 import ies.sequeros.dam.application.usecases.UpdateShelterLogoUseCase
 import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
 import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
 import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
+import ies.sequeros.dam.domain.repositories.IAnimalRepository
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
 import ies.sequeros.dam.domain.repositories.IShelterRepository
 import ies.sequeros.dam.domain.repositories.IUserRepository
+import ies.sequeros.dam.infrastructure.RestAnimalRepository
 import ies.sequeros.dam.infrastructure.RestAuthRepository
 import ies.sequeros.dam.infrastructure.RestLocalityRepository
 import ies.sequeros.dam.infrastructure.RestShelterRepository
 import ies.sequeros.dam.infrastructure.RestUserRepository
 import ies.sequeros.dam.infrastructure.ktor.createHttpClient
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
+import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailViewModel
+import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditViewModel
+import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesViewModel
 import ies.sequeros.dam.ui.appsettings.AppSettings
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.appsettings.UserSessionManager
+import ies.sequeros.dam.ui.inicio.InicioViewModel
 import ies.sequeros.dam.ui.login.LoginViewModel
 import ies.sequeros.dam.ui.profile.EditProfileViewModel
 import ies.sequeros.dam.ui.shelters.ProtectorasViewModel
@@ -38,8 +50,8 @@ import org.koin.dsl.module
 val appModule = module {
 
     //val baseUrl = "http://10.0.2.2:8000"
-    val baseUrl = "http://localhost:8000"
-    //val baseUrl = "http://192.168.18.13:8000"
+    //val baseUrl = "http://localhost:8000"
+    val baseUrl = "http://192.168.18.13:8000"
 
     // --- Infraestructura ---
     single {
@@ -55,6 +67,7 @@ val appModule = module {
     single<IUserRepository> { RestUserRepository(get(), baseUrl) }
     single<ILocalityRepository> { RestLocalityRepository(get(), baseUrl) }
     single<IShelterRepository> { RestShelterRepository(get(), baseUrl) }
+    single<IAnimalRepository> { RestAnimalRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
@@ -74,6 +87,12 @@ val appModule = module {
     factory { GetSheltersUseCase(get()) }
     factory { GetShelterByIdUseCase(get()) }
     factory { UpdateShelterLogoUseCase(get()) }
+    factory { GetAnimalsUseCase(get()) }
+    factory { GetAnimalByIdUseCase(get()) }
+    factory { CreateAnimalUseCase(get()) }
+    factory { UpdateAnimalUseCase(get()) }
+    factory { DeleteAnimalUseCase(get()) }
+    factory { UpdateAnimalPhotoUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -85,4 +104,8 @@ val appModule = module {
     viewModel { ProtectorasViewModel(get()) }
     viewModel { ShelterProfileViewModel(get()) }
     viewModel { ShelterEditViewModel(get(), get()) }
+    viewModel { InicioViewModel(get()) }
+    viewModel { AnimalDetailViewModel(get()) }
+    viewModel { AnimalEditViewModel(get(), get(), get(), get(), get()) }
+    viewModel { MisAnimalesViewModel(get()) }
 }
