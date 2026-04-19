@@ -100,8 +100,8 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing) // Necesario para coroutines en Desktop
-            // Motor HTTP para Desktop (también usa OkHttp)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.datetime)
         }
 
         // --- Dependencias exclusivas de Web (JavaScript) ---
