@@ -189,11 +189,12 @@ fun HomeScreen() {
                 val isOwnShelter = currentUser?.shelterId != null &&
                                    currentUser?.shelterId == selectedShelterId
                 ShelterProfileScreen(
-                    shelterId   = selectedShelterId ?: "",
-                    onBack      = { homeDestination = HomeDestination.TABS },
-                    onEditClick = if (isOwnShelter) {
+                    shelterId    = selectedShelterId ?: "",
+                    onBack       = { homeDestination = HomeDestination.TABS },
+                    onEditClick  = if (isOwnShelter) {
                         { homeDestination = HomeDestination.SHELTER_EDIT }
-                    } else null
+                    } else null,
+                    onAdminClick = { homeDestination = HomeDestination.PROFILE }
                 )
             }
 

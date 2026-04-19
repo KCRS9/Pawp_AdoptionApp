@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends
-from app.models.shelters import ShelterIn, ShelterOut, ShelterFullProfile
+from app.models.shelters import ShelterIn, ShelterUpdateIn, ShelterFullProfile
 from app.models.users import UserOut, UserDb
 from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo, get_full_shelter_profile
 from app.routers.users import get_current_user as get_current_user_profile, get_current_user
@@ -39,11 +39,10 @@ async def create_shelter(
     return {"id": new_shelter_id, "message": "Protectora creada y vinculada correctamente"}
 
 
-# 2. VER PROTECTORA (para todo el mundo)
-
-@router.get("/{shelter_id}", response_model=ShelterOut)
+# 2. VER PROTECTORA (para todo el mundo) — devuelve perfil completo con admin_id y animales
+@router.get("/{shelter_id}", response_model=ShelterFullProfile)
 async def get_shelter(shelter_id: str):
-    shelter = get_shelter_by_id(shelter_id)
+    shelter = get_full_shelter_profile(shelter_id)
     if not shelter:
         raise HTTPException(status_code=404, detail="Protectora no encontrada")
     return shelter
@@ -55,11 +54,11 @@ async def get_shelter(shelter_id: str):
 @router.put("/{shelter_id}", status_code=status.HTTP_200_OK)
 async def edit_monitor_shelter(
     shelter_id: str,
-    shelter_data: ShelterIn,
+    shelter_data: ShelterUpdateIn,
     current_user: UserOut = Depends(get_current_user_profile)
 ):
     # 1. Validar Rol
-    if current_user.role != "shelter":
+    if current_user.role not in ("shelter", "admin"):
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
     # 2. Validar Propiedad (¿Es ESTA mi protectora?)
@@ -90,25 +89,31 @@ async def upload_shelter_logo(
     if shelter.admin != current_user.id:
         raise HTTPException(status_code=403, detail="No tienes permiso para editar esta protectora")
 
-    # 3. Crea la carpeta si no existe
+    # 3. Borra el logo anterior si existe (evita acumular archivos huérfanos)
+    if shelter.profile_image:
+        old_path = f"app{shelter.profile_image}"
+        if os.path.exists(old_path):
+            os.remove(old_path)
+
+    # 4. Crea la carpeta si no existe
     upload_dir = "app/static/shelters"
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
 
-    # 4. Genera el nombre del archivo único con timestamp
+    # 5. Genera el nombre del archivo único con timestamp
     timestamp = int(time.time())
     file_extension = file.filename.split(".")[-1]
     file_name = f"logo_{shelter_id}_{timestamp}.{file_extension}"
     file_path = os.path.join(upload_dir, file_name)
 
-    # 5. Guarda el archivo físicamente
+    # 6. Guarda el archivo físicamente
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception:
         raise HTTPException(status_code=500, detail="Error al guardar el archivo")
 
-    # 6. Actualiza la URL en la base de datos
+    # 7. Actualiza la URL en la base de datos
     image_url = f"/static/shelters/{file_name}"
     success = update_shelter_logo(shelter_id, image_url)
 
@@ -118,16 +123,3 @@ async def upload_shelter_logo(
     return {"profile_image": image_url}
 
 
-# VER PERFIL DE PROTECTORAS
-
-@router.get("/{shelter_id}", response_model=ShelterFullProfile)
-async def get_shelter_details(shelter_id: str):
-    profile = get_full_shelter_profile(shelter_id)
-    
-    if not profile:
-        raise HTTPException(
-            status_code=404, 
-            detail="Protectora no encontrada"
-        )
-        
-    return profile

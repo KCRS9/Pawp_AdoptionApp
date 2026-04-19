@@ -13,6 +13,11 @@ data class ShelterEditState(
     val nameError: String? = null,
     val phoneError: String? = null,
     val emailError: String? = null,
+    val profileImage: String?     = null,
+    val previewBytes: ByteArray?  = null,   // bytes de la imagen seleccionada, antes de confirmar
+    val previewFileName: String?  = null,
+    val isUploadingPhoto: Boolean = false,
+    val isPhotoSuccess: Boolean   = false,
     val isLoading: Boolean   = false,
     val isSuccess: Boolean   = false,
     val errorMessage: String? = null

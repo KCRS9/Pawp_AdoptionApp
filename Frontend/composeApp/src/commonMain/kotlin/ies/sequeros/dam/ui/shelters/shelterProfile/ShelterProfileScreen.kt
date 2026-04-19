@@ -1,157 +1,175 @@
 package ies.sequeros.dam.ui.shelters.shelterProfile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import ies.sequeros.dam.ui.components.common.AvatarWithPencil
+import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.profile.ProfileStatColumn
+import ies.sequeros.dam.ui.theme.PawpPurple
+import ies.sequeros.dam.ui.theme.PawpSurfaceDark
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShelterProfileScreen(
-
     shelterId: String,
     onBack: () -> Unit,
     // null = vista de solo lectura (listado público)
-    // non-null = el usuario es admin de esta protectora, se muestra el lápiz
+    // non-null = el usuario es admin de esta protectora
     onEditClick: (() -> Unit)? = null,
     onAdminClick: (String) -> Unit = {}
 ) {
     val viewModel: ShelterProfileViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHost = remember { SnackbarHostState() }
 
-    // Cargamos la protectora al entrar a la pantalla usando el id como clave
     LaunchedEffect(shelterId) { viewModel.load(shelterId) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(state.shelter?.name ?: "Protectora") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
+    SettingsFormScaffold(
+        title        = state.shelter?.name ?: "Protectora",
+        onBack       = onBack,
+        snackbarHost = snackbarHost
+    ) {
 
         if (state.isLoading) {
-            Box(Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-            return@Scaffold
+            Box(
+                modifier         = Modifier.fillMaxWidth().padding(top = 48.dp),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+            return@SettingsFormScaffold
         }
 
-        val shelter = state.shelter ?: return@Scaffold
+        val shelter = state.shelter ?: return@SettingsFormScaffold
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // ── Foto de perfil con lápiz opcional (solo para el admin)
+        AvatarWithPencil(
+            imageUrl    = shelter.profileImage,
+            size        = 196.dp,
+            onEditClick = onEditClick,
+            modifier    = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // ── Nombre
+        Text(
+            text      = shelter.name,
+            style     = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            modifier  = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        // ── Píldora de ubicación + píldora de admin en fila centrada bajo el nombre
+        Row(
+            modifier              = Modifier.align(Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Logo con lápiz superpuesto si el usuario es el admin de la protectora
-            Box {
-                if (shelter.profileImage != null) {
-                    AsyncImage(
-                        model = shelter.profileImage,
-                        contentDescription = shelter.name,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(MaterialTheme.shapes.medium),
-                        contentScale = ContentScale.Crop
+            shelter.locationName?.let { location ->
+                Surface(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = PawpPurple.copy(alpha = 0.52f)
+                ) {
+                    Text(
+                        text     = location,
+                        style    = MaterialTheme.typography.labelSmall,
+                        color    = Color.White,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                     )
-                } else {
-                    Surface(
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(MaterialTheme.shapes.medium),
-                        color = MaterialTheme.colorScheme.secondaryContainer
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                shelter.name.take(1).uppercase(),
-                                style = MaterialTheme.typography.displaySmall
-                            )
-                        }
-                    }
-                }
-
-                // El lápiz solo aparece cuando este usuario administra esta protectora
-                if (onEditClick != null) {
-                    IconButton(
-                        onClick = onEditClick,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                                CircleShape
-                            )
-                    ) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Editar protectora")
-                    }
                 }
             }
+            Surface(
+                shape    = MaterialTheme.shapes.extraLarge,
+                color    = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.clickable { onAdminClick(shelter.adminId) }
+            ) {
+                Text(
+                    text     = "Admin: ${shelter.adminName ?: shelter.adminId}",
+                    style    = MaterialTheme.typography.labelSmall,
+                    color    = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                )
+            }
+        }
 
-            Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-            Text(shelter.name, style = MaterialTheme.typography.headlineSmall)
-            
-            Spacer(Modifier.height(24.dp))
+        // ── Estadísticas (en adopción real, publicaciones y seguidores estéticos)
+        Row(
+            modifier              = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ProfileStatColumn(label = "En adopción",   value = shelter.animals.size.toString(), onClick = {})
+            ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
+            ProfileStatColumn(label = "Seguidores",    value = "0", onClick = {})
+        }
 
-            ShelterInfoRow("Teléfono", shelter.phone)
-            
-            ShelterInfoRow("Email", shelter.email)
-            
-            shelter.address?.let { ShelterInfoRow("Dirección", it) }
-            
-            shelter.website?.let { ShelterInfoRow("Web", it) }
+        Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(12.dp))
-            
-            Text(shelter.description, style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.height(24.dp))
+        // ── Descripción
+        val descriptionBg = if (isSystemInDarkTheme()) PawpSurfaceDark else Color(0xFFF0F0F0)
+        Surface(
+            shape    = MaterialTheme.shapes.medium,
+            color    = descriptionBg,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+        ) {
+            if (shelter.description.isNotBlank()) {
+                Text(
+                    text     = shelter.description,
+                    style    = MaterialTheme.typography.bodyMedium,
+                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                Text(
+                    text      = "Esta protectora aún no tiene descripción.",
+                    style     = MaterialTheme.typography.bodyMedium,
+                    color     = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    fontStyle = FontStyle.Italic,
+                    modifier  = Modifier.padding(16.dp)
+                )
+            }
+        }
 
-            // Card del administrador — al pulsar va a su perfil de usuario
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onAdminClick(shelter.adminId) }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            "Administrador",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            shelter.adminName ?: shelter.adminId,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                }
+        Spacer(Modifier.height(16.dp))
+
+        // ── Datos de contacto
+        ShelterInfoRow("Teléfono", shelter.phone)
+        ShelterInfoRow("Email", shelter.email)
+        shelter.address?.let { ShelterInfoRow("Dirección", it) }
+        shelter.website?.let { ShelterInfoRow("Web", it) }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(16.dp))
+
+        // ── Sección de publicaciones (placeholder)
+        Text("Publicaciones", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            shape    = MaterialTheme.shapes.medium,
+            color    = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth().height(80.dp)
+        ) {
+            Box(Modifier.padding(12.dp), contentAlignment = Alignment.CenterStart) {
+                Text(
+                    text  = "Próximamente",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -160,8 +178,11 @@ fun ShelterProfileScreen(
 @Composable
 private fun ShelterInfoRow(label: String, value: String) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Text(label, style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(value, style = MaterialTheme.typography.bodyMedium)
         HorizontalDivider(modifier = Modifier.padding(top = 4.dp))
     }

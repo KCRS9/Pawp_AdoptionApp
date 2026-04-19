@@ -18,4 +18,6 @@ interface IShelterRepository {
         website: String?,
         description: String
     )
+
+    suspend fun uploadLogo(shelterId: String, imageBytes: ByteArray, fileName: String): String
 }

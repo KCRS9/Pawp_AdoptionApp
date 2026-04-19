@@ -6,6 +6,7 @@ import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.GetShelterByIdUseCase
 import ies.sequeros.dam.application.usecases.GetSheltersUseCase
+import ies.sequeros.dam.application.usecases.UpdateShelterLogoUseCase
 import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
 import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
@@ -72,6 +73,7 @@ val appModule = module {
     factory { ChangeEmailViewModel(get()) }
     factory { GetSheltersUseCase(get()) }
     factory { GetShelterByIdUseCase(get()) }
+    factory { UpdateShelterLogoUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -82,5 +84,5 @@ val appModule = module {
 
     viewModel { ProtectorasViewModel(get()) }
     viewModel { ShelterProfileViewModel(get()) }
-    viewModel { ShelterEditViewModel(get()) }
+    viewModel { ShelterEditViewModel(get(), get()) }
 }

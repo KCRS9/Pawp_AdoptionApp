@@ -1,53 +1,38 @@
 package ies.sequeros.dam.ui.profile
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
+import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.LocalityDropdown
-import ies.sequeros.dam.ui.components.common.UserAvatar
-import ies.sequeros.dam.ui.theme.PawpPurple
+import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.runtime.snapshotFlow
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     onBack: () -> Unit
@@ -62,7 +47,6 @@ fun EditProfileScreen(
 
     // Cuando el perfil se guarda → refrescamos sesión y volvemos
     LaunchedEffect(state.isSaveSuccess) {
-
         if (state.isSaveSuccess) {
             snackbarHost.showSnackbar("Perfil actualizado correctamente.")
             appViewModel.refreshCurrentUser()
@@ -71,21 +55,10 @@ fun EditProfileScreen(
         }
     }
 
-    // Cuando la foto se sube refrescamos sesión (la pantalla no cierra)
-//    LaunchedEffect(state.isPhotoSuccess) {
-//
-//        if (state.isPhotoSuccess) {
-//            appViewModel.refreshCurrentUser()
-//            viewModel.onPhotoSuccessHandled()
-//            //snackbarHost.showSnackbar("Foto actualizada correctamente")
-//        }
-//    }
-
-    LaunchedEffect(Unit){
-
+    LaunchedEffect(Unit) {
         snapshotFlow { state.isPhotoSuccess }
             .collect { success ->
-                if(success){
+                if (success) {
                     viewModel.onPhotoSuccessHandled()
                     appViewModel.refreshCurrentUser()
                     snackbarHost.showSnackbar("Foto actualizada correctamente")
@@ -95,130 +68,94 @@ fun EditProfileScreen(
 
     // Mostrar errores en Snackbar
     LaunchedEffect(state.errorMessage) {
-
         state.errorMessage?.let { snackbarHost.showSnackbar(it) }
     }
 
-    // Launcher de FileKit — se abre al pulsar el icono de lápiz del avatar
-    val imageLauncher = rememberFilePickerLauncher(
-        type = PickerType.Image
-
-    ) {
-        file ->
-        file?.let { viewModel.onAvatarSelected(it) }
+    // Selector de imagen → guarda bytes para previsualizar (no sube todavía)
+    val imageLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->
+        viewModel.onAvatarFileSelected(file)
     }
 
-    Scaffold(
-        topBar = {
+    SettingsFormScaffold(
+        title        = "Editar perfil",
+        onBack       = onBack,
+        snackbarHost = snackbarHost
+    ) {
 
-            TopAppBar(
+        AvatarWithPencil(
+            imageUrl     = currentUser?.profileImage,
+            previewBytes = state.previewBytes,
+            size         = 96.dp,
+            isUploading  = state.isUploadingPhoto,
+            onEditClick  = { imageLauncher.launch() },
+            modifier     = Modifier.align(Alignment.CenterHorizontally)
+        )
 
-                title = { Text("Editar perfil") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver")
-                    }
+        // Confirmar / Cancelar visibles solo cuando hay imagen seleccionada pendiente
+        if (state.previewBytes != null) {
+            Row(
+                modifier              = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(onClick = { viewModel.onAvatarFileSelected(null) }) {
+                    Text("Cancelar")
                 }
-            )
-        },
-
-        snackbarHost = { SnackbarHost(snackbarHost) }
-
-    ) { innerPadding ->
-
-        Column(
-
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            // ── Avatar con icono de lápiz superpuesto
-            Box {
-                // Foto actual (o icono por defecto si no tiene)
-                if (state.isUploadingPhoto) {
-                    CircularProgressIndicator(
-                        color    = PawpPurple.copy(alpha = 0.5f),
-                        modifier = Modifier.size(96.dp)
-                    )
-                } else {
-                    UserAvatar(imageUrl = currentUser?.profileImage, size = 96.dp)
-                }
-
-                // Botón de lápiz en la esquina inferior derecha
-                IconButton(
-                    onClick  = { imageLauncher.launch() },
-                    modifier = Modifier
-                        .size(32.dp)
-                        .align(Alignment.BottomEnd)
-                        .background(PawpPurpleDark, CircleShape)
-                ) {
-                    Icon(
-                        imageVector        = Icons.Filled.Edit,
-                        contentDescription = "Cambiar foto",
-                        tint               = Color.White,
-                        modifier           = Modifier.size(16.dp)
-                    )
+                Button(onClick = viewModel::confirmAvatar) {
+                    Text("Confirmar")
                 }
             }
+        }
 
-            Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-            // Nombre
-            OutlinedTextField(
+        // Nombre
+        OutlinedTextField(
+            value          = state.name,
+            onValueChange  = viewModel::onNameChange,
+            label          = { Text("Nombre") },
+            modifier       = Modifier.fillMaxWidth(),
+            isError        = state.nameError != null,
+            supportingText = { state.nameError?.let { Text(it) } },
+            singleLine     = true
+        )
 
-                value          = state.name,
-                onValueChange  = viewModel::onNameChange,
-                label          = { Text("Nombre") },
-                modifier       = Modifier.fillMaxWidth(),
-                isError        = state.nameError != null,
-                supportingText = { state.nameError?.let { Text(it) } },
-                singleLine     = true
-            )
+        Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.height(8.dp))
+        // Descripción
+        OutlinedTextField(
+            value         = state.description,
+            onValueChange = viewModel::onDescriptionChange,
+            label         = { Text("Sobre mí") },
+            modifier      = Modifier.fillMaxWidth().height(120.dp),
+            maxLines      = 5
+        )
 
-            // Descripción
-            OutlinedTextField(
-                value         = state.description,
-                onValueChange = viewModel::onDescriptionChange,
-                label         = { Text("Sobre mí") },
-                modifier      = Modifier.fillMaxWidth().height(120.dp),
-                maxLines      = 5
-            )
+        Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.height(8.dp))
+        // Provincia
+        LocalityDropdown(
+            localities   = state.localities,
+            selectedName = state.locationName,
+            onSelect     = viewModel::onLocationSelect
+        )
 
-            // Provincia
-            LocalityDropdown(
-                localities   = state.localities,
-                selectedName = state.locationName,
-                onSelect     = viewModel::onLocationSelect
-            )
+        Spacer(Modifier.height(24.dp))
 
-            Spacer(Modifier.height(24.dp))
-
-            // Botón guardar
-            Button(
-                onClick  = viewModel::saveProfile,
-                enabled  = state.isValid && !state.isSaving,
-                shape    = MaterialTheme.shapes.medium,
-                colors   = ButtonDefaults.buttonColors(
-                    containerColor = PawpPurpleDark,
-                    contentColor   = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (state.isSaving) {
-
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
-                } else {
-
-                    Text("Guardar cambios")
-                }
+        // Botón guardar
+        Button(
+            onClick  = viewModel::saveProfile,
+            enabled  = state.isValid && !state.isSaving,
+            shape    = androidx.compose.material3.MaterialTheme.shapes.medium,
+            colors   = ButtonDefaults.buttonColors(
+                containerColor = PawpPurpleDark,
+                contentColor   = Color.White
+            ),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (state.isSaving) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+            } else {
+                Text("Guardar cambios")
             }
         }
     }

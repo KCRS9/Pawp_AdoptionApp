@@ -15,6 +15,10 @@ data class EditProfileState(
     val localities: List<Locality> = emptyList(),
     val isLoadingLocalities: Boolean = false,
 
+    // Imagen seleccionada aún no subida — bytes para vista previa local
+    val previewBytes: ByteArray?  = null,
+    val previewFileName: String?  = null,
+
     // Estados de las operaciones
     val isSaving: Boolean = false,
     val isUploadingPhoto: Boolean = false,

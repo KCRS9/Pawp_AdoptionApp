@@ -4,12 +4,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
+import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -23,22 +28,32 @@ fun ShelterEditScreen(onBack: () -> Unit) {
 
     // Pre-cargamos los datos de la protectora al entrar por primera vez
     LaunchedEffect(currentUser?.shelterId) {
-
         currentUser?.shelterId?.let { viewModel.init(it) }
     }
 
     LaunchedEffect(state.isSuccess) {
-
         if (state.isSuccess) {
-
             snackbarHost.showSnackbar("Protectora actualizada correctamente.")
             onBack()
         }
     }
 
+    LaunchedEffect(Unit) {
+        snapshotFlow { state.isPhotoSuccess }.collect { success ->
+            if (success) {
+                viewModel.onPhotoSuccessHandled()
+                snackbarHost.showSnackbar("Logo actualizado correctamente")
+            }
+        }
+    }
+
     LaunchedEffect(state.errorMessage) {
-        
         state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+    }
+
+    // Abre el selector → guarda bytes para previsualizar (no sube todavía)
+    val logoLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->
+        viewModel.onLogoFileSelected(file)
     }
 
     SettingsFormScaffold(
@@ -46,6 +61,32 @@ fun ShelterEditScreen(onBack: () -> Unit) {
         onBack = onBack,
         snackbarHost = snackbarHost
     ) {
+
+        AvatarWithPencil(
+            imageUrl     = state.profileImage,
+            previewBytes = state.previewBytes,
+            size         = 96.dp,
+            isUploading  = state.isUploadingPhoto,
+            onEditClick  = { logoLauncher.launch() },
+            modifier     = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        // Botones confirmar / cancelar visibles solo cuando hay previsualización pendiente
+        if (state.previewBytes != null) {
+            Row(
+                modifier              = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(onClick = { viewModel.onLogoFileSelected(null) }) {
+                    Text("Cancelar")
+                }
+                Button(onClick = viewModel::confirmLogo) {
+                    Text("Confirmar")
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
 
         // Nombre — obligatorio
         OutlinedTextField(

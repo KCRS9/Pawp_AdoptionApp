@@ -24,6 +24,7 @@ data class ShelterDetailDto(
     val email: String,
     val website: String? = null,
     val description: String,
+    @SerialName("location_name") val locationName: String? = null,
     @SerialName("admin_id")   val adminId: String,
     @SerialName("admin_name") val adminName: String? = null,
     @SerialName("profile_image") val profileImage: String? = null,
@@ -47,4 +48,10 @@ data class UpdateShelterDto(
     val email: String,
     val website: String?,
     val description: String
+)
+
+// DTO de respuesta al subir el logo — POST /shelters/{id}/logo
+@Serializable
+data class ShelterLogoResponseDto(
+    @SerialName("profile_image") val profileImage: String
 )

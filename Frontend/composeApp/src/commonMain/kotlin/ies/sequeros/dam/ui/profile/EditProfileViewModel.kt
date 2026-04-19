@@ -106,25 +106,33 @@ class EditProfileViewModel(
         }
     }
 
-    /**
-     * Se llama cuando el usuario selecciona una imagen con FileKit.
-     * readBytes() es suspend — lo ejecutamos en el viewModelScope.
-     */
-    fun onAvatarSelected(file: PlatformFile) {
-
+    // Paso 1: el usuario selecciona un archivo → guardamos bytes para previsualizar
+    fun onAvatarFileSelected(file: PlatformFile?) {
+        if (file == null) {
+            _state.update { it.copy(previewBytes = null, previewFileName = null) }
+            return
+        }
         viewModelScope.launch {
+            val bytes = file.readBytes()
+            _state.update { it.copy(previewBytes = bytes, previewFileName = file.name ?: "avatar.jpg") }
+        }
+    }
 
+    // Paso 2: el usuario confirma → se sube la imagen al servidor
+    fun confirmAvatar() {
+        val bytes    = _state.value.previewBytes    ?: return
+        val fileName = _state.value.previewFileName ?: return
+        viewModelScope.launch {
             _state.update { it.copy(isUploadingPhoto = true, errorMessage = null) }
             try {
-
-                val bytes = file.readBytes()
-
-                updateAvatarUseCase(bytes, file.name ?: "avatar.jpg")
-                // Señalamos éxito — la pantalla llamará refreshCurrentUser()
-                _state.update { it.copy(isUploadingPhoto = false, isPhotoSuccess = true) }
-
+                updateAvatarUseCase(bytes, fileName)
+                _state.update { it.copy(
+                    isUploadingPhoto = false,
+                    isPhotoSuccess   = true,
+                    previewBytes     = null,
+                    previewFileName  = null
+                ) }
             } catch (e: Exception) {
-
                 _state.update { it.copy(isUploadingPhoto = false, errorMessage = e.message) }
             }
         }
