@@ -29,3 +29,6 @@ val PawpNavInactive = Color(0xFFCAC9C9)
 
 /** Gris muy claro para separadores y bordes suaves */
 val PawpSeparator = Color(0xFFD9D9D9)
+
+/** Fondo gris para recuadros de descripción en tema claro */
+val PawpSurfaceLight = Color(0xFFEDEDED)

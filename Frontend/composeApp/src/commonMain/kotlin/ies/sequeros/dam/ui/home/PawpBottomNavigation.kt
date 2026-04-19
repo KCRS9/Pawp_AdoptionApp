@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -55,8 +56,8 @@ fun PawpBottomNavigation(
     ){
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.surface,
-            //containerColor = Color.Transparent,
-            tonalElevation = 4.dp
+            tonalElevation = 0.dp,
+            modifier = Modifier.shadow(elevation = 12.dp)
         ) {
 
             val itemColors = NavigationBarItemDefaults.colors(

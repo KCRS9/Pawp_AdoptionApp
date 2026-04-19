@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -19,14 +20,13 @@ import ies.sequeros.dam.ui.theme.PawpPurple
 
 @Composable
 fun UserAvatar(
-
     imageUrl: String?,
     size: Dp = 40.dp,
+    shadowElevation: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
-
     Box(
-        modifier = modifier.size(size).clip(CircleShape),
+        modifier = modifier.size(size).shadow(shadowElevation, CircleShape).clip(CircleShape),
         contentAlignment = Alignment.Center
     ){
         Icon(
