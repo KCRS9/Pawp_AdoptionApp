@@ -3,7 +3,7 @@ import uuid
 from app.models.users import UserDb, UserIn
 from app.models.animals import AnimalIn, AnimalDb
 from app.models.adoptions import AdoptionIn,AdoptionUpdate
-from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData
+from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
 
 # Configuración de la conexión a la base de datos
@@ -91,23 +91,25 @@ def get_full_shelter_profile(shelter_id: str):
         with conn.cursor() as cursor:
             #Se Obtienen los datos de la protectora y el nombre del admin con JOIN
             sql_shelter = """
-                SELECT s.id, s.name, s.address, s.location, s.phone, s.email, 
-                       s.website, s.description, s.admin, u.name as admin_name, s.profile_image
+                SELECT s.id, s.name, s.address, s.location, l.name AS location_name,
+                       s.phone, s.email, s.website, s.description,
+                       s.admin, u.name AS admin_name, s.profile_image
                 FROM SHELTER s
                 JOIN USERS u ON s.admin = u.id
+                LEFT JOIN LOCALITY l ON s.location = l.id
                 WHERE s.id = ?
             """
             cursor.execute(sql_shelter, (shelter_id,))
             res = cursor.fetchone()
-            
+
             if not res:
                 return None
 
             # Se Obtienen sus animales disponibles
             sql_animals = """
-                SELECT id, name, species, profile_image 
-                FROM ANIMAL 
-                WHERE shelter_id = ? AND status = 'available'
+                SELECT id, name, species, profile_image
+                FROM ANIMAL
+                WHERE shelter = ? AND status = 'available'
             """
             cursor.execute(sql_animals, (shelter_id,))
             animals_list = []
@@ -119,20 +121,20 @@ def get_full_shelter_profile(shelter_id: str):
                     "profile_image": row[3]
                 })
 
-            # Muestra el resultado
             return {
-                "id": res[0],
-                "name": res[1],
-                "address": res[2],
-                "location": res[3],
-                "phone": res[4],
-                "email": res[5],
-                "website": res[6],
-                "description": res[7],
-                "admin_id": res[8],
-                "admin_name": res[9],
-                "profile_image": res[10],
-                "animals": animals_list
+                "id":            res[0],
+                "name":          res[1],
+                "address":       res[2],
+                "location":      res[3],
+                "location_name": res[4],
+                "phone":         res[5],
+                "email":         res[6],
+                "website":       res[7],
+                "description":   res[8],
+                "admin_id":      res[9],
+                "admin_name":    res[10],
+                "profile_image": res[11],
+                "animals":       animals_list
             }
 
 
@@ -312,7 +314,7 @@ def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
                 )
     return None
 
-def update_shelter(shelter_id: str, shelter: ShelterIn) -> bool:
+def update_shelter(shelter_id: str, shelter: ShelterUpdateIn) -> bool:
     """ Actualiza datos de la protectora """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
@@ -334,7 +336,9 @@ def update_shelter(shelter_id: str, shelter: ShelterIn) -> bool:
             )
             cursor.execute(sql, values)
             conn.commit()
-            return cursor.rowcount > 0
+            # MariaDB devuelve rowcount=0 cuando los valores no cambian pero la fila existe.
+            # Si no hay excepción, la operación fue correcta.
+            return True
         
 
 # Adoptions
