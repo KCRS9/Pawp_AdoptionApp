@@ -27,5 +27,9 @@ data class AnimalSummary(
     val id: String,
     val name: String,
     val species: String,
-    val profileImage: String?
+    val breed: String = "",
+    val gender: String = "unknown",
+    val profileImage: String?,
+    val shelterName: String? = null,
+    val locationName: String? = null
 )
