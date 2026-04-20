@@ -467,7 +467,7 @@ def insert_adoption(user_id: str, adoption: AdoptionIn) -> AdoptionOut:
                 (adoption_id,)
             )
             r = cursor.fetchone()
-            created_at = datetime.combine(r[5], r[6])
+            created_at = datetime.combine(r[5], (datetime.min + r[6]).time())
             return AdoptionOut(
                 id=r[0],
                 animal_id=str(r[1]),
@@ -497,7 +497,7 @@ def get_adoptions_by_shelter(shelter_id: str) -> list:
                     animal_id=str(r[1]),
                     user_name=r[2],
                     status=r[3],
-                    created_at=datetime.combine(r[4], r[5]),
+                    created_at=datetime.combine(r[4], (datetime.min + r[5]).time()),
                 )
                 for r in rows
             ]
@@ -522,7 +522,7 @@ def get_adoptions_by_user(user_id: str) -> list:
                     animal_id=str(r[1]),
                     animal_name=r[2],
                     status=r[3],
-                    created_at=datetime.combine(r[4], r[5]),
+                    created_at=datetime.combine(r[4], (datetime.min + r[5]).time()),
                 )
                 for r in rows
             ]
@@ -545,7 +545,7 @@ def get_adoption_by_id(adoption_id: int) -> AdoptionOut | None:
                     user_id=str(r[2]),
                     status=r[3],
                     message=r[4],
-                    created_at=datetime.combine(r[5], r[6]),
+                    created_at=datetime.combine(r[5], (datetime.min + r[6]).time()),
                 )
             return None
 
