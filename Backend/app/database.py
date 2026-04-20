@@ -446,7 +446,7 @@ def insert_adoption(user_id: str, adoption: AdoptionIn) -> AdoptionOut:
         with conn.cursor() as cursor:
 
             # 1. Verificar que el animal existe y obtener su shelter
-            cursor.execute("SELECT shelter FROM ANIMAL WHERE id = ?", (adoption.animal_id,))
+            cursor.execute("SELECT shelter_id FROM ANIMAL WHERE id = ?", (adoption.animal_id,))
             row = cursor.fetchone()
             if not row:
                 raise ValueError(f"Animal {adoption.animal_id} no encontrado")
