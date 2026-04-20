@@ -432,6 +432,27 @@ def update_shelter(shelter_id: str, shelter: ShelterUpdateIn) -> bool:
             return True
         
 
+def get_all_shelters(skip: int = 0, limit: int = 20):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT id, name, location, profile_image 
+                FROM SHELTER 
+                LIMIT ? OFFSET ?
+            """
+            cursor.execute(sql, (limit, skip))
+            
+            shelters = []
+            for row in cursor.fetchall():
+                shelters.append({
+                    "id": row[0],
+                    "name": row[1],
+                    "location": row[2],
+                    "profile_image": row[3]
+                })
+            return shelters
+        
+
 # Adoptions
 
 def insert_adoption(user_id: int, adoption: AdoptionIn) -> int:
