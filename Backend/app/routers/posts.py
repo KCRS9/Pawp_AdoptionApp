@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
-from app.auth.auth import get_current_user
+from app.routers.users import get_current_user
 from app.models.users import UserDb
 from app.database import insert_post
-from Backend.app.models.posts_models import PostOut
+from Backend.app.models.posts import PostOut
 import uuid
 import shutil
 import os
