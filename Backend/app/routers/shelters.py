@@ -87,7 +87,7 @@ async def upload_shelter_logo(
         raise HTTPException(status_code=404, detail="Protectora no encontrada")
 
     # 2. Verifica que el usuario es el dueño (admin) de la protectora
-    if shelter.admin != current_user.id:
+    if shelter.admin != current_user.id and current_user.role != "admin":
         raise HTTPException(status_code=403, detail="No tienes permiso para editar esta protectora")
 
     # 3. Borra el logo anterior si existe (evita acumular archivos huérfanos)
