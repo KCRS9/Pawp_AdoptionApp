@@ -20,6 +20,8 @@ data class ShelterSummary(
     val id: String,
     val name: String,
     val location: Int,
+    val locationName: String? = null,
+    val animalsAvailable: Int = 0,
     val profileImage: String?
 )
 
