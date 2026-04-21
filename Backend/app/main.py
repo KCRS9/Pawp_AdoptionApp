@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import users
 from app.routers import shelters
@@ -10,6 +11,16 @@ import os
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(debug=True)
+
+# Necesario para que el frontend pueda hacer peticiones al backend en WEB
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8081", "http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(users.router)
 app.include_router(shelters.router)
 app.include_router(adoptions.router)
