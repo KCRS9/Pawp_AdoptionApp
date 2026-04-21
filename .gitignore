@@ -12,3 +12,6 @@ Frontend/**/*.iml
 Frontend/.kotlin/
 Documentacion/
 prov/
+
+# Backend Docker Database
+Backend/myapidb_data/

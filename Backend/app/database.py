@@ -2,8 +2,9 @@ import mariadb
 import uuid
 import uuid as uuid_lib
 from app.models.users import UserDb, UserIn
-from app.models.animals import AnimalIn
-from app.models.adoptions import AdoptionIn,AdoptionUpdate
+from app.models.animals import AnimalIn, AnimalDb
+from app.models.adoptions import AdoptionIn, AdoptionOut, AdoptionMyOut, AdoptionShelterOut, AdoptionUpdate
+from datetime import datetime
 from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
 
@@ -455,46 +456,138 @@ def get_all_shelters(skip: int = 0, limit: int = 20):
 
 # Adoptions
 
-def insert_adoption(user_id: int, adoption: AdoptionIn) -> int:
+def insert_adoption(user_id: str, adoption: AdoptionIn) -> AdoptionOut:
+    """
+    Issue #39 — Crear una solicitud.
+    1. Deduce la shelter a partir del animal_id.
+    2. Inserta con CURDATE/CURTIME para que la BD ponga la fecha actual.
+    3. Devuelve el objeto completo AdoptionOut.
+    """
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+
+            # 1. Verificar que el animal existe y obtener su shelter
+            cursor.execute("SELECT shelter_id FROM ANIMAL WHERE id = ?", (adoption.animal_id,))
+            row = cursor.fetchone()
+            if not row:
+                raise ValueError(f"Animal {adoption.animal_id} no encontrado")
+            shelter_id = row[0]
+
+            # 2. Insertar la solicitud de adopción
+            sql = """
+                INSERT INTO ADOPTION (user, shelter, animal, status, date, time, text)
+                VALUES (?, ?, ?, 'pending', CURDATE(), CURTIME(), ?)
+            """
+            cursor.execute(sql, (user_id, shelter_id, adoption.animal_id, adoption.message))
+            conn.commit()
+            adoption_id = cursor.lastrowid
+
+            # 3. Recuperar la fila recién insertada para construir AdoptionOut
+            cursor.execute(
+                "SELECT id, animal, user, status, text, date, time FROM ADOPTION WHERE id = ?",
+                (adoption_id,)
+            )
+            r = cursor.fetchone()
+            created_at = datetime.combine(r[5], (datetime.min + r[6]).time())
+            return AdoptionOut(
+                id=r[0],
+                animal_id=str(r[1]),
+                user_id=str(r[2]),
+                status=r[3],
+                message=r[4],
+                created_at=created_at,
+            )
+
+
+def get_adoptions_by_shelter(shelter_id: str) -> list:
+    """Issue #41 — Solicitudes recibidas por una protectora."""
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO ADOPTION (user, shelter, animal, status, date, time, text)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                SELECT a.id, a.animal, u.name, a.status, a.date, a.time
+                FROM ADOPTION a
+                JOIN USERS u ON a.user = u.id
+                WHERE a.shelter = ?
+                ORDER BY a.date DESC, a.time DESC
             """
-            values = (user_id, adoption.shelter, adoption.animal, 'pending', adoption.date, adoption.time, adoption.text)
-            cursor.execute(sql, values)
-            conn.commit()
-            return cursor.lastrowid
-        
-
-
-def get_adoptions_by_shelter(shelter: int):
-    with mariadb.connect(**db_config) as conn:
-        with conn.cursor() as cursor:
-            # Shelter podran consultar solicitudes
-            sql = "SELECT user, animal, date FROM ADOPTION WHERE shelter = ?"
-            cursor.execute(sql, (shelter,))
+            cursor.execute(sql, (shelter_id,))
             rows = cursor.fetchall()
-            return [{"user": r[0], "animal": r[1], "date": r[2]} for r in rows]
-        
+            return [
+                AdoptionShelterOut(
+                    id=r[0],
+                    animal_id=str(r[1]),
+                    user_name=r[2],
+                    status=r[3],
+                    created_at=datetime.combine(r[4], (datetime.min + r[5]).time()),
+                )
+                for r in rows
+            ]
 
 
-def get_adoption_by_id(adoption_id: int):
+def get_adoptions_by_user(user_id: str) -> list:
+    """Issue #40 — Mis solicitudes (usuario autenticado)."""
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = "SELECT user, animal, date, status, text, shelter FROM ADOPTION WHERE id = ?"
-            cursor.execute(sql, (adoption_id,))
-            row = cursor.fetchone()
-            if row:
-                return {
-                    "user": row[0], "animal": row[1], "date": row[2], 
-                    "status": row[3], "text": row[4], "shelter_id": row[5]
-                }
-            return None
-        
+            sql = """
+                SELECT a.id, a.animal, an.name, a.status, a.date, a.time
+                FROM ADOPTION a
+                JOIN ANIMAL an ON a.animal = an.id
+                WHERE a.user = ?
+                ORDER BY a.date DESC, a.time DESC
+            """
+            cursor.execute(sql, (user_id,))
+            rows = cursor.fetchall()
+            return [
+                AdoptionMyOut(
+                    id=r[0],
+                    animal_id=str(r[1]),
+                    animal_name=r[2],
+                    status=r[3],
+                    created_at=datetime.combine(r[4], (datetime.min + r[5]).time()),
+                )
+                for r in rows
+            ]
 
-def update_adoption_db(adoption_id: int, new_status) -> bool:
+
+def get_adoption_by_id(adoption_id: int) -> AdoptionOut | None:
+    """Detalle de una adopción por ID."""
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT id, animal, user, status, text, date, time, shelter
+                FROM ADOPTION WHERE id = ?
+            """
+            cursor.execute(sql, (adoption_id,))
+            r = cursor.fetchone()
+            if r:
+                return AdoptionOut(
+                    id=r[0],
+                    animal_id=str(r[1]),
+                    user_id=str(r[2]),
+                    status=r[3],
+                    message=r[4],
+                    created_at=datetime.combine(r[5], (datetime.min + r[6]).time()),
+                )
+            return None
+
+
+def get_adoption_raw(adoption_id: int) -> dict | None:
+    """Detalle interno que incluye shelter_id (usado para validaciones de permisos)."""
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, animal, user, status, text, date, time, shelter FROM ADOPTION WHERE id = ?",
+                (adoption_id,)
+            )
+            r = cursor.fetchone()
+            if r:
+                return {"id": r[0], "animal_id": str(r[1]), "user_id": str(r[2]),
+                        "status": r[3], "message": r[4], "shelter_id": str(r[7])}
+            return None
+
+
+def update_adoption_db(adoption_id: int, new_status: str) -> bool:
+    """Issue #42 — Actualizar estado de una solicitud."""
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             sql = "UPDATE ADOPTION SET status = ? WHERE id = ?"
