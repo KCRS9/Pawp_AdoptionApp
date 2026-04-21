@@ -52,30 +52,25 @@ Base de datos y usuario configurados en `compose.yaml`. Las tablas se crean auto
 #### `POST /users/`
 ```json
 // Body
-{ "name": "string", "email": "string", "password": "string", "role": "user|shelter|admin", "location": 1 }
+{
+  "name": "string",
+  "email": "string",
+  "password": "string",
+  "role": "user|shelter|admin",
+  "location": 1
+}
 
 // Respuesta 201
-{ "id": "uuid", "message": "Usuario creado correctamente" }
+{
+  "id": "uuid",
+  "message": "Usuario creado correctamente"
+}
 ```
 
 #### `POST /users/login`
-```json
-// Body (form-data)
-username=email@ejemplo.com&password=contraseña
 
-// Respuesta 200
-{ "access_token": "jwt", "token_type": "bearer" }
-```
 
 #### `GET /users/me`
-```json
-// Respuesta 200
-{
-  "id": "uuid", "name": "string", "email": "string",
-  "role": "user", "location": 1, "location_name": "Valencia",
-  "description": "string", "profile_image": "/static/...", "shelter_id": "uuid|null"
-}
-```
 
 ---
 
@@ -96,23 +91,16 @@ Query params: skip (int, default 0), limit (int, default 20), location (int, opc
 ```json
 // Respuesta 200
 [{
-  "id": "uuid", "name": "string",
-  "location": 3, "location_name": "Valencia",
-  "animals_available": 5, "profile_image": "/static/..."
+  "id": "uuid",
+  "name": "string",
+  "location": 3,
+  "location_name": "Valencia",
+  "animals_available": 5,
+  "profile_image": "/static/..."
 }]
 ```
 
 #### `GET /shelters/{id}`
-```json
-// Respuesta 200
-{
-  "id": "uuid", "name": "string", "address": "string", "location": 3, "location_name": "Valencia",
-  "phone": "string", "email": "string", "website": "string", "description": "string",
-  "admin_id": "uuid", "admin_name": "string", "profile_image": "/static/...",
-  "animals": [{ "id": "uuid", "name": "string", "species": "string", "profile_image": "/static/..." }]
-}
-```
-
 ---
 
 ### Animales — `/animals`
@@ -133,23 +121,19 @@ Query params: skip (int), limit (int, max 200), species (string), shelter_id (uu
 ```json
 // Respuesta 200
 [{
-  "id": "uuid", "name": "string", "species": "string", "breed": "string",
-  "gender": "male|female|unknown", "profile_image": "/static/...",
-  "shelter_id": "uuid", "shelter_name": "string", "location_name": "string"
+  "id": "uuid",
+  "name": "string",
+  "species": "string",
+  "breed": "string",
+  "gender": "male|female|unknown",
+  "profile_image": "/static/...",
+  "shelter_id": "uuid",
+  "shelter_name": "string",
+  "location_name": "string"
 }]
 ```
 
 #### `GET /animals/{id}`
-```json
-// Respuesta 200
-{
-  "id": "uuid", "name": "string", "species": "string", "breed": "string",
-  "birth_date": "YYYY-MM-DD", "gender": "male|female|unknown",
-  "size": "small|medium|large", "description": "string", "health": "string",
-  "status": "available|adopted|reserved|other", "profile_image": "/static/...",
-  "shelter_id": "uuid", "shelter_name": "string", "location_name": "string"
-}
-```
 
 ---
 
