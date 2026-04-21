@@ -67,7 +67,7 @@ fun ShelterCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
+                        .height(250.dp)
                         .clip(PhotoShape)
                 )
             } else {
