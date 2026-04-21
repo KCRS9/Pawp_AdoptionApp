@@ -63,7 +63,7 @@ async def edit_monitor_shelter(
         raise HTTPException(status_code=403, detail="Permiso denegado")
 
     # 2. Validar Propiedad (¿Es ESTA mi protectora?)
-    if current_user.shelter_id != shelter_id:
+    if current_user.role != "admin" and current_user.shelter_id != shelter_id:
         raise HTTPException(status_code=403, detail="No puedes editar una protectora que no es la tuya.")
 
     # 3. Actualizar
