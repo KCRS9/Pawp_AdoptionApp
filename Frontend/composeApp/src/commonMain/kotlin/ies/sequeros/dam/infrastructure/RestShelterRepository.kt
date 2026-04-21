@@ -27,18 +27,21 @@ class RestShelterRepository(
     private val baseUrl: String
 ) : IShelterRepository {
 
-    override suspend fun getShelters(): List<ShelterSummary> {
+    override suspend fun getShelters(location: Int?): List<ShelterSummary> {
 
-        println("LOG [RestShelterRepository]: Obteniendo listado de protectoras")
+        var url = "$baseUrl/shelters/"
 
-        val response = client.get("$baseUrl/shelters/")
+        if (location != null) url += "?location=$location"
 
-        if (!response.status.isSuccess()) {
+        val response = client.get(url)
 
+        if (!response.status.isSuccess())
             throw Exception("Error al obtener protectoras (${response.status.value})")
-        }
 
-        return response.body<List<ShelterSummaryDto>>().map { it.toDomain() }
+        return response.body<List<ShelterSummaryDto>>().map {
+            
+            it.toDomain().copy(profileImage = it.profileImage?.let { img -> if (img.startsWith("/")) "$baseUrl$img" else img })
+        }
     }
 
     override suspend fun getShelterById(id: String): Shelter {
