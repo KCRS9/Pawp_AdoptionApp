@@ -1,80 +1,157 @@
 package ies.sequeros.dam.ui.components.shelter
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import ies.sequeros.dam.domain.models.ShelterSummary
+import ies.sequeros.dam.ui.theme.PawpPurple
+import ies.sequeros.dam.ui.theme.PawpSurfaceDark
 
+private val CardShape = RoundedCornerShape(12.dp)
+private val PhotoShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 
 @Composable
 fun ShelterCard(
 
     shelter: ShelterSummary,
-    localityName: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+
 ) {
-    Card(
+    val isDark = isSystemInDarkTheme()
+    val cardBg = if (isDark) PawpSurfaceDark else Color.White
 
-        modifier = Modifier
+    Surface(
+
+        shape = CardShape,
+        color = cardBg,
+        modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .shadow(elevation = 4.dp, shape = CardShape)
+            .clickable(onClick = onClick)
     ) {
-        Row(
-
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Logo de la protectora o placeholder con la inicial
-            if (shelter.profileImage != null) {
+        Column {
+            //Foto o placeholder con inicial
+            if (!shelter.profileImage.isNullOrBlank()) {
 
                 AsyncImage(
-
                     model = shelter.profileImage,
                     contentDescription = shelter.name,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    contentScale = ContentScale.Crop
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .clip(PhotoShape)
                 )
             } else {
-                Surface(
-
+                Box(
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    color = MaterialTheme.colorScheme.secondaryContainer
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .clip(PhotoShape)
+                        .background(MaterialTheme.colorScheme.secondaryContainer),
+                    contentAlignment = Alignment.Center
                 ) {
-
-                    Box(contentAlignment = Alignment.Center) {
-
-                        Text(
-                            text = shelter.name.take(1).uppercase(),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
+                    Text(
+                        text = shelter.name.take(1).uppercase(),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
                 }
             }
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.height(8.dp))
 
-            Column {
+            // Nombre, ubicación, contador de animales
+            Column(
 
-                Text(shelter.name, style = MaterialTheme.typography.titleMedium)
-
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+                    .padding(bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
-                    localityName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = shelter.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isDark) Color.White else Color.Black,
+                    maxLines = 1
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Ubicación
+                    if (!shelter.locationName.isNullOrBlank()) {
+
+                        Row(
+
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Icon(
+
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = null,
+                                tint = PawpPurple,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Text(
+                                text = shelter.locationName,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    // Contador animales disponibles
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Pets,
+                            contentDescription = null,
+                            tint = PawpPurple,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Text(
+                            text = "${shelter.animalsAvailable} en adopción",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
     }
