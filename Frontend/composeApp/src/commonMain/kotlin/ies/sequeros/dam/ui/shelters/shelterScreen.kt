@@ -113,7 +113,7 @@ fun ProtectorasScreen(
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
 
         PullToRefreshBox(
-            
+
             isRefreshing = state.isLoading && state.shelters.isNotEmpty(),
             onRefresh = { viewModel.loadShelters() },
             modifier = Modifier.widthIn(max = 480.dp).fillMaxSize()
