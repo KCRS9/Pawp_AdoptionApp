@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends
+from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends, Query
+from typing import Optional
 from app.models.shelters import ShelterIn, ShelterUpdateIn, ShelterFullProfile,ShelterSummaryOut
 from app.models.users import UserOut, UserDb
 from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo, get_full_shelter_profile, get_all_shelters
@@ -129,7 +130,10 @@ async def upload_shelter_logo(
     #- **limit**: Número máximo de registros a devolver.
 
 @router.get("/", response_model=list[ShelterSummaryOut])
-async def list_shelters(skip: int = 0, limit: int = 20):
-    
-    shelters = get_all_shelters(skip=skip, limit=limit)
+async def list_shelters(
+    skip: int = 0,
+    limit: int = Query(default=20, le=100),
+    location: Optional[int] = Query(default=None)
+):
+    shelters = get_all_shelters(skip=skip, limit=limit, location=location)
     return shelters

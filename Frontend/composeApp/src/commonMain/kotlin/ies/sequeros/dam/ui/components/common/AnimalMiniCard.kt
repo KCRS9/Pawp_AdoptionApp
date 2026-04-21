@@ -48,6 +48,7 @@ private val PhotoShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 
 @Composable
 fun AnimalMiniCard(
+
     name: String,
     species: String,
     gender: String = "unknown",
@@ -56,10 +57,12 @@ fun AnimalMiniCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     val isDark = isSystemInDarkTheme()
     val cardBg = if (isDark) PawpSurfaceDark else Color.White
 
     Surface(
+
         shape = CardShape,
         color = cardBg,
         modifier = modifier
@@ -68,27 +71,33 @@ fun AnimalMiniCard(
             .clickable(onClick = onClick)
     ) {
         Column {
-            // ── Foto con overlay de favorito ──────────────────────────────
+            //Foto con overlay de favorito
             Box {
                 if (!profileImage.isNullOrBlank()) {
+
                     AsyncImage(
+
                         model = profileImage,
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
+                            .height(250.dp)
                             .clip(PhotoShape)
                     )
                 } else {
+
                     val iconRes = when (species.lowercase()) {
+
                         "perro" -> Res.drawable.icon_dog
                         "gato" -> Res.drawable.icon_cat
                         "conejo" -> Res.drawable.icon_rabbit
                         "reptil" -> Res.drawable.icon_turtle
                         else -> Res.drawable.icon_hamster
                     }
+
                     Box(
+
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)
@@ -96,7 +105,9 @@ fun AnimalMiniCard(
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
+
                         Image(
+
                             painter = painterResource(iconRes),
                             contentDescription = species,
                             modifier = Modifier.size(56.dp)
@@ -114,7 +125,9 @@ fun AnimalMiniCard(
                         .background(Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
+
                     Icon(
+
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = "Favorito",
                         tint = PawpPurple,
