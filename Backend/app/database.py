@@ -1,11 +1,13 @@
 import mariadb
 import uuid
 import uuid as uuid_lib
+from typing import Optional
 from app.models.users import UserDb, UserIn
 from app.models.animals import AnimalIn
 from app.models.adoptions import AdoptionIn,AdoptionUpdate
 from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
+from datetime import datetime
 
 # Configuración de la conexión a la base de datos
 db_config = {
@@ -547,3 +549,31 @@ def update_user_password(user_id: str, hashed_password: str) -> bool:
             cursor.execute(sql, (hashed_password, user_id))
             conn.commit()
             return cursor.rowcount > 0
+        
+
+# POSTS
+
+def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Optional[str]):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+
+            # 1. Insertar el post
+            sql = "INSERT INTO POST (photo, animal, user, text) VALUES (?, ?, ?, ?)"
+            cursor.execute(sql, (photo_url, animal_id, user_id, text))
+            post_id = cursor.lastrowid
+            conn.commit()
+            
+            # 2. Consultar datos
+            cursor.execute("SELECT name FROM USERS WHERE id = ?", (user_id,))
+            user_name = cursor.fetchone()[0]
+            
+            return {
+                "id": post_id,
+                "user": user_id,
+                "user_name": user_name,
+                "animal": animal_id,
+                "text": text,
+                "photo": photo_url,
+                "created_at": datetime.now(),
+                "likes": 0
+            }
