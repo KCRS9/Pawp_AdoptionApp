@@ -219,7 +219,10 @@ fun HomeScreen() {
             }
 
             HomeDestination.SHELTER_EDIT -> {
-                ShelterEditScreen(onBack = { homeDestination = HomeDestination.SHELTER_PROFILE })
+                ShelterEditScreen(
+                    shelterId = selectedShelterId ?: "",
+                    onBack = { homeDestination = HomeDestination.SHELTER_PROFILE }
+                )
             }
 
             HomeDestination.ANIMAL_DETAIL -> {
