@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends
+from fastapi import APIRouter, status, HTTPException, UploadFile, File, Depends, Query
+from typing import Optional
 from app.models.shelters import ShelterIn, ShelterUpdateIn, ShelterFullProfile,ShelterSummaryOut
 from app.models.users import UserOut, UserDb
 from app.database import insert_shelter, get_shelter_by_id, update_shelter, update_shelter_logo, get_full_shelter_profile, get_all_shelters
