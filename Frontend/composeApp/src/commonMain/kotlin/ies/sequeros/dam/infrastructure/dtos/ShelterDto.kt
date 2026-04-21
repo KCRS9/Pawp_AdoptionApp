@@ -10,9 +10,10 @@ data class ShelterSummaryDto(
     val id: String,
     val name: String,
     val location: Int,
+    @SerialName("location_name") val locationName: String? = null,
+    @SerialName("animals_available") val animalsAvailable: Int = 0,
     @SerialName("profile_image") val profileImage: String? = null
 )
-
 // DTO para el detalle GET /shelters/{id}
 @Serializable
 data class ShelterDetailDto(

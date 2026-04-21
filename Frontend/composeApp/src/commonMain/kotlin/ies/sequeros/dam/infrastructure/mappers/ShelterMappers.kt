@@ -12,24 +12,26 @@ fun ShelterSummaryDto.toDomain() = ShelterSummary(
     id = id,
     name = name,
     location = location,
+    locationName = locationName,
+    animalsAvailable = animalsAvailable,
     profileImage = profileImage
 )
 
 // Convierte el DTO de detalle en la entidad completa del dominio
 fun ShelterDetailDto.toDomain() = Shelter(
-    id           = id,
-    name         = name,
-    address      = address,
-    location     = location,
+    id = id,
+    name = name,
+    address = address,
+    location = location,
     locationName = locationName,
-    phone        = phone,
-    email        = email,
-    website      = website,
-    description  = description,
-    adminId      = adminId,
-    adminName    = adminName,
+    phone = phone,
+    email = email,
+    website = website,
+    description = description,
+    adminId = adminId,
+    adminName = adminName,
     profileImage = profileImage,
-    animals      = animals.map { it.toDomain() }
+    animals = animals.map { it.toDomain() }
 )
 
 fun AnimalSummaryDto.toDomain() = AnimalSummary(
