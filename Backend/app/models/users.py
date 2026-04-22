@@ -44,6 +44,14 @@ class UserUpdate(BaseModel): #Para el PATCH
     profile_image: str | None = None
 
 
+class UserAdminUpdate(BaseModel): # Para el PUT del Admin
+    name: str
+    email: str
+    role: str
+    location: int
+    description: Optional[str] = None
+
+
 class EmailUpdate(BaseModel):
     password: str
     new_email: str

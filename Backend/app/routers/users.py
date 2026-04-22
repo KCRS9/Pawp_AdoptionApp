@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
 from pydantic import BaseModel
-from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate
+from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate, UserAdminUpdate
 from app.models.shelters import ShelterRegistrationData
 from app.database import insert_user, insert_user_with_shelter, get_user_by_email, get_user_by_id, update_user_db, update_user_me, update_user_email, update_user_password
 import shutil
@@ -135,6 +135,53 @@ async def get_user_profile(
         )
 
     return user
+
+
+@router.put("/{user_id}", status_code=status.HTTP_200_OK)
+async def update_user(
+    user_id: str,
+    user_data: UserAdminUpdate,
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Solo el admin puede usar este endpoint
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acceso denegado"
+        )
+    
+    # 2. Verificamos que el usuario a editar exista
+    existing_user = get_user_by_id(user_id)
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+
+    # 3. Si se cambia el email, validar que no esté en uso por OTRO usuario
+    if user_data.email != existing_user.email:
+        user_with_email = get_user_by_email(user_data.email)
+        if user_with_email and user_with_email.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El nuevo correo ya está registrado por otro usuario"
+            )
+
+    # 4. Construimos los datos a actualizar
+    update_data = {
+        "name": user_data.name,
+        "email": user_data.email,
+        "role": user_data.role,
+        "location": user_data.location,
+        "description": user_data.description
+    }
+
+    # 5. Actualizamos
+    success = update_user_db(user_id, update_data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al actualizar el usuario")
+
+    return {"message": "Usuario actualizado correctamente"}
 
 
 @router.patch("/me", status_code=200)
