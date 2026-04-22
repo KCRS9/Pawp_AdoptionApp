@@ -8,7 +8,6 @@ from app.models.adoptions import AdoptionIn, AdoptionOut, AdoptionMyOut, Adoptio
 from datetime import datetime
 from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
-from datetime import datetime
 
 # Configuración de la conexión a la base de datos
 db_config = {
@@ -122,6 +121,15 @@ def update_user_db(user_id: int, data: dict) -> bool:
             cursor.execute(sql, tuple(values))
             conn.commit()
             return cursor.rowcount >= 0
+        
+
+def update_user_photo_db(user_id: str, photo_url: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "UPDATE `USERS` SET profile_image = ? WHERE id = ?"
+            cursor.execute(sql, (photo_url, user_id))
+            conn.commit()
+            return cursor.rowcount > 0
         
 
 # Mostrar perfil protectora
