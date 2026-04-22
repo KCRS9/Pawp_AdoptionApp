@@ -49,9 +49,11 @@ def get_user_by_email(email: str) -> UserDb | None:
             sql = """
                 SELECT u.id, u.name, u.email, u.password, u.role,
                        u.location, u.description, u.profile_image,
-                       s.id AS shelter_id
+                       s.id AS shelter_id,
+                       l.name AS location_name
                 FROM USERS u
                 LEFT JOIN SHELTER s ON s.admin = u.id
+                LEFT JOIN LOCALITY l ON l.id = u.location
                 WHERE u.email = ?
             """
             cursor.execute(sql, (email,))
@@ -67,7 +69,40 @@ def get_user_by_email(email: str) -> UserDb | None:
                     location=result[5],
                     description=result[6],
                     profile_image=result[7],
-                    shelter_id=result[8]
+                    shelter_id=result[8],
+                    location_name=result[9]
+                )
+    return None
+
+
+def get_user_by_id(user_id: str) -> UserDb | None:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT u.id, u.name, u.email, u.password, u.role,
+                       u.location, u.description, u.profile_image,
+                       s.id AS shelter_id,
+                       l.name AS location_name
+                FROM USERS u
+                LEFT JOIN SHELTER s ON s.admin = u.id
+                LEFT JOIN LOCALITY l ON l.id = u.location
+                WHERE u.id = ?
+            """
+            cursor.execute(sql, (user_id,))
+            result = cursor.fetchone()
+
+            if result:
+                return UserDb(
+                    id=result[0],
+                    name=result[1],
+                    email=result[2],
+                    password=result[3],
+                    role=result[4],
+                    location=result[5],
+                    description=result[6],
+                    profile_image=result[7],
+                    shelter_id=result[8],
+                    location_name=result[9]
                 )
     return None
 
@@ -302,10 +337,6 @@ def insert_shelter(shelter: ShelterIn) -> str:
 
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            # He actualizado las columnas al nuevo esquema: 'contact' → 'phone',
-            # 'website' → 'email', y añadido 'website' para la web pública.
-            # También quito el hardcoded "Dirección no proporcionada" — ahora
-            # address es nullable en la BD, así que guardamos lo que venga (puede ser None).
             sql = """
                 INSERT INTO SHELTER (id, name, address, location, phone, email, website, description, admin)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -347,9 +378,6 @@ def insert_user_with_shelter(user: UserIn, shelter_data: ShelterRegistrationData
                 )
 
                 # Luego creo la protectora vinculada a ese usuario.
-                # 'address' lo dejo NULL porque en el registro inicial el admin
-                # puede no tener la dirección todavía — la rellenará desde "Editar protectora".
-                # 'location' la copio del usuario para no pedirla dos veces en el formulario.
                 cursor.execute(
                     """
                     INSERT INTO SHELTER (id, name, address, location, phone, email, description, admin)
@@ -381,8 +409,6 @@ def get_shelter_by_id(shelter_id: str) -> ShelterDb | None:
     """ Recupera una protectora por ID (Pública) """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            # He actualizado el SELECT para usar los nuevos nombres de columna
-            # y añadido 'location', 'website' y 'profile_image' que antes no se traían.
             sql = """
                 SELECT id, name, address, location, phone, email, website, description, admin, profile_image
                 FROM SHELTER
@@ -410,8 +436,6 @@ def update_shelter(shelter_id: str, shelter: ShelterUpdateIn) -> bool:
     """ Actualiza datos de la protectora """
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            # He actualizado los campos al nuevo esquema y añadido 'website'
-            # para que el admin pueda poner también la web pública de la protectora.
             sql = """
                 UPDATE SHELTER
                 SET name=?, address=?, phone=?, email=?, website=?, description=?
@@ -428,8 +452,6 @@ def update_shelter(shelter_id: str, shelter: ShelterUpdateIn) -> bool:
             )
             cursor.execute(sql, values)
             conn.commit()
-            # MariaDB devuelve rowcount=0 cuando los valores no cambian pero la fila existe.
-            # Si no hay excepción, la operación fue correcta.
             return True
         
 

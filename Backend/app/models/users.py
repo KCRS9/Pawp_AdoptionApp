@@ -24,6 +24,7 @@ class UserOut(UserBase):
     location: int
     role: str
     profile_image: Optional[str] = None
+    location_name: Optional[str] = None
 
 #Clase DB: Lo que guardamos en la base de datos
 class UserDb(UserIn):
