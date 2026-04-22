@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate
 from app.models.shelters import ShelterRegistrationData
-from app.database import insert_user, insert_user_with_shelter, get_user_by_email, update_user_db, update_user_me, update_user_email, update_user_password
+from app.database import insert_user, insert_user_with_shelter, get_user_by_email, get_user_by_id, update_user_db, update_user_me, update_user_email, update_user_password
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -60,7 +60,6 @@ async def create_user(request: SignupRequest):
 
     try:
         if request.shelter:
-            
             user_id = insert_user_with_shelter(user_in, request.shelter)
         else:
             user_id = insert_user(user_in)
@@ -75,7 +74,6 @@ async def create_user(request: SignupRequest):
 
 # Ruta para iniciar sesión
 @router.post(
-
     "/login/",
     response_model = Token,
     status_code = status.HTTP_200_OK
@@ -113,8 +111,30 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.get("/me", response_model=UserOut)
 async def get_profile(current_user: UserOut = Depends(get_current_user)):
-    return current_user# get_current_user ya debe traer los nuevos campos de la BD
+    return current_user
 
+
+@router.get("/{user_id}", response_model=UserOut)
+async def get_user_profile(
+    user_id: str,
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Solo el admin puede consultar el perfil de cualquier usuario
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acceso denegado"
+        )
+
+    # 2. Buscar el usuario por ID
+    user = get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+
+    return user
 
 
 @router.patch("/me", status_code=200)
@@ -170,25 +190,6 @@ async def upload_avatar(
     return {"message": "Foto de perfil actualizada", "profile_image": image_url}
 
 
-
-#@router.patch("/me")
-#def patch_user_me(user_data: UserUpdate, current_user: UserDb = Depends(get_current_user)):
-    # 1. Convertimos lo que llega en un diccionario y quitamos lo que sea "None"
-    #datos_a_cambiar = user_data.model_dump(exclude_unset=True)
-
-    #if not datos_a_cambiar:
-        #raise HTTPException(status_code=400, detail="No has enviado nada para cambiar")
-
-    # 2. Llamamos a la base de datos
-    #actualizado = update_user_me(current_user.id, datos_a_cambiar)
-    
-    #if actualizado:
-        #return {"message": "Perfil actualizado correctamente"}
-    
-    #raise HTTPException(status_code=500, detail="Error al actualizar")#
-
-
-
 @router.patch("/me/email")
 async def change_user_email(
     data: EmailUpdate, 
@@ -215,7 +216,6 @@ async def change_user_email(
         raise HTTPException(status_code=500, detail="Error al actualizar el correo")
 
     return {"message": "Correo actualizado correctamente"}
-
 
 
 @router.patch("/me/password")
