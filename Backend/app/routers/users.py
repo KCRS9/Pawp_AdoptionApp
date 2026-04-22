@@ -1,10 +1,13 @@
 from fastapi import APIRouter, status, HTTPException, Depends,File, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
+import time
+import os
+import shutil
 from typing import Optional
 from pydantic import BaseModel
 from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate
 from app.models.shelters import ShelterRegistrationData
-from app.database import insert_user, insert_user_with_shelter, get_user_by_email, get_user_by_id, update_user_db, update_user_me, update_user_email, update_user_password
+from app.database import insert_user, insert_user_with_shelter, get_user_by_email, get_user_by_id, update_user_db, update_user_email, update_user_password, update_user_photo_db
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -247,3 +250,51 @@ async def change_user_password(
         raise HTTPException(status_code=500, detail="Error al actualizar la contraseña")
 
     return {"message": "Contraseña actualizada correctamente"}
+
+
+
+
+# Actualizar foto de usuario solo admin
+@router.post("/{user_id}/photo", status_code=200)
+async def upload_user_photo_admin(
+    user_id: str,
+    file: UploadFile = File(...),
+    current_user: UserDb = Depends(get_current_user)
+):
+    # Valida que el que hace la petición es ADMIN
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+
+    # Verifica que el usuario destino existe
+    user_target = get_user_by_id(user_id)
+    if not user_target:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Valida extensión de imagen
+    extension = file.filename.split(".")[-1].lower()
+    if extension not in ["jpg", "jpeg", "png", "webp"]:
+        raise HTTPException(status_code=400, detail="Formato no permitido")
+
+    # Prepara carpeta y nombre
+    upload_dir = "app/static/users"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    timestamp = int(time.time())
+    file_name = f"avatar_{user_id}_{timestamp}.{extension}"
+    file_path = os.path.join(upload_dir, file_name)
+
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al guardar la imagen")
+
+    # Actualizar en Base de Datos
+    image_url = f"/static/users/{file_name}"
+    success = update_user_photo_db(user_id, image_url)
+
+    if not success:
+         raise HTTPException(status_code=500, detail="Error al actualizar la base de datos")
+
+    return {"profile_image": image_url}
