@@ -70,3 +70,12 @@ class ShelterFullProfile(BaseModel):
     admin_name: str
     profile_image: Optional[str] = None
     animals: list[ShelterProfileAnimal]
+
+# Modelo ligero para el listado
+class ShelterSummaryOut(BaseModel):
+    id: str
+    name: str
+    location: int
+    location_name: Optional[str] = None
+    animals_available: int = 0
+    profile_image: Optional[str] = None
