@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
@@ -18,17 +17,15 @@ import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ShelterEditScreen(onBack: () -> Unit) {
+fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
     val viewModel: ShelterEditViewModel = koinViewModel()
-    val appViewModel: AppViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val currentUser by appViewModel.currentUser.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
     // Pre-cargamos los datos de la protectora al entrar por primera vez
-    LaunchedEffect(currentUser?.shelterId) {
-        currentUser?.shelterId?.let { viewModel.init(it) }
+    LaunchedEffect(shelterId) {
+        if (shelterId.isNotBlank()) viewModel.init(shelterId)
     }
 
     LaunchedEffect(state.isSuccess) {

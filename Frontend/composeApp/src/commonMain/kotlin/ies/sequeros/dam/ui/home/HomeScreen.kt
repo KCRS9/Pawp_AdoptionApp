@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.admin.AdminPanelScreen
 import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailScreen
 import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditScreen
 import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesScreen
@@ -50,7 +51,8 @@ enum class HomeDestination {
     SHELTER_EDIT,
     ANIMAL_DETAIL,
     ANIMAL_EDIT,
-    MIS_ANIMALES
+    MIS_ANIMALES,
+    ADMIN_PANEL,
 }
 
 @Composable
@@ -91,16 +93,23 @@ fun HomeScreen() {
                     scope.launch { drawerState.close() }
                 },
                 onMyAdoptionsClick = { scope.launch { drawerState.close() } },
+
                 onMyAnimalsClick = {
                     homeDestination = HomeDestination.MIS_ANIMALES
                     scope.launch { drawerState.close() }
                 },
+
                 onRegisterAnimalClick = {
                     selectedAnimalId = null
                     homeDestination = HomeDestination.ANIMAL_EDIT
                     scope.launch { drawerState.close() }
                 },
-                onAdminPanelClick = { scope.launch { drawerState.close() } },
+
+                onAdminPanelClick = {
+                    homeDestination = HomeDestination.ADMIN_PANEL
+                    scope.launch { drawerState.close() }
+                },
+
                 onNotificationsClick = { scope.launch { drawerState.close() } },
                 onThemeClick = {
                     showThemeDialog = true
@@ -192,9 +201,11 @@ fun HomeScreen() {
             }
 
             HomeDestination.SHELTER_PROFILE -> {
-                val isOwnShelter = currentUser?.shelterId != null &&
-                                   currentUser?.shelterId == selectedShelterId
+                val isOwnShelter = currentUser?.role == "admin" ||
+                    (currentUser?.shelterId != null && currentUser?.shelterId == selectedShelterId)
+
                 ShelterProfileScreen(
+
                     shelterId = selectedShelterId ?: "",
                     onBack = { homeDestination = HomeDestination.TABS },
                     onEditClick = if (isOwnShelter) { { homeDestination = HomeDestination.SHELTER_EDIT } } else null,
@@ -208,7 +219,10 @@ fun HomeScreen() {
             }
 
             HomeDestination.SHELTER_EDIT -> {
-                ShelterEditScreen(onBack = { homeDestination = HomeDestination.SHELTER_PROFILE })
+                ShelterEditScreen(
+                    shelterId = selectedShelterId ?: "",
+                    onBack = { homeDestination = HomeDestination.SHELTER_PROFILE }
+                )
             }
 
             HomeDestination.ANIMAL_DETAIL -> {
@@ -249,6 +263,19 @@ fun HomeScreen() {
                     onBack = { homeDestination = HomeDestination.TABS }
                 )
             }
+
+            HomeDestination.ADMIN_PANEL -> {
+
+                AdminPanelScreen(
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onSheltersClick = {
+                        selectedTab = HomeTab.PROTECTORAS
+                        homeDestination = HomeDestination.TABS
+                    }
+                )
+            }
+
+
         }
     }
 }
