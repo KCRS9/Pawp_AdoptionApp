@@ -40,9 +40,15 @@ import pawp_adoption.composeapp.generated.resources.icon_hamster
 import pawp_adoption.composeapp.generated.resources.icon_rabbit
 import pawp_adoption.composeapp.generated.resources.icon_turtle
 
-private data class SpeciesFilter(val label: String, val key: String?, val icon: DrawableResource?)
+private data class SpeciesFilter(
 
+    val label: String,
+    val key: String?,
+    val icon: DrawableResource?
+)
+// Lista de filtros de especie 
 private val SPECIES_FILTERS = listOf(
+
     SpeciesFilter("Todos", null, null),
     SpeciesFilter("Perros", "Perro", Res.drawable.icon_dog),
     SpeciesFilter("Gatos", "Gato", Res.drawable.icon_cat),
@@ -53,94 +59,124 @@ private val SPECIES_FILTERS = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InicioScreen(onAnimalClick: (String) -> Unit = {}) {
+fun InicioScreen(
+    
+    onAnimalClick: (String) -> Unit = {}
+) {
+
     val viewModel: InicioViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
+    // Detecta cuando el usuario llega al fina y carga mas animales
     val reachedEnd by remember {
+
         derivedStateOf {
             val info = listState.layoutInfo
             val last = info.visibleItemsInfo.lastOrNull()?.index ?: 0
             last >= info.totalItemsCount - 3 && info.totalItemsCount > 0
         }
     }
+
     LaunchedEffect(reachedEnd) {
+
         if (reachedEnd) viewModel.loadMore()
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        androidx.compose.foundation.layout.Column(
+    Box(
+
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+
+        PullToRefreshBox(
+
+            isRefreshing = state.isLoading && state.animals.isNotEmpty(),
+            onRefresh = { viewModel.refresh() },
             modifier = Modifier.widthIn(max = 480.dp).fillMaxSize()
         ) {
-            PawpCard(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
 
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(SPECIES_FILTERS) { filter ->
-                    FilterChip(
-                        selected = state.selectedSpecies == filter.key,
-                        onClick = { viewModel.selectSpecies(filter.key) },
-                        label = { Text(filter.label) },
-                        leadingIcon = filter.icon?.let { res ->
-                            {
-                                Image(
-                                    painter = painterResource(res),
-                                    contentDescription = filter.label,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-
-            PullToRefreshBox(
-                isRefreshing = state.isLoading && state.animals.isNotEmpty(),
-                onRefresh = { viewModel.refresh() },
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(bottom = 12.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                when {
-                    state.isLoading && state.animals.isEmpty() -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    state.animals.isEmpty() -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "No hay animales disponibles.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                // PawpCard
+                item {
+                    PawpCard(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+                }
+
+                // Filtros de especies
+                item {
+
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(SPECIES_FILTERS) { filter ->
+
+                            FilterChip(
+
+                                selected = state.selectedSpecies == filter.key,
+                                onClick = { viewModel.selectSpecies(filter.key) },
+                                label = { Text(filter.label) },
+                                leadingIcon = filter.icon?.let { res ->
+                                    {
+                                        Image(
+                                            painter = painterResource(res),
+                                            contentDescription = filter.label,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
                             )
                         }
                     }
-                    else -> {
-                        LazyColumn(
-                            state = listState,
-                            contentPadding = PaddingValues(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(state.animals, key = { it.id }) { animal ->
-                                AnimalMiniCard(
-                                    name = animal.name,
-                                    species = animal.species,
-                                    gender = animal.gender,
-                                    locationName = animal.locationName,
-                                    profileImage = animal.profileImage,
-                                    onClick = { onAnimalClick(animal.id) }
+                }
+
+                when {
+                    state.isLoading && state.animals.isEmpty() -> {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    }
+
+                    state.animals.isEmpty() -> {
+
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No hay animales disponibles.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            if (state.isLoadingMore) {
-                                item {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
-                                }
+                        }
+                    }
+                    else -> {
+                        items(state.animals, key = { it.id }) { animal ->
+                            AnimalMiniCard(
+                                name = animal.name,
+                                species = animal.species,
+                                gender = animal.gender,
+                                locationName = animal.locationName,
+                                profileImage = animal.profileImage,
+                                onClick = { onAnimalClick(animal.id) },
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                        if (state.isLoadingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
                             }
                         }
                     }

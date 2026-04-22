@@ -435,23 +435,41 @@ def update_shelter(shelter_id: str, shelter: ShelterUpdateIn) -> bool:
             return True
         
 
-def get_all_shelters(skip: int = 0, limit: int = 20):
+def get_all_shelters(skip: int = 0, limit: int = 20, location: int = None):
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = """
-                SELECT id, name, location, profile_image 
-                FROM SHELTER 
+            conditions = []
+            params = []
+
+            if location is not None:
+                conditions.append("s.location = ?")
+                params.append(location)
+
+            where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+
+            sql = f"""
+                SELECT s.id, s.name, s.location, l.name,
+                       COUNT(a.id) AS animals_available,
+                       s.profile_image
+                FROM SHELTER s
+                LEFT JOIN LOCALITY l ON l.id = s.location
+                LEFT JOIN ANIMAL a ON a.shelter_id = s.id AND a.status = 'available'
+                {where}
+                GROUP BY s.id, s.name, s.location, l.name, s.profile_image
                 LIMIT ? OFFSET ?
             """
-            cursor.execute(sql, (limit, skip))
-            
+            params += [limit, skip]
+            cursor.execute(sql, params)
+
             shelters = []
             for row in cursor.fetchall():
                 shelters.append({
                     "id": row[0],
                     "name": row[1],
                     "location": row[2],
-                    "profile_image": row[3]
+                    "location_name": row[3],
+                    "animals_available": row[4],
+                    "profile_image": row[5]
                 })
             return shelters
         

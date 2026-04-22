@@ -101,7 +101,7 @@ val appModule = module {
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
 
-    viewModel { ProtectorasViewModel(get()) }
+    viewModel { ProtectorasViewModel(get(), get()) }
     viewModel { ShelterProfileViewModel(get()) }
     viewModel { ShelterEditViewModel(get(), get()) }
     viewModel { InicioViewModel(get()) }

@@ -5,7 +5,7 @@ import ies.sequeros.dam.domain.models.ShelterSummary
 
 interface IShelterRepository {
 
-    suspend fun getShelters(): List<ShelterSummary>
+    suspend fun getShelters(location: Int? = null): List<ShelterSummary>
 
     suspend fun getShelterById(id: String): Shelter
 
