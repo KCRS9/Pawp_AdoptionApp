@@ -30,6 +30,7 @@ class UserOut(UserBase):
 class UserDb(UserIn):
     id: str
     shelter_id: Optional[str] = None
+    location_name: Optional[str] = None
 
 #Class Login: Para poder facilitar el inicio de sesion
 class UserLogin(UserBase):

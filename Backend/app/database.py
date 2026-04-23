@@ -108,6 +108,46 @@ def get_user_by_id(user_id: str) -> UserDb | None:
     return None
 
 
+def get_all_users_db(skip: int = 0, limit: int = 20, search: str = None) -> list:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT u.id, u.name, u.email, u.password, u.role,
+                       u.location, u.description, u.profile_image,
+                       s.id AS shelter_id,
+                       l.name AS location_name
+                FROM USERS u
+                LEFT JOIN SHELTER s ON s.admin = u.id
+                LEFT JOIN LOCALITY l ON l.id = u.location
+            """
+            params = []
+            if search:
+                sql += " WHERE u.name LIKE ? OR u.email LIKE ?"
+                params = [f"%{search}%", f"%{search}%"]
+            
+            sql += " LIMIT ? OFFSET ?"
+            params += [limit, skip]
+            
+            cursor.execute(sql, tuple(params))
+            results = cursor.fetchall()
+            
+            users = []
+            for result in results:
+                users.append(UserDb(
+                    id=result[0],
+                    name=result[1],
+                    email=result[2],
+                    password=result[3],
+                    role=result[4],
+                    location=result[5],
+                    description=result[6],
+                    profile_image=result[7],
+                    shelter_id=result[8],
+                    location_name=result[9]
+                ))
+            return users
+
+
 def update_user_db(user_id: int, data: dict) -> bool:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
