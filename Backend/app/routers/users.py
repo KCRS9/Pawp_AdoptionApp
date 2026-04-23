@@ -7,7 +7,17 @@ from typing import Optional
 from pydantic import BaseModel
 from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate, UserAdminUpdate
 from app.models.shelters import ShelterRegistrationData
-from app.database import insert_user, insert_user_with_shelter, get_user_by_email, get_user_by_id, update_user_db, update_user_email, update_user_password, update_user_photo_db
+from app.database import (
+    insert_user, 
+    insert_user_with_shelter, 
+    get_user_by_email, 
+    get_user_by_id, 
+    update_user_db, 
+    update_user_email, 
+    update_user_password, 
+    update_user_photo_db,
+    get_all_users_db
+)
 import shutil
 from app.auth.auth import (
     get_hash_password, 
@@ -115,6 +125,25 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @router.get("/me", response_model=UserOut)
 async def get_profile(current_user: UserOut = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/", response_model=list[UserOut])
+async def list_users(
+    skip: int = 0,
+    limit: int = 20,
+    search: Optional[str] = None,
+    current_user: UserDb = Depends(get_current_user)
+):
+    # 1. Solo el admin puede listar usuarios
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acceso denegado"
+        )
+    
+    # 2. Obtener lista desde la DB
+    users = get_all_users_db(skip=skip, limit=limit, search=search)
+    return users
 
 
 @router.get("/{user_id}", response_model=UserOut)
