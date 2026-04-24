@@ -146,6 +146,37 @@ def get_all_users_db(skip: int = 0, limit: int = 20, search: str = None) -> list
                     location_name=result[9]
                 ))
             return users
+        
+
+def get_user_favorites_db(user_id: str) -> list:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT a.id, a.name, a.species, a.breed, a.gender, a.profile_image,
+                       a.shelter_id, s.name, l.name
+                FROM ANIMAL a
+                JOIN FAVORITE f ON a.id = f.animal
+                JOIN SHELTER s ON s.id = a.shelter_id
+                LEFT JOIN LOCALITY l ON l.id = s.location
+                WHERE f.user = ?
+            """
+            cursor.execute(sql, (user_id,))
+            rows = cursor.fetchall()
+            
+            return [
+                {
+                    "id": row[0],
+                    "name": row[1],
+                    "species": row[2],
+                    "breed": row[3] or "",
+                    "gender": row[4] or "unknown",
+                    "profile_image": row[5],
+                    "shelter_id": row[6],
+                    "shelter_name": row[7],
+                    "location_name": row[8],
+                }
+                for row in rows
+            ]
 
 
 def update_user_db(user_id: int, data: dict) -> bool:

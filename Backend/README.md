@@ -479,6 +479,31 @@ Query params: text (int), animal_id (string), photo (string/binary)
 }
 ```
 
+---------------
+
+### Favoritos — `/favorites`
+
+| Método | Ruta | Auth | Roles | Descripción |
+|--------|------|------|-------|-------------|
+| `GET` | `/favorites/` | Si | User | Listar favoritos del usuario |
+
+
+### GET `/favorites/`
+
+``` json (Respuesta 200)
+{
+  "id": "uuid",
+    "name": "string",
+    "species": "string",
+    "gender": "male|female|unknown",
+    "profile_image": "/static/...",
+    "shelter_id": "uuid",
+    "shelter_name": "string",
+    "location_name": "string"
+}
+
+```
+
 
 
 ## Cómo documentar un endpoint nuevo
