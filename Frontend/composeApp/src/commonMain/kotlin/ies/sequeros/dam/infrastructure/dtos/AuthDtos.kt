@@ -50,7 +50,22 @@ data class UserProfileDto(
     val role: String,
     @SerialName("profile_image") val profileImage: String? = null,
     @SerialName("shelter_id") val shelterId: String? = null,
+    val description: String? = null,
+    @SerialName("location_name") val locationName: String? = null
+)
+
+@Serializable
+data class UpdateUserAdminDto(
+    val name: String,
+    val email: String,
+    val role: String,
+    val location: Int,
     val description: String? = null
+)
+
+@Serializable
+data class AdminPhotoResponseDto(
+    @SerialName("profile_image") val profileImage: String
 )
 
 // DTO para los datos de la protectora dentro del body de POST /users/signup/

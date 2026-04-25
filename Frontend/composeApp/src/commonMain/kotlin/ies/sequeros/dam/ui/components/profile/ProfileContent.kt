@@ -110,8 +110,8 @@ fun ProfileContent(
         //Nombre
         Text(
 
-            text      = user.name.toTitleCase(),
-            style     = MaterialTheme.typography.headlineSmall,
+            text = user.name.toTitleCase(),
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
 
