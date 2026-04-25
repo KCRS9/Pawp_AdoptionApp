@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
@@ -54,6 +55,8 @@ fun AnimalMiniCard(
     gender: String = "unknown",
     locationName: String? = null,
     profileImage: String? = null,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -115,22 +118,20 @@ fun AnimalMiniCard(
                     }
                 }
 
-                // Botón favorito (futuro)
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
                         .size(28.dp)
                         .shadow(2.dp, CircleShape)
-                        .background(Color.White, CircleShape),
+                        .background(Color.White, CircleShape)
+                        .then(if (onFavoriteClick != null) Modifier.clickable { onFavoriteClick() } else Modifier),
                     contentAlignment = Alignment.Center
                 ) {
-
                     Icon(
-
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorito",
-                        tint = PawpPurple,
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos",
+                        tint = if (isFavorite) Color.Red else PawpPurple,
                         modifier = Modifier.size(15.dp)
                     )
                 }
