@@ -1,5 +1,6 @@
 package ies.sequeros.dam.di
 
+import ies.sequeros.dam.application.usecases.AddFavoriteUseCase
 import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
 import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
 import ies.sequeros.dam.application.usecases.CreateAnimalUseCase
@@ -7,11 +8,14 @@ import ies.sequeros.dam.application.usecases.DeleteAnimalUseCase
 import ies.sequeros.dam.application.usecases.GetAnimalByIdUseCase
 import ies.sequeros.dam.application.usecases.GetAnimalsUseCase
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
+import ies.sequeros.dam.application.usecases.GetFavoritesUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.GetShelterByIdUseCase
 import ies.sequeros.dam.application.usecases.GetSheltersUseCase
 import ies.sequeros.dam.application.usecases.GetUserByIdUseCase
+import ies.sequeros.dam.application.usecases.GetUserFavoritesUseCase
 import ies.sequeros.dam.application.usecases.GetUsersUseCase
+import ies.sequeros.dam.application.usecases.RemoveFavoriteUseCase
 import ies.sequeros.dam.application.usecases.UpdateAnimalPhotoUseCase
 import ies.sequeros.dam.application.usecases.UpdateAnimalUseCase
 import ies.sequeros.dam.application.usecases.UpdateShelterLogoUseCase
@@ -23,11 +27,13 @@ import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
 import ies.sequeros.dam.domain.repositories.IAuthRepository
+import ies.sequeros.dam.domain.repositories.IFavoritesRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
 import ies.sequeros.dam.domain.repositories.IShelterRepository
 import ies.sequeros.dam.domain.repositories.IUserRepository
 import ies.sequeros.dam.infrastructure.RestAnimalRepository
 import ies.sequeros.dam.infrastructure.RestAuthRepository
+import ies.sequeros.dam.infrastructure.RestFavoritesRepository
 import ies.sequeros.dam.infrastructure.RestLocalityRepository
 import ies.sequeros.dam.infrastructure.RestShelterRepository
 import ies.sequeros.dam.infrastructure.RestUserRepository
@@ -75,6 +81,7 @@ val appModule = module {
     single<ILocalityRepository> { RestLocalityRepository(get(), baseUrl) }
     single<IShelterRepository> { RestShelterRepository(get(), baseUrl) }
     single<IAnimalRepository> { RestAnimalRepository(get(), baseUrl) }
+    single<IFavoritesRepository> { RestFavoritesRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
@@ -104,11 +111,15 @@ val appModule = module {
     factory { GetUsersUseCase(get()) }
     factory { UpdateUserAdminUseCase(get()) }
     factory { UpdateUserPhotoAdminUseCase(get()) }
+    factory { GetFavoritesUseCase(get()) }
+    factory { GetUserFavoritesUseCase(get()) }
+    factory { AddFavoriteUseCase(get()) }
+    factory { RemoveFavoriteUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
     single { AppSettings(get()) }
-    factory { AppViewModel(get(), get(), get(), get()) }
+    factory { AppViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { LoginViewModel(get()) }
     factory { RegisterViewModel(get(), get()) }
 
@@ -120,6 +131,6 @@ val appModule = module {
     viewModel { AnimalEditViewModel(get(), get(), get(), get(), get()) }
     viewModel { MisAnimalesViewModel(get()) }
     viewModel { AdminUsersViewModel(get()) }
-    viewModel { AdminUserProfileViewModel(get()) }
+    viewModel { AdminUserProfileViewModel(get(), get()) }
     viewModel { AdminUserEditViewModel(get(), get(), get()) }
 }
