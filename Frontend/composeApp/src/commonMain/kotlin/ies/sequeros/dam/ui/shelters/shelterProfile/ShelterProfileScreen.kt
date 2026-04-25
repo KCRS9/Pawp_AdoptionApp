@@ -44,7 +44,7 @@ fun ShelterProfileScreen(
     shelterId: String,
     onBack: () -> Unit,
     onEditClick: (() -> Unit)? = null,
-    onAdminClick: (String) -> Unit = {},
+    onAdminClick: ((String) -> Unit)? = null,
     onAnimalClick: (String) -> Unit = {},
     onVerAnimalesClick: (() -> Unit)? = null
 ) {
@@ -108,7 +108,9 @@ fun ShelterProfileScreen(
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
                 color = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.clickable { onAdminClick(shelter.adminId) }
+                modifier = if (onAdminClick != null)
+                               Modifier.clickable { onAdminClick(shelter.adminId) }
+                           else Modifier
             ) {
                 Text(
                     text = "Admin: ${shelter.adminName ?: shelter.adminId}",
