@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.routers.users import get_current_user
-from app.database import get_user_favorites_db, add_favorite_db, remove_favorite_db
+from app.database import get_user_favorites_db, add_favorite_db, remove_favorite_db, user_exists
 from app.models.users import UserDb
 
 
@@ -62,4 +62,17 @@ def remove_favorite(animal_id: str, current_user: UserDb = Depends(get_current_u
     
     # Éxito (200)
     return {"message": "Animal eliminado de favoritos"}
+
+
+
+# Devuelve animales favoritos de usuario por id
+@router.get("/users/{user_id}/favorites", response_model=list)
+def get_external_user_favorites(user_id: str, current_user: UserDb = Depends(get_current_user)):
+    if not user_exists(user_id):
+        raise HTTPException(
+            status_code=404, 
+            detail="Usuario no encontrado"
+        )
+    favorites = get_user_favorites_db(user_id)
+    return favorites
     

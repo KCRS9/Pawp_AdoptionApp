@@ -486,8 +486,9 @@ Query params: text (int), animal_id (string), photo (string/binary)
 | Método | Ruta | Auth | Roles | Descripción |
 |--------|------|------|-------|-------------|
 | `GET` | `/favorites/` | Si | User | Listar favoritos del usuario |
-| `POST` | `/favorites/` | Si | User | Añadir animal a favorito |
-| `DELETE` | `/favorites/` | Si | User | Eliminar animal de favorito |
+| `POST` | `/favorites/{animal_id}` | Si | User | Añadir animal a favorito |
+| `DELETE` | `/favorites/{animal_id}` | Si | User | Eliminar animal de favorito |
+| `GET` | `/users/{user_id}/favorites` | Si | Cualquiera | Ver favoritos de un usuario concreto |
 
 
 ### GET `/favorites/`
@@ -534,6 +535,30 @@ Query params: text (int), animal_id (string), photo (string/binary)
 ```
 
 
+### GET `/users/{user_id}/favorites`
+
+```Query params: user_id → string (UUID del usuario)
+```
+
+``` json (Respuesta 200)
+
+[
+  {
+    "id": "uuid",
+    "name": "string",
+    "species": "string",
+    "gender": "male|female|unknown",
+    "profile_image": "/static/...",
+    "shelter_id": "uuid",
+    "shelter_name": "string",
+    "location_name": "string"
+  }
+]
+
+
+```Errores:
+{ "detail": "Usuario no encontrado" }   // 404
+```
 
 
 
