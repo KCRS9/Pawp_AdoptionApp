@@ -99,7 +99,7 @@ class AppViewModel(
                 }
 
                 settings.saveUserProfile(user.copy(locationName = locationName.toString()))
-                if (user.role == "user") loadFavorites()
+                loadFavorites()
 
             }catch (e: Exception){
 

@@ -173,7 +173,7 @@ fun InicioScreen(
                                 locationName = animal.locationName,
                                 profileImage = animal.profileImage,
                                 isFavorite = animal.id in favoriteIds,
-                                onFavoriteClick = if (currentUser?.role == "user") {
+                                onFavoriteClick = if (currentUser != null) {
                                     { appViewModel.toggleFavorite(animal.id) }
                                 } else null,
                                 onClick = { onAnimalClick(animal.id) },
