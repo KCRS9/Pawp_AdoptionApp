@@ -10,6 +10,8 @@ import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
 import ies.sequeros.dam.application.usecases.GetShelterByIdUseCase
 import ies.sequeros.dam.application.usecases.GetSheltersUseCase
+import ies.sequeros.dam.application.usecases.GetUserByIdUseCase
+import ies.sequeros.dam.application.usecases.GetUsersUseCase
 import ies.sequeros.dam.application.usecases.UpdateAnimalPhotoUseCase
 import ies.sequeros.dam.application.usecases.UpdateAnimalUseCase
 import ies.sequeros.dam.application.usecases.UpdateShelterLogoUseCase
@@ -17,6 +19,8 @@ import ies.sequeros.dam.application.usecases.LoginUseCase
 import ies.sequeros.dam.application.usecases.RegisterUseCase
 import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
 import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
+import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
+import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
@@ -29,6 +33,9 @@ import ies.sequeros.dam.infrastructure.RestShelterRepository
 import ies.sequeros.dam.infrastructure.RestUserRepository
 import ies.sequeros.dam.infrastructure.ktor.createHttpClient
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
+import ies.sequeros.dam.ui.admin.AdminUserEditViewModel
+import ies.sequeros.dam.ui.admin.AdminUserProfileViewModel
+import ies.sequeros.dam.ui.admin.AdminUsersViewModel
 import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailViewModel
 import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditViewModel
 import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesViewModel
@@ -93,6 +100,10 @@ val appModule = module {
     factory { UpdateAnimalUseCase(get()) }
     factory { DeleteAnimalUseCase(get()) }
     factory { UpdateAnimalPhotoUseCase(get()) }
+    factory { GetUserByIdUseCase(get()) }
+    factory { GetUsersUseCase(get()) }
+    factory { UpdateUserAdminUseCase(get()) }
+    factory { UpdateUserPhotoAdminUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -108,4 +119,7 @@ val appModule = module {
     viewModel { AnimalDetailViewModel(get()) }
     viewModel { AnimalEditViewModel(get(), get(), get(), get(), get()) }
     viewModel { MisAnimalesViewModel(get()) }
+    viewModel { AdminUsersViewModel(get()) }
+    viewModel { AdminUserProfileViewModel(get()) }
+    viewModel { AdminUserEditViewModel(get(), get(), get()) }
 }
