@@ -8,15 +8,17 @@ from pydantic import BaseModel
 from app.models.users import UserIn, UserOut, UserUpdate, UserDb, EmailUpdate, PasswordUpdate, UserAdminUpdate
 from app.models.shelters import ShelterRegistrationData
 from app.database import (
-    insert_user, 
-    insert_user_with_shelter, 
-    get_user_by_email, 
-    get_user_by_id, 
-    update_user_db, 
-    update_user_email, 
-    update_user_password, 
+    insert_user,
+    insert_user_with_shelter,
+    get_user_by_email,
+    get_user_by_id,
+    update_user_db,
+    update_user_email,
+    update_user_password,
     update_user_photo_db,
-    get_all_users_db
+    get_all_users_db,
+    get_user_favorites_db,
+    user_exists
 )
 import shutil
 from app.auth.auth import (
@@ -144,6 +146,20 @@ async def list_users(
     # 2. Obtener lista desde la DB
     users = get_all_users_db(skip=skip, limit=limit, search=search)
     return users
+
+
+@router.get("/{user_id}/favorites", response_model=list)
+async def get_user_favorites(
+    user_id: str,
+    current_user: UserDb = Depends(get_current_user)
+):
+    if not user_exists(user_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    favorites = get_user_favorites_db(user_id)
+    return favorites
 
 
 @router.get("/{user_id}", response_model=UserOut)

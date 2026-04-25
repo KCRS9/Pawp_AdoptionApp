@@ -31,11 +31,13 @@ fun ProfileScreen(
 
     onBack: () -> Unit,
     onEditClick: () -> Unit,
-    isOwnProfile: Boolean = true
+    isOwnProfile: Boolean = true,
+    onAnimalClick: (String) -> Unit = {}
 ) {
 
     val appViewModel: AppViewModel = koinViewModel()
     val currentUser by appViewModel.currentUser.collectAsStateWithLifecycle()
+    val favoriteAnimals by appViewModel.favoriteAnimals.collectAsStateWithLifecycle()
 
     Scaffold(
 
@@ -74,10 +76,11 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileContent(
-
-                user         = currentUser!!,
-                isOwnProfile = isOwnProfile,
-                onEditClick  = onEditClick
+                user            = currentUser!!,
+                isOwnProfile    = isOwnProfile,
+                onEditClick     = onEditClick,
+                favoriteAnimals = favoriteAnimals,
+                onAnimalClick   = onAnimalClick
             )
         }
     }

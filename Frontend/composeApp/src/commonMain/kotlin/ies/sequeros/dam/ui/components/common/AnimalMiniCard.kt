@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
@@ -54,6 +55,8 @@ fun AnimalMiniCard(
     gender: String = "unknown",
     locationName: String? = null,
     profileImage: String? = null,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,22 +64,27 @@ fun AnimalMiniCard(
     val isDark = isSystemInDarkTheme()
     val cardBg = if (isDark) PawpSurfaceDark else Color.White
 
-    Surface(
-
-        shape = CardShape,
-        color = cardBg,
+    // Root Box sin clickable — el corazón es hermano de la Surface,
+    // no hijo, por lo que su clickable no propaga al de la card.
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 4.dp, shape = CardShape)
-            .clickable(onClick = onClick)
     ) {
-        Column {
-            //Foto con overlay de favorito
-            Box {
+
+        // Surface: toda la card, con el clickable de navegación
+        Surface(
+            shape = CardShape,
+            color = cardBg,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+        ) {
+            Column {
+                // Foto (sin corazón)
                 if (!profileImage.isNullOrBlank()) {
 
                     AsyncImage(
-
                         model = profileImage,
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
@@ -88,7 +96,6 @@ fun AnimalMiniCard(
                 } else {
 
                     val iconRes = when (species.lowercase()) {
-
                         "perro" -> Res.drawable.icon_dog
                         "gato" -> Res.drawable.icon_cat
                         "conejo" -> Res.drawable.icon_rabbit
@@ -97,7 +104,6 @@ fun AnimalMiniCard(
                     }
 
                     Box(
-
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp)
@@ -105,9 +111,7 @@ fun AnimalMiniCard(
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
-
                         Image(
-
                             painter = painterResource(iconRes),
                             contentDescription = species,
                             modifier = Modifier.size(56.dp)
@@ -115,87 +119,90 @@ fun AnimalMiniCard(
                     }
                 }
 
-                // Botón favorito (futuro)
-                Box(
+                Spacer(Modifier.height(8.dp))
+
+                // ── Info ──────────────────────────────────────────────────
+                Row(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(28.dp)
-                        .shadow(2.dp, CircleShape)
-                        .background(Color.White, CircleShape),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Icon(
-
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorito",
-                        tint = PawpPurple,
-                        modifier = Modifier.size(15.dp)
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            // ── Info ──────────────────────────────────────────────────────
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (isDark) Color.White else Color.Black,
-                        maxLines = 1
-                    )
-                    if (!locationName.isNullOrBlank()) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = null,
-                                tint = PawpPurple,
-                                modifier = Modifier.size(12.dp)
-                            )
-                            Text(
-                                text = locationName,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isDark) Color.White else Color.Black,
+                            maxLines = 1
+                        )
+                        if (!locationName.isNullOrBlank()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = null,
+                                    tint = PawpPurple,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Text(
+                                    text = locationName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
+                    }
+
+                    val (genderSymbol, genderColor) = when (gender) {
+                        "male"   -> "♂" to Color(0xFF4A90D9)
+                        "female" -> "♀" to Color(0xFFD94A8B)
+                        else     -> "?" to (if (isDark) PawpPurpleLight else PawpPurple)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(26.dp)
+                            .background(genderColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = genderSymbol,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = genderColor,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
-                // Icono de género
-                val (genderSymbol, genderColor) = when (gender) {
-                    "male" -> "♂" to Color(0xFF4A90D9)
-                    "female" -> "♀" to Color(0xFFD94A8B)
-                    else -> "?" to (if (isDark) PawpPurpleLight else PawpPurple)
-                }
-                Box(
-                    modifier = Modifier
-                        .size(26.dp)
-                        .background(genderColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = genderSymbol,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = genderColor,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Spacer(Modifier.height(10.dp))
             }
+        }
 
-            Spacer(Modifier.height(10.dp))
+        // Corazón — hermano de Surface dentro del Box raíz.
+        // Al estar fuera del árbol clickable de la card, su propio
+        // clickable no propaga hacia arriba y la navegación no se dispara.
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .size(28.dp)
+                .shadow(2.dp, CircleShape)
+                .background(Color.White, CircleShape)
+                .then(
+                    if (onFavoriteClick != null) Modifier.clickable { onFavoriteClick() }
+                    else Modifier
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos",
+                tint = if (isFavorite) Color.Red else PawpPurple,
+                modifier = Modifier.size(15.dp)
+            )
         }
     }
 }

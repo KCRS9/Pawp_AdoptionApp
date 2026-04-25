@@ -148,7 +148,11 @@ fun HomeScreen() {
             HomeDestination.PROFILE -> {
                 ProfileScreen(
                     onBack = { homeDestination = HomeDestination.TABS },
-                    onEditClick = { homeDestination = HomeDestination.EDIT_PROFILE }
+                    onEditClick = { homeDestination = HomeDestination.EDIT_PROFILE },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    }
                 )
             }
 
@@ -301,7 +305,11 @@ fun HomeScreen() {
                 AdminUserProfileScreen(
                     userId = selectedUserId ?: "",
                     onBack = { homeDestination = HomeDestination.ADMIN_USERS },
-                    onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT }
+                    onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    }
                 )
             }
 
