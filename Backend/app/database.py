@@ -430,6 +430,19 @@ def add_favorite_db(user_id: str, animal_id: str):
             return "SUCCESS"
         
 
+# Eliminar animal de favoritos (solo si estaba antes)
+def remove_favorite_db(user_id: str, animal_id: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = "DELETE FROM FAVORITE WHERE user = ? AND animal = ?"
+            cursor.execute(sql, (user_id, animal_id))
+            conn.commit()
+            
+            # rowcount devuelve cuántas filas han sido borradas
+            return cursor.rowcount > 0
+
+        
+
 
 
 def insert_shelter(shelter: ShelterIn) -> str:

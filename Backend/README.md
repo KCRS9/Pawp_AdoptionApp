@@ -486,6 +486,8 @@ Query params: text (int), animal_id (string), photo (string/binary)
 | Método | Ruta | Auth | Roles | Descripción |
 |--------|------|------|-------|-------------|
 | `GET` | `/favorites/` | Si | User | Listar favoritos del usuario |
+| `POST` | `/favorites/` | Si | User | Añadir animal a favorito |
+| `DELETE` | `/favorites/` | Si | User | Eliminar animal de favorito |
 
 
 ### GET `/favorites/`
@@ -503,6 +505,36 @@ Query params: text (int), animal_id (string), photo (string/binary)
 }
 
 ```
+
+
+### POST  `/favorites/`
+
+``` json (Respuesta 201)
+
+{ "message": "Animal añadido a favoritos" }
+
+
+``` Errores
+
+{ "detail": "Animal no encontrado" }       // 404
+{ "detail": "Ya está en favoritos" }        // 409
+```
+
+
+### DELETE `/favorites/`
+
+``` json (Respuesta 200)
+
+{ "message": "Animal eliminado de favoritos" }
+
+
+``` Errores
+
+{ "detail": "No estaba en favoritos" }      // 404
+```
+
+
+
 
 
 
