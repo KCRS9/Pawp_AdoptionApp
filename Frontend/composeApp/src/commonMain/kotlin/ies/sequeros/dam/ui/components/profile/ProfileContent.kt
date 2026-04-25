@@ -36,7 +36,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import ies.sequeros.dam.domain.models.AnimalSummary
 import ies.sequeros.dam.domain.models.User
+import ies.sequeros.dam.ui.components.common.AnimalMiniCard
 import ies.sequeros.dam.ui.extensions.toRoleLabel
 import ies.sequeros.dam.ui.extensions.toTitleCase
 import ies.sequeros.dam.ui.theme.PawpPurple
@@ -46,7 +48,9 @@ import ies.sequeros.dam.ui.theme.PawpSurfaceDark
 fun ProfileContent(
     user: User,
     isOwnProfile: Boolean = true,
-    onEditClick: () -> Unit = {}
+    onEditClick: () -> Unit = {},
+    favoriteAnimals: List<AnimalSummary> = emptyList(),
+    onAnimalClick: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -164,7 +168,7 @@ fun ProfileContent(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
-            ProfileStatColumn(label = "Favoritos",     value = "0", onClick = {})
+            ProfileStatColumn(label = "Favoritos",     value = favoriteAnimals.size.toString(), onClick = {})
             ProfileStatColumn(label = "Seguidores",    value = "0", onClick = {})
         }
 
@@ -205,10 +209,27 @@ fun ProfileContent(
 
         //Favoritos
         ProfileSection(title = "Favoritos") {
-
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                items(5) { AnimalCardPlaceholder() }
+            if (favoriteAnimals.isEmpty()) {
+                Text(
+                    text = if (isOwnProfile) "Aún no tienes ningún animal favorito"
+                           else "Este usuario aún no tiene ningún animal favorito",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(favoriteAnimals, key = { it.id }) { animal ->
+                        AnimalMiniCard(
+                            name = animal.name,
+                            species = animal.species,
+                            gender = animal.gender,
+                            locationName = animal.locationName,
+                            profileImage = animal.profileImage,
+                            onClick = { onAnimalClick(animal.id) },
+                            modifier = Modifier.widthIn(max = 200.dp)
+                        )
+                    }
+                }
             }
         }
 
