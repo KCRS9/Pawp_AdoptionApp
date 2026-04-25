@@ -16,6 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.admin.AdminPanelScreen
+import ies.sequeros.dam.ui.admin.AdminUserEditScreen
+import ies.sequeros.dam.ui.admin.AdminUserProfileScreen
+import ies.sequeros.dam.ui.admin.AdminUsersScreen
 import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailScreen
 import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditScreen
 import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesScreen
@@ -53,6 +56,9 @@ enum class HomeDestination {
     ANIMAL_EDIT,
     MIS_ANIMALES,
     ADMIN_PANEL,
+    ADMIN_USERS,
+    ADMIN_USER_PROFILE,
+    ADMIN_USER_EDIT,
 }
 
 @Composable
@@ -71,6 +77,7 @@ fun HomeScreen() {
 
     var selectedShelterId by remember { mutableStateOf<String?>(null) }
     var selectedAnimalId by remember { mutableStateOf<String?>(null) }
+    var selectedUserId by remember { mutableStateOf<String?>(null) }
 
     if (showThemeDialog) {
         ThemeDialog(
@@ -209,7 +216,12 @@ fun HomeScreen() {
                     shelterId = selectedShelterId ?: "",
                     onBack = { homeDestination = HomeDestination.TABS },
                     onEditClick = if (isOwnShelter) { { homeDestination = HomeDestination.SHELTER_EDIT } } else null,
-                    onAdminClick = { homeDestination = HomeDestination.PROFILE },
+                    onAdminClick = if (currentUser?.role == "admin") {
+                        { adminId ->
+                            selectedUserId = adminId
+                            homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                        }
+                    } else null,
                     onAnimalClick = { id ->
                         selectedAnimalId = id
                         homeDestination = HomeDestination.ANIMAL_DETAIL
@@ -265,13 +277,38 @@ fun HomeScreen() {
             }
 
             HomeDestination.ADMIN_PANEL -> {
-
                 AdminPanelScreen(
                     onBack = { homeDestination = HomeDestination.TABS },
                     onSheltersClick = {
                         selectedTab = HomeTab.PROTECTORAS
                         homeDestination = HomeDestination.TABS
+                    },
+                    onUsersClick = { homeDestination = HomeDestination.ADMIN_USERS }
+                )
+            }
+
+            HomeDestination.ADMIN_USERS -> {
+                AdminUsersScreen(
+                    onBack = { homeDestination = HomeDestination.ADMIN_PANEL },
+                    onUserClick = { userId ->
+                        selectedUserId = userId
+                        homeDestination = HomeDestination.ADMIN_USER_PROFILE
                     }
+                )
+            }
+
+            HomeDestination.ADMIN_USER_PROFILE -> {
+                AdminUserProfileScreen(
+                    userId = selectedUserId ?: "",
+                    onBack = { homeDestination = HomeDestination.ADMIN_USERS },
+                    onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT }
+                )
+            }
+
+            HomeDestination.ADMIN_USER_EDIT -> {
+                AdminUserEditScreen(
+                    userId = selectedUserId ?: "",
+                    onBack = { homeDestination = HomeDestination.ADMIN_USER_PROFILE }
                 )
             }
 

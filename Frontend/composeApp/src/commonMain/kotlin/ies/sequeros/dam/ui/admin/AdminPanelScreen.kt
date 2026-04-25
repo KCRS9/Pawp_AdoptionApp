@@ -40,7 +40,8 @@ import ies.sequeros.dam.ui.theme.PawpPurple
 fun AdminPanelScreen(
 
     onBack: () -> Unit,
-    onSheltersClick: () -> Unit
+    onSheltersClick: () -> Unit,
+    onUsersClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -88,8 +89,8 @@ fun AdminPanelScreen(
             AdminPanelItem(
                 icon = Icons.Default.People,
                 title = "Usuarios",
-                subtitle = "Próximamente",
-                onClick = null
+                subtitle = "Ver y gestionar todos los usuarios",
+                onClick = onUsersClick
             )
         }
         }
