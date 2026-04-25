@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.AnimalMiniCard
 import ies.sequeros.dam.ui.components.common.PawpCard
 import org.jetbrains.compose.resources.DrawableResource
@@ -67,6 +68,10 @@ fun InicioScreen(
     val viewModel: InicioViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+
+    val appViewModel: AppViewModel = koinViewModel()
+    val favoriteIds by appViewModel.favoriteIds.collectAsStateWithLifecycle()
+    val currentUser by appViewModel.currentUser.collectAsStateWithLifecycle()
 
     // Detecta cuando el usuario llega al fina y carga mas animales
     val reachedEnd by remember {
@@ -167,6 +172,10 @@ fun InicioScreen(
                                 gender = animal.gender,
                                 locationName = animal.locationName,
                                 profileImage = animal.profileImage,
+                                isFavorite = animal.id in favoriteIds,
+                                onFavoriteClick = if (currentUser?.role == "user") {
+                                    { appViewModel.toggleFavorite(animal.id) }
+                                } else null,
                                 onClick = { onAnimalClick(animal.id) },
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
