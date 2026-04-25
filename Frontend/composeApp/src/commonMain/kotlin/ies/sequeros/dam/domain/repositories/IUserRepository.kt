@@ -23,6 +23,6 @@ interface IUserRepository {
     suspend fun getUsers(skip: Int = 0, limit: Int = 20, search: String? = null): List<User>
 
     suspend fun updateUserAdmin(userId: String, name: String, email: String, role: String, location: Int, description: String?): Unit
-    
+
     suspend fun updateUserPhoto(userId: String, imageBytes: ByteArray, fileName: String): String
 }
