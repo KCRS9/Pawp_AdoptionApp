@@ -148,6 +148,15 @@ def get_all_users_db(skip: int = 0, limit: int = 20, search: str = None) -> list
             return users
         
 
+# verifica si el usuario existe
+def user_exists(user_id: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id FROM USERS WHERE id = ?", (user_id,))
+            return cursor.fetchone() is not None
+
+
+
 def get_user_favorites_db(user_id: str) -> list:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
