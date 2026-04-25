@@ -408,6 +408,28 @@ def update_animal_photo(animal_id: str, photo_url: str) -> bool:
             return True
         
 
+# Amadir animal favorito (solo usuario regitrado)
+def add_favorite_db(user_id: str, animal_id: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            # Se Verifica si el animal existe
+            cursor.execute("SELECT id FROM ANIMAL WHERE id = ?", (animal_id,))
+            if not cursor.fetchone():
+                return "NOT_FOUND"
+
+            #  Se busca si el animal esta repetido
+            sql_check = "SELECT id FROM FAVORITE WHERE user = ? AND animal = ?"
+            cursor.execute(sql_check, (user_id, animal_id))
+            
+            if cursor.fetchone():
+                return "ALREADY_EXISTS"
+
+            sql_insert = "INSERT INTO FAVORITE (user, animal) VALUES (?, ?)"
+            cursor.execute(sql_insert, (user_id, animal_id))
+            conn.commit()
+            return "SUCCESS"
+        
+
 
 
 def insert_shelter(shelter: ShelterIn) -> str:
