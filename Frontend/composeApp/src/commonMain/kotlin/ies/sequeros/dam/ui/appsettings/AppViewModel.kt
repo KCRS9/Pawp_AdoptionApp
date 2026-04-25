@@ -2,9 +2,16 @@ package ies.sequeros.dam.ui.appsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ies.sequeros.dam.application.usecases.AddFavoriteUseCase
 import ies.sequeros.dam.application.usecases.GetCurrentUserUseCase
+import ies.sequeros.dam.application.usecases.GetFavoritesUseCase
 import ies.sequeros.dam.application.usecases.GetLocalitiesUseCase
+import ies.sequeros.dam.application.usecases.RemoveFavoriteUseCase
+import ies.sequeros.dam.domain.models.AnimalSummary
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -15,7 +22,10 @@ class AppViewModel(
     private val settings: AppSettings,
     private val sessionManager: UserSessionManager,
     private val getCurrentUser: GetCurrentUserUseCase,
-    private val getLocalities: GetLocalitiesUseCase
+    private val getLocalities: GetLocalitiesUseCase,
+    private val getFavorites: GetFavoritesUseCase,
+    private val addFavorite: AddFavoriteUseCase,
+    private val removeFavorite: RemoveFavoriteUseCase
 
 ): ViewModel() {
 
@@ -32,8 +42,41 @@ class AppViewModel(
     )
 
     //Perfil de usuario
-
     val currentUser = settings.currentUser
+
+    // Favoritos
+    private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteIds: StateFlow<Set<String>> = _favoriteIds.asStateFlow()
+
+    private val _favoriteAnimals = MutableStateFlow<List<AnimalSummary>>(emptyList())
+    val favoriteAnimals: StateFlow<List<AnimalSummary>> = _favoriteAnimals.asStateFlow()
+
+    fun loadFavorites() {
+        viewModelScope.launch {
+            try {
+                val favorites = getFavorites()
+                _favoriteIds.value = favorites.map { it.id }.toSet()
+                _favoriteAnimals.value = favorites
+            } catch (e: Exception) {
+                println("LOG [AppViewModel]: Error al cargar favoritos → ${e.message}")
+            }
+        }
+    }
+
+    fun toggleFavorite(animalId: String) {
+        val current = _favoriteIds.value
+        val adding = animalId !in current
+        _favoriteIds.value = if (adding) current + animalId else current - animalId
+        viewModelScope.launch {
+            try {
+                if (adding) addFavorite(animalId) else removeFavorite(animalId)
+                loadFavorites()
+            } catch (e: Exception) {
+                _favoriteIds.value = current
+                println("LOG [AppViewModel]: Error al toggle favorito → ${e.message}")
+            }
+        }
+    }
 
     /* Llama a GET /users/me y guarda el resultado en AppSettings.
       Se invoca desde notifyLogin() y desde init.
@@ -52,9 +95,11 @@ class AppViewModel(
                 }catch (e: Exception){
 
                     println("LOG[AppViewModel]: Error al traer el nombre de la localidad -> ${e.message}")
+                    null
                 }
 
                 settings.saveUserProfile(user.copy(locationName = locationName.toString()))
+                if (user.role == "user") loadFavorites()
 
             }catch (e: Exception){
 
@@ -69,16 +114,17 @@ class AppViewModel(
         settings.clearUserProfile()
         fetchCurrentUser()
     }
-    fun notifyLogin() {
 
+    fun notifyLogin() {
         settings.clearUserProfile()
         sessionManager.notifyLogin()
         fetchCurrentUser()
     }
 
     fun logout(){
-
         settings.clearUserProfile()
+        _favoriteIds.value = emptySet()
+        _favoriteAnimals.value = emptyList()
         sessionManager.logout()
     }
 
