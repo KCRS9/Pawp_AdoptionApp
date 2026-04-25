@@ -30,7 +30,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AdminUserProfileScreen(
     userId: String,
     onBack: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onAnimalClick: (String) -> Unit = {}
 ) {
     val viewModel: AdminUserProfileViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -69,9 +70,11 @@ fun AdminUserProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileContent(
-                user = state.user!!,
-                isOwnProfile = true,
-                onEditClick = onEditClick
+                user            = state.user!!,
+                isOwnProfile    = false,
+                onEditClick     = onEditClick,
+                favoriteAnimals = state.favoriteAnimals,
+                onAnimalClick   = onAnimalClick
             )
         }
     }
