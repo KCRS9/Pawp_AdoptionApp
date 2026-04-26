@@ -15,6 +15,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.adoptions.AdoptionDetailScreen
+import ies.sequeros.dam.ui.adoptions.AdoptionFormScreen
+import ies.sequeros.dam.ui.adoptions.MisSolicitudesScreen
+import ies.sequeros.dam.ui.adoptions.SolicitudesProtectoraScreen
 import ies.sequeros.dam.ui.admin.AdminPanelScreen
 import ies.sequeros.dam.ui.admin.AdminUserEditScreen
 import ies.sequeros.dam.ui.admin.AdminUserProfileScreen
@@ -59,6 +63,10 @@ enum class HomeDestination {
     ADMIN_USERS,
     ADMIN_USER_PROFILE,
     ADMIN_USER_EDIT,
+    ADOPTION_FORM,
+    MIS_SOLICITUDES,
+    SHELTER_ADOPTIONS,
+    ADOPTION_DETAIL,
 }
 
 @Composable
@@ -78,6 +86,12 @@ fun HomeScreen() {
     var selectedShelterId by remember { mutableStateOf<String?>(null) }
     var selectedAnimalId by remember { mutableStateOf<String?>(null) }
     var selectedUserId by remember { mutableStateOf<String?>(null) }
+    var selectedAdoptionId by remember { mutableStateOf<Int?>(null) }
+    var adoptionAnimalId by remember { mutableStateOf("") }
+    var adoptionAnimalName by remember { mutableStateOf("") }
+    var adoptionIsShelter by remember { mutableStateOf(false) }
+    var animalDetailBackDest by remember { mutableStateOf(HomeDestination.TABS) }
+    var userProfileBackDest by remember { mutableStateOf(HomeDestination.ADMIN_USERS) }
 
     if (showThemeDialog) {
         ThemeDialog(
@@ -99,7 +113,10 @@ fun HomeScreen() {
                     homeDestination = HomeDestination.PROFILE
                     scope.launch { drawerState.close() }
                 },
-                onMyAdoptionsClick = { scope.launch { drawerState.close() } },
+                onMyAdoptionsClick = {
+                    homeDestination = HomeDestination.MIS_SOLICITUDES
+                    scope.launch { drawerState.close() }
+                },
 
                 onMyAnimalsClick = {
                     homeDestination = HomeDestination.MIS_ANIMALES
@@ -109,6 +126,11 @@ fun HomeScreen() {
                 onRegisterAnimalClick = {
                     selectedAnimalId = null
                     homeDestination = HomeDestination.ANIMAL_EDIT
+                    scope.launch { drawerState.close() }
+                },
+
+                onShelterAdoptionsClick = {
+                    homeDestination = HomeDestination.SHELTER_ADOPTIONS
                     scope.launch { drawerState.close() }
                 },
 
@@ -151,6 +173,7 @@ fun HomeScreen() {
                     onEditClick = { homeDestination = HomeDestination.EDIT_PROFILE },
                     onAnimalClick = { id ->
                         selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     }
                 )
@@ -183,6 +206,7 @@ fun HomeScreen() {
                             HomeTab.INICIO -> InicioScreen(
                                 onAnimalClick = { id ->
                                     selectedAnimalId = id
+                                    animalDetailBackDest = HomeDestination.TABS
                                     homeDestination = HomeDestination.ANIMAL_DETAIL
                                 }
                             )
@@ -223,11 +247,13 @@ fun HomeScreen() {
                     onAdminClick = if (currentUser?.role == "admin") {
                         { adminId ->
                             selectedUserId = adminId
+                            userProfileBackDest = HomeDestination.SHELTER_PROFILE
                             homeDestination = HomeDestination.ADMIN_USER_PROFILE
                         }
                     } else null,
                     onAnimalClick = { id ->
                         selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.SHELTER_PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
                     onVerAnimalesClick = { homeDestination = HomeDestination.TABS }
@@ -243,14 +269,20 @@ fun HomeScreen() {
 
             HomeDestination.ANIMAL_DETAIL -> {
                 val isAdminOfShelter = currentUser?.shelterId != null
+                val isUser = currentUser?.role == "user"
                 AnimalDetailScreen(
                     animalId = selectedAnimalId ?: "",
-                    onBack = { homeDestination = HomeDestination.TABS },
+                    onBack = { homeDestination = animalDetailBackDest },
                     onShelterClick = { shelterId ->
                         selectedShelterId = shelterId
                         homeDestination = HomeDestination.SHELTER_PROFILE
                     },
-                    onEditClick = if (isAdminOfShelter) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null
+                    onEditClick = if (isAdminOfShelter) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null,
+                    onAdoptClick = if (isUser) { animalId, animalName ->
+                        adoptionAnimalId = animalId
+                        adoptionAnimalName = animalName
+                        homeDestination = HomeDestination.ADOPTION_FORM
+                    } else null
                 )
             }
 
@@ -274,6 +306,7 @@ fun HomeScreen() {
                     shelterId = currentUser?.shelterId ?: "",
                     onAnimalClick = { id ->
                         selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.MIS_ANIMALES
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
                     onBack = { homeDestination = HomeDestination.TABS }
@@ -296,6 +329,7 @@ fun HomeScreen() {
                     onBack = { homeDestination = HomeDestination.ADMIN_PANEL },
                     onUserClick = { userId ->
                         selectedUserId = userId
+                        userProfileBackDest = HomeDestination.ADMIN_USERS
                         homeDestination = HomeDestination.ADMIN_USER_PROFILE
                     }
                 )
@@ -304,10 +338,11 @@ fun HomeScreen() {
             HomeDestination.ADMIN_USER_PROFILE -> {
                 AdminUserProfileScreen(
                     userId = selectedUserId ?: "",
-                    onBack = { homeDestination = HomeDestination.ADMIN_USERS },
+                    onBack = { homeDestination = userProfileBackDest },
                     onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT },
                     onAnimalClick = { id ->
                         selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.ADMIN_USER_PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     }
                 )
@@ -320,6 +355,57 @@ fun HomeScreen() {
                 )
             }
 
+            HomeDestination.ADOPTION_FORM -> {
+                AdoptionFormScreen(
+                    animalId = adoptionAnimalId,
+                    animalName = adoptionAnimalName,
+                    userEmail = currentUser?.email ?: "",
+                    onBack = { homeDestination = HomeDestination.ANIMAL_DETAIL }
+                )
+            }
+
+            HomeDestination.MIS_SOLICITUDES -> {
+                MisSolicitudesScreen(
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onAdoptionClick = { id ->
+                        selectedAdoptionId = id
+                        adoptionIsShelter = false
+                        homeDestination = HomeDestination.ADOPTION_DETAIL
+                    }
+                )
+            }
+
+            HomeDestination.SHELTER_ADOPTIONS -> {
+                SolicitudesProtectoraScreen(
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onAdoptionClick = { id ->
+                        selectedAdoptionId = id
+                        adoptionIsShelter = true
+                        homeDestination = HomeDestination.ADOPTION_DETAIL
+                    }
+                )
+            }
+
+            HomeDestination.ADOPTION_DETAIL -> {
+                AdoptionDetailScreen(
+                    adoptionId = selectedAdoptionId ?: 0,
+                    isShelter = adoptionIsShelter,
+                    onBack = {
+                        homeDestination = if (adoptionIsShelter) HomeDestination.SHELTER_ADOPTIONS
+                                          else HomeDestination.MIS_SOLICITUDES
+                    },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.ADOPTION_DETAIL
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onUserClick = { id ->
+                        selectedUserId = id
+                        userProfileBackDest = HomeDestination.ADOPTION_DETAIL
+                        homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                    }
+                )
+            }
 
         }
     }
