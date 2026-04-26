@@ -92,6 +92,7 @@ fun HomeScreen() {
     var adoptionIsShelter by remember { mutableStateOf(false) }
     var animalDetailBackDest by remember { mutableStateOf(HomeDestination.TABS) }
     var userProfileBackDest by remember { mutableStateOf(HomeDestination.ADMIN_USERS) }
+    var misAnimalesBackDest by remember { mutableStateOf(HomeDestination.TABS) }
 
     if (showThemeDialog) {
         ThemeDialog(
@@ -119,6 +120,8 @@ fun HomeScreen() {
                 },
 
                 onMyAnimalsClick = {
+                    selectedShelterId = currentUser?.shelterId
+                    misAnimalesBackDest = HomeDestination.TABS
                     homeDestination = HomeDestination.MIS_ANIMALES
                     scope.launch { drawerState.close() }
                 },
@@ -256,7 +259,10 @@ fun HomeScreen() {
                         animalDetailBackDest = HomeDestination.SHELTER_PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
-                    onVerAnimalesClick = { homeDestination = HomeDestination.TABS }
+                    onVerAnimalesClick = {
+                        misAnimalesBackDest = HomeDestination.SHELTER_PROFILE
+                        homeDestination = HomeDestination.MIS_ANIMALES
+                    }
                 )
             }
 
@@ -268,7 +274,6 @@ fun HomeScreen() {
             }
 
             HomeDestination.ANIMAL_DETAIL -> {
-                val isAdminOfShelter = currentUser?.shelterId != null
                 val isUser = currentUser?.role == "user"
                 AnimalDetailScreen(
                     animalId = selectedAnimalId ?: "",
@@ -277,7 +282,8 @@ fun HomeScreen() {
                         selectedShelterId = shelterId
                         homeDestination = HomeDestination.SHELTER_PROFILE
                     },
-                    onEditClick = if (isAdminOfShelter) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null,
+                    currentUserShelterId = currentUser?.shelterId,
+                    onEditClick = if (currentUser?.shelterId != null) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null,
                     onAdoptClick = if (isUser) { animalId, animalName ->
                         adoptionAnimalId = animalId
                         adoptionAnimalName = animalName
@@ -303,13 +309,13 @@ fun HomeScreen() {
 
             HomeDestination.MIS_ANIMALES -> {
                 MisAnimalesScreen(
-                    shelterId = currentUser?.shelterId ?: "",
+                    shelterId = selectedShelterId ?: "",
                     onAnimalClick = { id ->
                         selectedAnimalId = id
                         animalDetailBackDest = HomeDestination.MIS_ANIMALES
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
-                    onBack = { homeDestination = HomeDestination.TABS }
+                    onBack = { homeDestination = misAnimalesBackDest }
                 )
             }
 

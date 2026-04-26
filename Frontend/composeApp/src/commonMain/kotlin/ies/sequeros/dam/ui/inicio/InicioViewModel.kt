@@ -36,7 +36,7 @@ class InicioViewModel(private val getAnimals: GetAnimalsUseCase) : ViewModel() {
                     skip = s.animals.size,
                     limit = PAGE_SIZE,
                     species = s.selectedSpecies
-                )
+                ).shuffled()
                 _state.update {
                     it.copy(
                         isLoadingMore = false,
@@ -54,7 +54,7 @@ class InicioViewModel(private val getAnimals: GetAnimalsUseCase) : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null, animals = emptyList(), hasMore = true) }
             try {
-                val animals = getAnimals(skip = 0, limit = PAGE_SIZE, species = _state.value.selectedSpecies)
+                val animals = getAnimals(skip = 0, limit = PAGE_SIZE, species = _state.value.selectedSpecies).shuffled()
                 _state.update { it.copy(isLoading = false, animals = animals, hasMore = animals.size == PAGE_SIZE) }
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, errorMessage = e.message) }

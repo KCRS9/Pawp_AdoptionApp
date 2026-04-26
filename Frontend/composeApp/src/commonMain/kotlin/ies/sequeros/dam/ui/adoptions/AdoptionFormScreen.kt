@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ies.sequeros.dam.ui.components.common.showBrief
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,14 +57,14 @@ fun AdoptionFormScreen(
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            snackbarHost.showSnackbar("¡Solicitud enviada correctamente!")
+            snackbarHost.showBrief("¡Solicitud enviada correctamente!")
             viewModel.onSuccessHandled()
             onBack()
         }
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     Scaffold(

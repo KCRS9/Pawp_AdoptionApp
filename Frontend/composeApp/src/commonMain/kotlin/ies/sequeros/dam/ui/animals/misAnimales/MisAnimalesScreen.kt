@@ -22,7 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.components.common.AnimalMiniCard
+import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import org.koin.compose.viewmodel.koinViewModel
 
 private val STATUS_FILTERS = listOf(
@@ -44,7 +46,7 @@ fun MisAnimalesScreen(
 
     LaunchedEffect(shelterId) { viewModel.load(shelterId) }
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     SettingsFormScaffold(
@@ -52,6 +54,8 @@ fun MisAnimalesScreen(
         onBack = onBack,
         snackbarHost = snackbarHost
     ) {
+
+        PawpCard(showImage = true)
 
         LazyRow(
             contentPadding = PaddingValues(bottom = 8.dp),
