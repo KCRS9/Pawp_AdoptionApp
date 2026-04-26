@@ -869,3 +869,40 @@ def add_comment_db(user_id: str, post_id: int, text: str):
                 return cursor.lastrowid
             except mariadb.Error:
                 return None
+            
+
+def get_comments_by_animal_db(animal_id: str, skip: int = 0, limit: int = 20):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            
+            sql = """
+                SELECT 
+                    c.id, 
+                    c.user AS user_id, 
+                    u.name AS user_name, 
+                    u.profile_image AS user_image, 
+                    p.animal, 
+                    c.text, 
+                    c.date AS created_at
+                FROM COMMENT c
+                JOIN POST p ON c.post = p.id
+                JOIN USERS u ON c.user = u.id
+                WHERE p.animal = ?
+                ORDER BY c.date DESC
+                LIMIT ? OFFSET ?
+            """
+            cursor.execute(sql, (animal_id, limit, skip))
+            rows = cursor.fetchall()
+            
+            comments = []
+            for row in rows:
+                comments.append({
+                    "id": str(row[0]),
+                    "user_id": row[1],
+                    "user_name": row[2],
+                    "user_image": row[3],
+                    "animal_id": row[4],
+                    "text": row[5],
+                    "created_at": row[6].isoformat() if row[6] else None
+                })
+            return comments

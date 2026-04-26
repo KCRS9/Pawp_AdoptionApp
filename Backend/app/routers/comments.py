@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from app.routers.users import get_current_user
-from app.database import add_comment_db, UserDb
+from app.database import add_comment_db, UserDb, get_comments_by_animal_db
 from app.models.comments import CommentCreate
 
 
@@ -29,3 +29,16 @@ def post_comment(
         "id": new_id,
         "message": "Comentario publicado con éxito"
     }
+
+
+
+@router.get("/", response_model=list)
+def get_comments(
+    # se usa Query(..., ...) para que sea obligatorio y devuelva 422 si falta
+    animal_id: str = Query(..., description="UUID del animal"),
+    skip: int = 0,
+    limit: int = 20
+):
+    comments = get_comments_by_animal_db(animal_id, skip, limit)
+    
+    return comments
