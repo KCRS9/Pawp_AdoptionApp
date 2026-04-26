@@ -275,6 +275,7 @@ fun HomeScreen() {
 
             HomeDestination.ANIMAL_DETAIL -> {
                 val isUser = currentUser?.role == "user"
+                val isAdmin = currentUser?.role == "admin"
                 AnimalDetailScreen(
                     animalId = selectedAnimalId ?: "",
                     onBack = { homeDestination = animalDetailBackDest },
@@ -283,7 +284,8 @@ fun HomeScreen() {
                         homeDestination = HomeDestination.SHELTER_PROFILE
                     },
                     currentUserShelterId = currentUser?.shelterId,
-                    onEditClick = if (currentUser?.shelterId != null) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null,
+                    isSystemAdmin = isAdmin,
+                    onEditClick = if (isAdmin || currentUser?.shelterId != null) { { homeDestination = HomeDestination.ANIMAL_EDIT } } else null,
                     onAdoptClick = if (isUser) { animalId, animalName ->
                         adoptionAnimalId = animalId
                         adoptionAnimalName = animalName

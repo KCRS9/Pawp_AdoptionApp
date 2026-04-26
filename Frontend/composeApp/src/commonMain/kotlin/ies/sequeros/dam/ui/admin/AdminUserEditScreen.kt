@@ -47,8 +47,8 @@ fun AdminUserEditScreen(userId: String, onBack: () -> Unit) {
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            viewModel.onSuccessHandled()
             snackbarHost.showBrief("Usuario actualizado correctamente")
+            viewModel.onSuccessHandled()
             onBack()
         }
     }

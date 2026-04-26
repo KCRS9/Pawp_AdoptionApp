@@ -44,6 +44,7 @@ fun AnimalDetailScreen(
     onBack: () -> Unit,
     onShelterClick: (String) -> Unit = {},
     currentUserShelterId: String? = null,
+    isSystemAdmin: Boolean = false,
     onEditClick: (() -> Unit)? = null,
     onAdoptClick: ((animalId: String, animalName: String) -> Unit)? = null
 ) {
@@ -80,8 +81,7 @@ fun AnimalDetailScreen(
         val animal = state.animal ?: return@SettingsFormScaffold
 
         val canEdit = onEditClick != null &&
-                currentUserShelterId != null &&
-                animal.shelterId == currentUserShelterId
+                (isSystemAdmin || (currentUserShelterId != null && animal.shelterId == currentUserShelterId))
 
         AvatarWithPencil(
             imageUrl = animal.profileImage,
