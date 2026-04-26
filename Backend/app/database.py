@@ -832,3 +832,21 @@ def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Op
                 "created_at": datetime.now(),
                 "likes": 0
             }
+
+
+# COMMENTS
+
+def add_comment_db(user_id: str, post_id: int, text: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            # Se usa para poner la fecha actual
+            now = datetime.now()
+            
+            sql = "INSERT INTO COMMENT (user, post, text, date) VALUES (?, ?, ?, ?)"
+            
+            try:
+                cursor.execute(sql, (user_id, post_id, text, now))
+                conn.commit()
+                return cursor.lastrowid
+            except mariadb.Error:
+                return None
