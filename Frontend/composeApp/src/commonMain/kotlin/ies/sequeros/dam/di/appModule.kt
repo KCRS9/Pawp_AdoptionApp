@@ -1,6 +1,11 @@
 package ies.sequeros.dam.di
 
 import ies.sequeros.dam.application.usecases.AddFavoriteUseCase
+import ies.sequeros.dam.application.usecases.CreateAdoptionUseCase
+import ies.sequeros.dam.application.usecases.GetAdoptionDetailUseCase
+import ies.sequeros.dam.application.usecases.GetMyAdoptionsUseCase
+import ies.sequeros.dam.application.usecases.GetShelterAdoptionsUseCase
+import ies.sequeros.dam.application.usecases.UpdateAdoptionStatusUseCase
 import ies.sequeros.dam.application.usecases.ChangeEmailUseCase
 import ies.sequeros.dam.application.usecases.ChangePasswordUseCase
 import ies.sequeros.dam.application.usecases.CreateAnimalUseCase
@@ -27,18 +32,24 @@ import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
 import ies.sequeros.dam.domain.repositories.IAuthRepository
+import ies.sequeros.dam.domain.repositories.IAdoptionRepository
 import ies.sequeros.dam.domain.repositories.IFavoritesRepository
 import ies.sequeros.dam.domain.repositories.ILocalityRepository
 import ies.sequeros.dam.domain.repositories.IShelterRepository
 import ies.sequeros.dam.domain.repositories.IUserRepository
 import ies.sequeros.dam.infrastructure.RestAnimalRepository
 import ies.sequeros.dam.infrastructure.RestAuthRepository
+import ies.sequeros.dam.infrastructure.RestAdoptionRepository
 import ies.sequeros.dam.infrastructure.RestFavoritesRepository
 import ies.sequeros.dam.infrastructure.RestLocalityRepository
 import ies.sequeros.dam.infrastructure.RestShelterRepository
 import ies.sequeros.dam.infrastructure.RestUserRepository
 import ies.sequeros.dam.infrastructure.ktor.createHttpClient
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
+import ies.sequeros.dam.ui.adoptions.AdoptionDetailViewModel
+import ies.sequeros.dam.ui.adoptions.AdoptionFormViewModel
+import ies.sequeros.dam.ui.adoptions.MisSolicitudesViewModel
+import ies.sequeros.dam.ui.adoptions.SolicitudesProtectoraViewModel
 import ies.sequeros.dam.ui.admin.AdminUserEditViewModel
 import ies.sequeros.dam.ui.admin.AdminUserProfileViewModel
 import ies.sequeros.dam.ui.admin.AdminUsersViewModel
@@ -82,6 +93,7 @@ val appModule = module {
     single<IShelterRepository> { RestShelterRepository(get(), baseUrl) }
     single<IAnimalRepository> { RestAnimalRepository(get(), baseUrl) }
     single<IFavoritesRepository> { RestFavoritesRepository(get(), baseUrl) }
+    single<IAdoptionRepository> { RestAdoptionRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
@@ -115,6 +127,11 @@ val appModule = module {
     factory { GetUserFavoritesUseCase(get()) }
     factory { AddFavoriteUseCase(get()) }
     factory { RemoveFavoriteUseCase(get()) }
+    factory { CreateAdoptionUseCase(get()) }
+    factory { GetMyAdoptionsUseCase(get()) }
+    factory { GetShelterAdoptionsUseCase(get()) }
+    factory { GetAdoptionDetailUseCase(get()) }
+    factory { UpdateAdoptionStatusUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -133,4 +150,8 @@ val appModule = module {
     viewModel { AdminUsersViewModel(get()) }
     viewModel { AdminUserProfileViewModel(get(), get()) }
     viewModel { AdminUserEditViewModel(get(), get(), get()) }
+    viewModel { AdoptionFormViewModel(get()) }
+    viewModel { MisSolicitudesViewModel(get()) }
+    viewModel { SolicitudesProtectoraViewModel(get()) }
+    viewModel { AdoptionDetailViewModel(get(), get()) }
 }

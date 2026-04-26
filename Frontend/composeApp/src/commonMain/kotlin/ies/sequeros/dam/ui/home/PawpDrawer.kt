@@ -57,6 +57,7 @@ fun PawpDrawer(
     onMyAdoptionsClick: () -> Unit,
     onMyAnimalsClick: () -> Unit,
     onRegisterAnimalClick: () -> Unit,
+    onShelterAdoptionsClick: () -> Unit,
     onAdminPanelClick: () -> Unit,
     onNotificationsClick:() -> Unit,
     onThemeClick: () -> Unit,
@@ -119,6 +120,12 @@ fun PawpDrawer(
                     icon  = Icons.Filled.Pets,
                     label = "Mi protectora",
                     onClick = onMyShelterClick
+                )
+
+                DrawerItem(
+                    icon  = Icons.Filled.Favorite,
+                    label = "Solicitudes recibidas",
+                    onClick = onShelterAdoptionsClick
                 )
             }
             //ADMINISTRADORS

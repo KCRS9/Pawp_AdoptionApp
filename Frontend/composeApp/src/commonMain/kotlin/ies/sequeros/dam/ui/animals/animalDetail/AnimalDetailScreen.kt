@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,7 +25,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,7 +42,8 @@ fun AnimalDetailScreen(
     animalId: String,
     onBack: () -> Unit,
     onShelterClick: (String) -> Unit = {},
-    onEditClick: (() -> Unit)? = null
+    onEditClick: (() -> Unit)? = null,
+    onAdoptClick: ((animalId: String, animalName: String) -> Unit)? = null
 ) {
     val viewModel: AnimalDetailViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,6 +94,13 @@ fun AnimalDetailScreen(
         )
 
         Spacer(Modifier.height(8.dp))
+
+        if (animal.status != "available") {
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                AnimalStatusChip(animal.status)
+            }
+            Spacer(Modifier.height(8.dp))
+        }
 
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -202,6 +212,37 @@ fun AnimalDetailScreen(
                 )
             }
         }
+
+        if (onAdoptClick != null && animal.status == "available") {
+            Spacer(Modifier.height(8.dp))
+            Button(
+                onClick = { onAdoptClick(animal.id, animal.name) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("¡Adóptame!")
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimalStatusChip(status: String) {
+    val (label, color) = when (status) {
+        "reserved" -> "Reservado" to Color(0xFFFFA726)
+        "adopted" -> "Adoptado"  to Color(0xFF9E9E9E)
+        "other" -> "No disponible" to Color(0xFF9E9E9E)
+        else -> return
+    }
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = color.copy(alpha = 0.15f)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = color,
+            modifier = androidx.compose.ui.Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+        )
     }
 }
 

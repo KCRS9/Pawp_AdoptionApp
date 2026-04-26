@@ -167,8 +167,8 @@ async def get_user_profile(
     user_id: str,
     current_user: UserDb = Depends(get_current_user)
 ):
-    # 1. Solo el admin puede consultar el perfil de cualquier usuario
-    if current_user.role != "admin":
+    # 1. Solo admin y protectoras pueden consultar el perfil de cualquier usuario
+    if current_user.role not in ("admin", "shelter"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acceso denegado"

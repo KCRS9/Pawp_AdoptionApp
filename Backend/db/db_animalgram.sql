@@ -91,18 +91,23 @@ FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `ADOPTION` (
-`id` int NOT NULL AUTO_INCREMENT,
-`user` char(36) NOT NULL,
-`shelter` char(36) NOT NULL,
-`animal` char(36) NOT NULL,
-`status` enum('pending','approved','rejected','completed') NOT NULL,
-`date` date NOT NULL,
-`time` time NOT NULL,
-`text` text NOT NULL,
-PRIMARY KEY (`id`),
-FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
-FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE,
-FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user` char(36) NOT NULL,
+  `shelter` char(36) NOT NULL,
+  `animal` char(36) NOT NULL,
+  `status` enum('pending','reviewing','approved','rejected','completed') NOT NULL DEFAULT 'pending',
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `text` text NOT NULL,
+  `contact` varchar(100) NULL,
+  `housing_type` varchar(50) NULL,
+  `other_animals` tinyint(1) NULL,
+  `hours_alone` int NULL,
+  `experience` text NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`shelter`) REFERENCES `SHELTER`(`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `RESERVATION` (

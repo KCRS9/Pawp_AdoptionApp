@@ -2,37 +2,72 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
-# Carga del issue #39: solo animal_id y message
-# El shelter se deduce del animal, el user del JWT, el status es 'pending' por defecto
+
 class AdoptionIn(BaseModel):
     animal_id: str
-    message: str
+    motivation: str
+    contact: str
+    housing_type: str
+    other_animals: bool
+    hours_alone: int
+    experience: str
 
-# Respuesta del issue #39
+
 class AdoptionOut(BaseModel):
     id: int
     animal_id: str
     user_id: str
     status: str
-    message: str
+    motivation: str
+    contact: Optional[str] = None
+    housing_type: Optional[str] = None
+    other_animals: Optional[bool] = None
+    hours_alone: Optional[int] = None
+    experience: Optional[str] = None
     created_at: datetime
 
-# Issue #40: Mis solicitudes — incluye animal_name para el drawer del frontend
+
 class AdoptionMyOut(BaseModel):
     id: int
     animal_id: str
     animal_name: str
+    animal_image: Optional[str] = None
+    shelter_name: str
     status: str
     created_at: datetime
 
-# Issue #41: Solicitudes de la protectora — incluye user_name
+
 class AdoptionShelterOut(BaseModel):
     id: int
     animal_id: str
+    animal_name: str
+    animal_image: Optional[str] = None
+    user_id: str
     user_name: str
+    user_image: Optional[str] = None
     status: str
     created_at: datetime
 
-# Para actualizar el estado (issues #42)
+
+class AdoptionDetailOut(BaseModel):
+    id: int
+    animal_id: str
+    animal_name: str
+    animal_image: Optional[str] = None
+    user_id: str
+    user_name: str
+    user_image: Optional[str] = None
+    user_location: Optional[str] = None
+    shelter_name: str
+    status: str
+    motivation: str
+    contact: Optional[str] = None
+    housing_type: Optional[str] = None
+    other_animals: Optional[bool] = None
+    hours_alone: Optional[int] = None
+    experience: Optional[str] = None
+    created_at: datetime
+
+
 class AdoptionUpdate(BaseModel):
-    status: str  # 'pending', 'approved', 'rejected', 'completed'
+    status: str  # 'pending', 'reviewing', 'approved', 'rejected', 'completed'
