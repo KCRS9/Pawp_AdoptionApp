@@ -2,5 +2,5 @@ from pydantic import BaseModel
 
 
 class CommentCreate(BaseModel):
-    post_id: int
+    animal_id: str
     text: str
