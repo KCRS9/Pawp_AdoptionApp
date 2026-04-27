@@ -560,6 +560,65 @@ Query params: text (int), animal_id (string), photo (string/binary)
 { "detail": "Usuario no encontrado" }   // 404
 ```
 
+--------------------------------------------------------
+
+
+### Comentarios — `/comments`
+
+| Método | Ruta | Auth | Roles | Descripción |
+|--------|------|------|-------|-------------|
+| `GET` | `/comments/` | Si | Todos | Listar comentarios de un animal  |
+| `POST` | `/comments` | Si | User, shelter | Crear comentario |
+
+
+
+
+### GET `/comments/`
+
+```Query params: animal_id → string (UUID del animal) — obligatorio
+                             skip      → int (por defecto 0)
+                             limit     → int (por defecto 20)
+```
+
+``` json (Respuesta 200)
+
+[
+  {
+    "id": "uuid",
+    "user_id": "uuid",
+    "user_name": "string",
+    "user_image": "/static/...",
+    "animal_id": "uuid",
+    "text": "string",
+    "created_at": "YYYY-MM-DDTHH:MM:SS"
+  }
+]
+
+```
+
+
+### POST `/comments/
+
+```json
+// Body
+{
+  "animal_id": "uuid",
+  "text": "string"
+}
+```
+
+``` json (Respuesta 201)
+
+{ "id": "uuid", "message": "Comentario publicado" }
+
+
+```Errores:
+{ "detail": "Animal no encontrado" }    // 404
+{ "detail": "No autenticado" }          // 401
+```
+
+
+
 
 
 

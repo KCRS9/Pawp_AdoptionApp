@@ -855,20 +855,20 @@ def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Op
 
 # COMMENTS
 
-def add_comment_db(user_id: str, post_id: int, text: str):
-    with mariadb.connect(**db_config) as conn:
-        with conn.cursor() as cursor:
+#def add_comment_db(user_id: str, post_id: int, text: str):
+    #with mariadb.connect(**db_config) as conn:
+        #with conn.cursor() as cursor:
             # Se usa para poner la fecha actual
-            now = datetime.now()
+            #now = datetime.now()
             
-            sql = "INSERT INTO COMMENT (user, post, text, date) VALUES (?, ?, ?, ?)"
+            #sql = "INSERT INTO COMMENT (user, post, text, date) VALUES (?, ?, ?, ?)"
             
-            try:
-                cursor.execute(sql, (user_id, post_id, text, now))
-                conn.commit()
-                return cursor.lastrowid
-            except mariadb.Error:
-                return None
+            #try:
+                #cursor.execute(sql, (user_id, post_id, text, now))
+                #conn.commit()
+                #return cursor.lastrowid
+            #except mariadb.Error:
+                #return None
             
 
 def get_comments_by_animal_db(animal_id: str, skip: int = 0, limit: int = 20):
@@ -906,3 +906,23 @@ def get_comments_by_animal_db(animal_id: str, skip: int = 0, limit: int = 20):
                     "created_at": row[6].isoformat() if row[6] else None
                 })
             return comments
+        
+
+
+def create_animal_comment_db(user_id: str, animal_id: str, text: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id FROM POST WHERE animal = ?", (animal_id,))
+            post_row = cursor.fetchone()
+            
+            if not post_row:
+                return None 
+            
+            post_id = post_row[0]
+
+            now = datetime.now()
+            sql = "INSERT INTO COMMENT (user, post, text, date) VALUES (?, ?, ?, ?)"
+            cursor.execute(sql, (user_id, post_id, text, now))
+            conn.commit()
+            
+            return cursor.lastrowid
