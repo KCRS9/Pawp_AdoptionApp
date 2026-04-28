@@ -569,6 +569,7 @@ Query params: text (int), animal_id (string), photo (string/binary)
 |--------|------|------|-------|-------------|
 | `GET` | `/comments/` | Si | Todos | Listar comentarios de un animal  |
 | `POST` | `/comments` | Si | User, shelter | Crear comentario |
+| `DELETE` | `/comments/{comment_id}` | Si | autor del comentario o rol admin | Eliminar comentario |
 
 
 
@@ -616,6 +617,27 @@ Query params: text (int), animal_id (string), photo (string/binary)
 { "detail": "Animal no encontrado" }    // 404
 { "detail": "No autenticado" }          // 401
 ```
+
+
+
+
+### DELETE `/comments/{comment_id}`
+
+```Query params: 
+   comment_id → string (UUID del comentario)
+   ```
+
+
+``` json (Respuesta 200)
+
+{ "message": "Comentario eliminado" }
+
+
+```Errores:
+{ "detail": "No tienes permiso para eliminar este comentario" }  // 403
+{ "detail": "Comentario no encontrado" }                         // 404
+```
+
 
 
 

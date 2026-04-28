@@ -926,3 +926,24 @@ def create_animal_comment_db(user_id: str, animal_id: str, text: str):
             conn.commit()
             
             return cursor.lastrowid
+        
+
+
+def delete_comment_db(comment_id: str, user_id: str, user_role: str):
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+
+            cursor.execute("SELECT user FROM COMMENT WHERE id = ?", (comment_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                return "NOT_FOUND"
+            
+            comment_author_id = result[0]
+
+            if comment_author_id == user_id or user_role == "admin":
+                cursor.execute("DELETE FROM COMMENT WHERE id = ?", (comment_id,))
+                conn.commit()
+                return "DONE"
+            else:
+                return "FORBIDDEN"
