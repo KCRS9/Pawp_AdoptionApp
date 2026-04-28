@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.datetime.LocalDate
@@ -77,14 +78,14 @@ fun AnimalEditScreen(
 
     LaunchedEffect(state.createdAnimalId) {
         state.createdAnimalId?.let { id ->
-            snackbarHost.showSnackbar("¡Animal creado correctamente!")
+            snackbarHost.showBrief("¡Animal creado correctamente!")
             onSaved(id)
         }
     }
 
     LaunchedEffect(state.isUpdated) {
         if (state.isUpdated) {
-            snackbarHost.showSnackbar("¡Cambios guardados correctamente!")
+            snackbarHost.showBrief("¡Cambios guardados correctamente!")
             onBack()
         }
     }
@@ -97,13 +98,13 @@ fun AnimalEditScreen(
         snapshotFlow { state.isPhotoSuccess }.collect { success ->
             if (success) {
                 viewModel.onPhotoSuccessHandled()
-                snackbarHost.showSnackbar("Foto actualizada correctamente")
+                snackbarHost.showBrief("Foto actualizada correctamente")
             }
         }
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     val photoLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->

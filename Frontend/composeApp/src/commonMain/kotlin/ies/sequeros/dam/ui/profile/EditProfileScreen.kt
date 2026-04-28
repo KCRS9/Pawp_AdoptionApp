@@ -28,6 +28,7 @@ import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.LocalityDropdown
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
@@ -48,7 +49,7 @@ fun EditProfileScreen(
     // Cuando el perfil se guarda → refrescamos sesión y volvemos
     LaunchedEffect(state.isSaveSuccess) {
         if (state.isSaveSuccess) {
-            snackbarHost.showSnackbar("Perfil actualizado correctamente.")
+            snackbarHost.showBrief("Perfil actualizado correctamente.")
             appViewModel.refreshCurrentUser()
             viewModel.onSaveSuccessHandled()
             onBack()
@@ -61,14 +62,14 @@ fun EditProfileScreen(
                 if (success) {
                     viewModel.onPhotoSuccessHandled()
                     appViewModel.refreshCurrentUser()
-                    snackbarHost.showSnackbar("Foto actualizada correctamente")
+                    snackbarHost.showBrief("Foto actualizada correctamente")
                 }
             }
     }
 
     // Mostrar errores en Snackbar
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     // Selector de imagen → guarda bytes para previsualizar (no sube todavía)

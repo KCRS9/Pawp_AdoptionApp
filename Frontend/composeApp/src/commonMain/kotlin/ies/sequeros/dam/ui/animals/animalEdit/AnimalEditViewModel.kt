@@ -30,7 +30,10 @@ class AnimalEditViewModel(
     }
 
     fun initEdit(animalId: String) {
-        if (_state.value.animalId == animalId && !_state.value.isCreateMode) return
+        if (_state.value.animalId == animalId && !_state.value.isCreateMode) {
+            _state.update { it.copy(isUpdated = false, isDeleted = false) }
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(animalId = animalId, isLoading = true, createdAnimalId = null, isUpdated = false, isDeleted = false) }
             try {

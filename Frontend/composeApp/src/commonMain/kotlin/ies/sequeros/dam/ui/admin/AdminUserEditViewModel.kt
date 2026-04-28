@@ -38,7 +38,10 @@ class AdminUserEditViewModel(
     val state: StateFlow<AdminUserEditState> = _state.asStateFlow()
 
     fun init(userId: String) {
-        if (_state.value.userId == userId) return
+        if (_state.value.userId == userId) {
+            _state.update { it.copy(isSuccess = false) }
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(userId = userId, isLoading = true) }
             try {

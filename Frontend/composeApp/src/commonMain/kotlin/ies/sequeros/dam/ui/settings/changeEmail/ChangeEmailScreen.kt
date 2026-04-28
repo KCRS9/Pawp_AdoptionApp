@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.appsettings.AppViewModel
 import ies.sequeros.dam.ui.components.common.PawpCard
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import ies.sequeros.dam.ui.theme.PawpPurple
 import ies.sequeros.dam.ui.theme.PawpPurpleDark
 import org.koin.compose.viewmodel.koinViewModel
@@ -46,13 +47,13 @@ fun ChangeEmailScreen(onBack: () -> Unit) {
 
         if (state.isSuccess) {
 
-            snackbarHost.showSnackbar("Correo actualizado. Inicia sesión de nuevo.")
+            snackbarHost.showBrief("Correo actualizado. Inicia sesión de nuevo.")
             appViewModel.logout()
         }
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     SettingsFormScaffold(

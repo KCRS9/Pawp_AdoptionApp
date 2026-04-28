@@ -127,7 +127,7 @@ fun ShelterProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStatColumn(label = "En adopción", value = shelter.animals.size.toString(), onClick = {})
+            ProfileStatColumn(label = "En adopción", value = shelter.animals.size.toString(), onClick = { onVerAnimalesClick?.invoke() })
             ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
             ProfileStatColumn(label = "Seguidores", value = "0", onClick = {})
         }

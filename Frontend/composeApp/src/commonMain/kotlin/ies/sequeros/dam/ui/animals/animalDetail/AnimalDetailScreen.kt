@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.domain.models.toAgeString
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import ies.sequeros.dam.ui.theme.PawpPurple
 import ies.sequeros.dam.ui.theme.pawpOnSurfaceTextColor
 import ies.sequeros.dam.ui.theme.pawpSurfaceColor
@@ -42,6 +43,8 @@ fun AnimalDetailScreen(
     animalId: String,
     onBack: () -> Unit,
     onShelterClick: (String) -> Unit = {},
+    currentUserShelterId: String? = null,
+    isSystemAdmin: Boolean = false,
     onEditClick: (() -> Unit)? = null,
     onAdoptClick: ((animalId: String, animalName: String) -> Unit)? = null
 ) {
@@ -59,7 +62,7 @@ fun AnimalDetailScreen(
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     SettingsFormScaffold(
@@ -77,10 +80,13 @@ fun AnimalDetailScreen(
 
         val animal = state.animal ?: return@SettingsFormScaffold
 
+        val canEdit = onEditClick != null &&
+                (isSystemAdmin || (currentUserShelterId != null && animal.shelterId == currentUserShelterId))
+
         AvatarWithPencil(
             imageUrl = animal.profileImage,
             size = 196.dp,
-            onEditClick = onEditClick,
+            onEditClick = if (canEdit) onEditClick else null,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

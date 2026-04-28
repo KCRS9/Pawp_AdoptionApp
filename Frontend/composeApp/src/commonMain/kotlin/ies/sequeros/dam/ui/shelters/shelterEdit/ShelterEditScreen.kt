@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
@@ -30,7 +31,7 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            snackbarHost.showSnackbar("Protectora actualizada correctamente.")
+            snackbarHost.showBrief("Protectora actualizada correctamente.")
             onBack()
         }
     }
@@ -39,13 +40,13 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
         snapshotFlow { state.isPhotoSuccess }.collect { success ->
             if (success) {
                 viewModel.onPhotoSuccessHandled()
-                snackbarHost.showSnackbar("Logo actualizado correctamente")
+                snackbarHost.showBrief("Logo actualizado correctamente")
             }
         }
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     // Abre el selector → guarda bytes para previsualizar (no sube todavía)

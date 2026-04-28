@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ies.sequeros.dam.ui.components.common.AvatarWithPencil
 import ies.sequeros.dam.ui.components.common.SettingsFormScaffold
+import ies.sequeros.dam.ui.components.common.showBrief
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import org.koin.compose.viewmodel.koinViewModel
@@ -46,14 +47,14 @@ fun AdminUserEditScreen(userId: String, onBack: () -> Unit) {
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
+            snackbarHost.showBrief("Usuario actualizado correctamente")
             viewModel.onSuccessHandled()
-            snackbarHost.showSnackbar("Usuario actualizado correctamente")
             onBack()
         }
     }
 
     LaunchedEffect(state.errorMessage) {
-        state.errorMessage?.let { snackbarHost.showSnackbar(it) }
+        state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
     val photoLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->
