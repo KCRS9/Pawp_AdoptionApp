@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from app.routers.users import get_current_user
-from app.database import  UserDb, get_comments_by_animal_db, create_animal_comment_db
+from app.database import  UserDb, get_comments_by_animal_db, create_animal_comment_db, delete_comment_db
 from app.models.comments import CommentCreate
 
 
@@ -47,3 +47,27 @@ def post_comment(
         "id": str(new_id),
         "message": "Comentario publicado"
     }
+
+
+
+@router.delete("/{comment_id}", status_code=status.HTTP_200_OK)
+def delete_comment(
+    comment_id: str, 
+    current_user: UserDb = Depends(get_current_user)
+):
+    # Se pasa el ID del usuario y también su rol
+    result = delete_comment_db(comment_id, current_user.id, current_user.role)
+    
+    if result == "NOT_FOUND":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Comentario no encontrado"
+        )
+    
+    if result == "FORBIDDEN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="No tienes permiso para eliminar este comentario"
+        )
+        
+    return {"message": "Comentario eliminado"}
