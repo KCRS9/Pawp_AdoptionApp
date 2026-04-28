@@ -27,7 +27,7 @@ class MisSolicitudesViewModel(
 
     fun load() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.update { it.copy(isLoading = true, errorMessage = null, adoptions = emptyList()) }
             try {
                 val adoptions = getMyAdoptions()
                 _state.update { it.copy(adoptions = adoptions, isLoading = false) }

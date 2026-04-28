@@ -41,6 +41,12 @@ class AppViewModel(
         initialValue = null
     )
 
+    val sessionVersion = sessionManager.sessionVersion.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = 0L
+    )
+
     //Perfil de usuario
     val currentUser = settings.currentUser
 

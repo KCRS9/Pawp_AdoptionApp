@@ -13,6 +13,9 @@ class UserSessionManager(
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
 
+    private val _sessionVersion = MutableStateFlow(0L)
+    val sessionVersion: StateFlow<Long> = _sessionVersion.asStateFlow()
+
     init {
 
         checkSession()
@@ -28,6 +31,7 @@ class UserSessionManager(
     fun notifyLogin(){
 
         println("LOG [UserSessionManager]: Login notificado. Sesión activa.")
+        _sessionVersion.value++
         _isLoggedIn.value = true
     }
 

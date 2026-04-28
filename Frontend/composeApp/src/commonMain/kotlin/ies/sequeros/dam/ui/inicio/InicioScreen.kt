@@ -72,6 +72,9 @@ fun InicioScreen(
     val appViewModel: AppViewModel = koinViewModel()
     val favoriteIds by appViewModel.favoriteIds.collectAsStateWithLifecycle()
     val currentUser by appViewModel.currentUser.collectAsStateWithLifecycle()
+    val sessionVersion by appViewModel.sessionVersion.collectAsStateWithLifecycle()
+
+    LaunchedEffect(sessionVersion) { viewModel.refresh() }
 
     // Detecta cuando el usuario llega al fina y carga mas animales
     val reachedEnd by remember {

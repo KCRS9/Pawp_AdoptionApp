@@ -27,7 +27,7 @@ class SolicitudesProtectoraViewModel(
 
     fun load() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.update { it.copy(isLoading = true, errorMessage = null, adoptions = emptyList()) }
             try {
                 val adoptions = getShelterAdoptions()
                 _state.update { it.copy(adoptions = adoptions, isLoading = false) }
