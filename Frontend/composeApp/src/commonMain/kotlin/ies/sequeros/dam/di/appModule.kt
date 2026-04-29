@@ -30,7 +30,14 @@ import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
 import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
+import ies.sequeros.dam.application.usecases.CreatePostUseCase
+import ies.sequeros.dam.application.usecases.GetPostsUseCase
+import ies.sequeros.dam.application.usecases.LikePostUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
+import ies.sequeros.dam.domain.repositories.IPostRepository
+import ies.sequeros.dam.infrastructure.RestPostRepository
+import ies.sequeros.dam.ui.social.PostFormViewModel
+import ies.sequeros.dam.ui.social.SocialViewModel
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.IAdoptionRepository
 import ies.sequeros.dam.domain.repositories.IFavoritesRepository
@@ -94,6 +101,7 @@ val appModule = module {
     single<IAnimalRepository> { RestAnimalRepository(get(), baseUrl) }
     single<IFavoritesRepository> { RestFavoritesRepository(get(), baseUrl) }
     single<IAdoptionRepository> { RestAdoptionRepository(get(), baseUrl) }
+    single<IPostRepository> { RestPostRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
@@ -132,6 +140,9 @@ val appModule = module {
     factory { GetShelterAdoptionsUseCase(get()) }
     factory { GetAdoptionDetailUseCase(get()) }
     factory { UpdateAdoptionStatusUseCase(get()) }
+    factory { GetPostsUseCase(get()) }
+    factory { CreatePostUseCase(get()) }
+    factory { LikePostUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -154,4 +165,6 @@ val appModule = module {
     viewModel { MisSolicitudesViewModel(get()) }
     viewModel { SolicitudesProtectoraViewModel(get()) }
     viewModel { AdoptionDetailViewModel(get(), get()) }
+    viewModel { SocialViewModel(get(), get()) }
+    viewModel { PostFormViewModel(get(), get()) }
 }
