@@ -10,7 +10,7 @@ CREATE TABLE `LOCALITY` (
 );
 
 CREATE TABLE `USERS` (
-  `id` VARCHAR(100) NOT NULL,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `USERS` (
 );
 
 CREATE TABLE `SHELTER` (
-  `id` VARCHAR(100) NOT NULL,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `address` varchar(255) NULL,
   `location` int NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `SHELTER` (
   `email` varchar(150) NOT NULL,
   `website` varchar(150) NULL,
   `description` text NOT NULL,
-  `admin`  varchar(100) NOT NULL,
+  `admin` char(36) NOT NULL,
   `profile_image` varchar(255) NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`admin`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
@@ -40,7 +40,7 @@ CREATE TABLE `SHELTER` (
 );
 
 CREATE TABLE `ANIMAL` (
-  `id` VARCHAR(100) NOT NULL,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `species` varchar(100) NOT NULL,
   `breed` varchar(100) NOT NULL,
@@ -70,12 +70,22 @@ FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE SET NULL
 );
 
+CREATE TABLE `POST_LIKE` (
+  `id`   int       NOT NULL AUTO_INCREMENT,
+  `user` char(36)  NOT NULL,
+  `post` int       NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_like` (`user`, `post`),
+  FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`post`) REFERENCES `POST`(`id`)  ON DELETE CASCADE
+);
+
 CREATE TABLE `COMMENT` (
 `id` int NOT NULL AUTO_INCREMENT,
 `user` char(36) NOT NULL,
 `post` int NOT NULL,
 `text` text NOT NULL,
-`date` datetime NOT NULL,
+`date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`),
 FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`post`) REFERENCES `POST`(`id`) ON DELETE CASCADE
@@ -86,6 +96,7 @@ CREATE TABLE `FAVORITE` (
 `user` char(36) NOT NULL,
 `animal` char(36) NOT NULL,
 PRIMARY KEY (`id`),
+UNIQUE KEY `unique_favorite` (`user`, `animal`),
 FOREIGN KEY (`user`) REFERENCES `USERS`(`id`) ON DELETE CASCADE,
 FOREIGN KEY (`animal`) REFERENCES `ANIMAL`(`id`) ON DELETE CASCADE
 );
@@ -181,7 +192,7 @@ INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, descri
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('102fb036-77ef-4003-9688-4a1f27da66cc', 'Juan Pérez', 'juan@perez.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Amante de los animales y voluntario ocasional.', '/static/images/user_0.jpg');
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'María García', 'maria@garcia.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Apasionada del mundo canino con amplio jardín.', '/static/images/user_5.jpg');
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('cedee2d2-c731-4371-8bbf-914f469cae30', 'Carlos López', 'carlos@lopez.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Busco un gato tranquilo para mi apartamento.', '/static/images/user_2.jpg');
-INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('fc7aa6f3-2762-4513-8c77-629bd904f236', 'Ana Martínez', 'ana@martinez.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Defensora de los derechos de los animales.', '/static/images/user_0.jpg');
+INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('fc7aa6f3-2762-4513-8c77-629bd904f236', 'Ana Martínez', 'ana@martinez.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Defensora de los derechos de los animales.', '/static/images/user_1.jpg');
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('9dd72ecf-50b4-43c8-a282-76896b38947f', 'Pedro Sánchez', 'pedro@sanchez.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user', 3, 'Deportista que busca un compañero de running.', '/static/images/user_6.jpg');
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES ('a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Elena Shelter', 'elena@shelter.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Directora de Huellas Felices.', '/static/images/owner_0.jpg');
 INSERT INTO `SHELTER` (id, name, address, location, phone, email, website, description, admin, profile_image) VALUES ('d0627579-2267-491f-af6d-37c0b508f52d', 'Huellas Felices', 'Calle de la Suerte 12, Alicante', 3, '600112233', 'elena@shelter.com', 'http://huellasfelices.es', 'Rescate de animales abandonados en Alicante.', 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', '/static/images/shelter_0.jpg');
