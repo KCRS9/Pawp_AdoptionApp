@@ -853,6 +853,86 @@ def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Op
             }
 
 
+def get_posts(skip: int, limit: int, current_user_id: str) -> list[dict]:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT
+                    p.id,
+                    p.user          AS user_id,
+                    u.name          AS user_name,
+                    u.profile_image AS user_image,
+                    p.animal        AS animal_id,
+                    a.name          AS animal_name,
+                    p.text,
+                    p.photo,
+                    p.created_at,
+                    p.likes,
+                    CASE WHEN pl.id IS NOT NULL THEN 1 ELSE 0 END AS liked_by_me
+                FROM POST p
+                JOIN  USERS  u  ON u.id  = p.user
+                LEFT JOIN ANIMAL a  ON a.id  = p.animal
+                LEFT JOIN POST_LIKE pl ON pl.post = p.id AND pl.user = ?
+                ORDER BY p.created_at DESC
+                LIMIT ? OFFSET ?
+            """
+            cursor.execute(sql, (current_user_id, limit, skip))
+            rows = cursor.fetchall()
+            return [
+                {
+                    "id":          r[0],
+                    "user":        r[1],
+                    "user_name":   r[2],
+                    "user_image":  r[3],
+                    "animal":      r[4],
+                    "animal_name": r[5],
+                    "text":        r[6],
+                    "photo":       r[7],
+                    "created_at":  r[8],
+                    "likes":       r[9],
+                    "liked_by_me": bool(r[10]),
+                }
+                for r in rows
+            ]
+
+
+def toggle_like_post(post_id: int, user_id: str) -> dict:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT id FROM POST_LIKE WHERE user = ? AND post = ?",
+                (user_id, post_id)
+            )
+            existing = cursor.fetchone()
+
+            if existing:
+                cursor.execute(
+                    "DELETE FROM POST_LIKE WHERE user = ? AND post = ?",
+                    (user_id, post_id)
+                )
+                cursor.execute(
+                    "UPDATE POST SET likes = GREATEST(0, likes - 1) WHERE id = ?",
+                    (post_id,)
+                )
+                liked = False
+            else:
+                cursor.execute(
+                    "INSERT INTO POST_LIKE (user, post) VALUES (?, ?)",
+                    (user_id, post_id)
+                )
+                cursor.execute(
+                    "UPDATE POST SET likes = likes + 1 WHERE id = ?",
+                    (post_id,)
+                )
+                liked = True
+
+            conn.commit()
+
+            cursor.execute("SELECT likes FROM POST WHERE id = ?", (post_id,))
+            row = cursor.fetchone()
+            return {"likes": row[0], "liked_by_me": liked}
+
+
 # COMMENTS
 
 #def add_comment_db(user_id: str, post_id: int, text: str):
