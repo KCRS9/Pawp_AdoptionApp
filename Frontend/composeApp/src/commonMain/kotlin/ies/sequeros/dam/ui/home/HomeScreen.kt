@@ -37,6 +37,7 @@ import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
 import ies.sequeros.dam.ui.shelters.shelterEdit.ShelterEditScreen
 import ies.sequeros.dam.ui.shelters.shelterProfile.ShelterProfileScreen
+import ies.sequeros.dam.ui.social.PostFormScreen
 import ies.sequeros.dam.ui.social.SocialScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -67,6 +68,7 @@ enum class HomeDestination {
     MIS_SOLICITUDES,
     SHELTER_ADOPTIONS,
     ADOPTION_DETAIL,
+    POST_FORM,
 }
 
 @Composable
@@ -196,7 +198,7 @@ fun HomeScreen() {
                         PawpBottomNavigation(
                             selectedTab = selectedTab,
                             onTabSelected = { selectedTab = it },
-                            onAddClick = { }
+                            onAddClick = { homeDestination = HomeDestination.POST_FORM }
                         )
                     }
                 ) { innerPadding ->
@@ -213,7 +215,18 @@ fun HomeScreen() {
                                     homeDestination = HomeDestination.ANIMAL_DETAIL
                                 }
                             )
-                            HomeTab.SOCIAL -> SocialScreen()
+                            HomeTab.SOCIAL -> SocialScreen(
+                                onAnimalClick = { id ->
+                                    selectedAnimalId = id
+                                    animalDetailBackDest = HomeDestination.TABS
+                                    homeDestination = HomeDestination.ANIMAL_DETAIL
+                                },
+                                onUserClick = { id ->
+                                    selectedUserId = id
+                                    userProfileBackDest = HomeDestination.TABS
+                                    homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                                }
+                            )
                             HomeTab.MENSAJES -> MensajesScreen()
                             HomeTab.PROTECTORAS -> ProtectorasScreen(
                                 onShelterClick = { shelterId ->
@@ -390,6 +403,16 @@ fun HomeScreen() {
                         selectedAdoptionId = id
                         adoptionIsShelter = true
                         homeDestination = HomeDestination.ADOPTION_DETAIL
+                    }
+                )
+            }
+
+            HomeDestination.POST_FORM -> {
+                PostFormScreen(
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onPostCreated = {
+                        selectedTab = HomeTab.SOCIAL
+                        homeDestination = HomeDestination.TABS
                     }
                 )
             }
