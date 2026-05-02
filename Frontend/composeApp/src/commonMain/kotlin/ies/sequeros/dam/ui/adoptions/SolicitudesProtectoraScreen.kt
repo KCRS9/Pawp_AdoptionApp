@@ -1,8 +1,8 @@
 package ies.sequeros.dam.ui.adoptions
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import ies.sequeros.dam.ui.components.common.PawpCard
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -79,48 +80,53 @@ fun SolicitudesProtectoraScreen(
                 onRefresh = { viewModel.load() },
                 modifier = Modifier.widthIn(max = 480.dp).fillMaxSize()
             ) {
-                when {
-                    state.isLoading && state.adoptions.isEmpty() -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
+                LazyColumn(contentPadding = PaddingValues(bottom = 12.dp)) {
+                    item {
+                        PawpCard(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp).padding(bottom = 4.dp))
+                    }
+                    item {
+                        LazyRow(contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
+                            items(STATUS_FILTERS) { (status, label) ->
+                                FilterChip(
+                                    selected = selectedStatus == status,
+                                    onClick = { selectedStatus = status },
+                                    label = { Text(label) },
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                            }
                         }
                     }
-                    else -> {
-                        Column {
-                            LazyRow(contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
-                                items(STATUS_FILTERS) { (status, label) ->
-                                    FilterChip(
-                                        selected = selectedStatus == status,
-                                        onClick = { selectedStatus = status },
-                                        label = { Text(label) },
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
-                                }
+                    if (state.isLoading && state.adoptions.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    } else if (filtered.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    if (selectedStatus == null) "No hay solicitudes recibidas"
+                                    else "No hay solicitudes con este estado",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-
-                            if (filtered.isEmpty()) {
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    Text(
-                                        if (selectedStatus == null) "No hay solicitudes recibidas"
-                                        else "No hay solicitudes con este estado",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            } else {
-                                LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp)) {
-                                    items(filtered, key = { it.id }) { adoption ->
-                                        AdoptionListItem(
-                                            imageUrl = adoption.animalImage,
-                                            title = adoption.animalName,
-                                            subtitle = adoption.userName,
-                                            status = adoption.status,
-                                            onClick = { onAdoptionClick(adoption.id) },
-                                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
-                                        )
-                                    }
-                                }
-                            }
+                        }
+                    } else {
+                        items(filtered, key = { it.id }) { adoption ->
+                            AdoptionListItem(
+                                imageUrl = adoption.animalImage,
+                                title = adoption.animalName,
+                                subtitle = adoption.userName,
+                                status = adoption.status,
+                                onClick = { onAdoptionClick(adoption.id) },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
                         }
                     }
                 }

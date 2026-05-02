@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import ies.sequeros.dam.ui.components.common.PawpCard
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,33 +61,40 @@ fun MisSolicitudesScreen(
                 onRefresh = { viewModel.load() },
                 modifier = Modifier.widthIn(max = 480.dp).fillMaxSize()
             ) {
-                when {
-                    state.isLoading && state.adoptions.isEmpty() -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                LazyColumn(contentPadding = PaddingValues(12.dp)) {
+                    item {
+                        PawpCard(modifier = Modifier.padding(bottom = 12.dp))
                     }
-                    state.adoptions.isEmpty() -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                "Aún no has enviado ninguna solicitud",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                    if (state.isLoading && state.adoptions.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
                         }
-                    }
-                    else -> {
-                        LazyColumn(contentPadding = PaddingValues(12.dp)) {
-                            items(state.adoptions, key = { it.id }) { adoption ->
-                                AdoptionListItem(
-                                    imageUrl = adoption.animalImage,
-                                    title = adoption.animalName,
-                                    subtitle = adoption.shelterName,
-                                    status = adoption.status,
-                                    onClick = { onAdoptionClick(adoption.id) },
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                    } else if (state.adoptions.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(top = 48.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "Aún no has enviado ninguna solicitud",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
+                        }
+                    } else {
+                        items(state.adoptions, key = { it.id }) { adoption ->
+                            AdoptionListItem(
+                                imageUrl = adoption.animalImage,
+                                title = adoption.animalName,
+                                subtitle = adoption.shelterName,
+                                status = adoption.status,
+                                onClick = { onAdoptionClick(adoption.id) },
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            )
                         }
                     }
                 }

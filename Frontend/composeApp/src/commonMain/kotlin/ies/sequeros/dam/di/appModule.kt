@@ -32,6 +32,7 @@ import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
 import ies.sequeros.dam.application.usecases.CreatePostUseCase
 import ies.sequeros.dam.application.usecases.GetPostsUseCase
+import ies.sequeros.dam.application.usecases.GetShelterPostsUseCase
 import ies.sequeros.dam.application.usecases.LikePostUseCase
 import ies.sequeros.dam.application.usecases.GetPostByIdUseCase
 import ies.sequeros.dam.application.usecases.DeletePostUseCase
@@ -92,8 +93,8 @@ import org.koin.dsl.module
 val appModule = module {
 
     //val baseUrl = "http://10.0.2.2:8000"
-    //val baseUrl = "http://localhost:8000"
-    val baseUrl = "http://192.168.18.13:8000"
+    val baseUrl = "http://localhost:8000"
+    //val baseUrl = "http://192.168.18.13:8000"
 
     // infraestructura
     single {
@@ -153,6 +154,7 @@ val appModule = module {
     factory { GetAdoptionDetailUseCase(get()) }
     factory { UpdateAdoptionStatusUseCase(get()) }
     factory { GetPostsUseCase(get()) }
+    factory { GetShelterPostsUseCase(get()) }
     factory { CreatePostUseCase(get()) }
     factory { LikePostUseCase(get()) }
     factory { GetPostByIdUseCase(get()) }
@@ -169,7 +171,7 @@ val appModule = module {
     factory { RegisterViewModel(get(), get()) }
 
     viewModel { ProtectorasViewModel(get(), get()) }
-    viewModel { ShelterProfileViewModel(get()) }
+    viewModel { ShelterProfileViewModel(get(), get()) }
     viewModel { ShelterEditViewModel(get(), get()) }
     viewModel { InicioViewModel(get()) }
     viewModel { AnimalDetailViewModel(get()) }

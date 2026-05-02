@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import ies.sequeros.dam.ui.social.PostCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +48,7 @@ fun ShelterProfileScreen(
     onEditClick: (() -> Unit)? = null,
     onAdminClick: ((String) -> Unit)? = null,
     onAnimalClick: (String) -> Unit = {},
+    onPostClick: (Int) -> Unit = {},
     onVerAnimalesClick: (() -> Unit)? = null
 ) {
     val viewModel: ShelterProfileViewModel = koinViewModel()
@@ -128,7 +131,7 @@ fun ShelterProfileScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProfileStatColumn(label = "En adopción", value = shelter.animals.size.toString(), onClick = { onVerAnimalesClick?.invoke() })
-            ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
+            ProfileStatColumn(label = "Publicaciones", value = state.posts.size.toString(), onClick = {})
             ProfileStatColumn(label = "Seguidores", value = "0", onClick = {})
         }
 
@@ -209,19 +212,36 @@ fun ShelterProfileScreen(
         HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
-        Text("Publicaciones", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Publicaciones",
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(Modifier.height(8.dp))
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            modifier = Modifier.fillMaxWidth().height(80.dp)
-        ) {
-            Box(Modifier.padding(12.dp), contentAlignment = Alignment.CenterStart) {
+        when {
+            state.isLoadingPosts -> {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
+            }
+            state.posts.isEmpty() -> {
                 Text(
-                    text = "Próximamente",
+                    text = "Aún no hay publicaciones con animales de esta protectora.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            else -> {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    state.posts.forEach { post ->
+                        PostCard(
+                            post = post,
+                            onLikeClick = {},
+                            onPostClick = { onPostClick(post.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
     }
