@@ -7,6 +7,7 @@ import ies.sequeros.dam.infrastructure.dtos.LikeResponseDto
 import ies.sequeros.dam.infrastructure.dtos.PostDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
@@ -26,12 +27,18 @@ class RestPostRepository(
     private fun String?.withBase() =
         if (this != null && !this.startsWith("http")) "$baseUrl$this" else this
 
-    override suspend fun getPosts(skip: Int, limit: Int): List<Post> {
+    override suspend fun getPosts(skip: Int, limit: Int, userId: String?): List<Post> {
         val dtos: List<PostDto> = client.get("$baseUrl/posts/") {
             parameter("skip", skip)
             parameter("limit", limit)
+            userId?.let { parameter("user_id", it) }
         }.body()
         return dtos.map { it.toDomain() }
+    }
+
+    override suspend fun getPostById(postId: Int): Post {
+        val dto: PostDto = client.get("$baseUrl/posts/$postId").body()
+        return dto.toDomain()
     }
 
     override suspend fun createPost(
@@ -67,6 +74,12 @@ class RestPostRepository(
         return LikeResult(dto.likes, dto.likedByMe)
     }
 
+    override suspend fun deletePost(postId: Int) {
+        val response = client.delete("$baseUrl/posts/$postId")
+        if (!response.status.isSuccess())
+            throw Exception("Error al eliminar la publicación (${response.status.value})")
+    }
+
     private fun PostDto.toDomain() = Post(
         id         = id,
         userId     = user,
@@ -78,6 +91,7 @@ class RestPostRepository(
         photoUrl   = photo.withBase() ?: photo,
         createdAt  = createdAt,
         likes      = likes,
-        likedByMe  = likedByMe
+        likedByMe  = likedByMe,
+        comments   = comments
     )
 }

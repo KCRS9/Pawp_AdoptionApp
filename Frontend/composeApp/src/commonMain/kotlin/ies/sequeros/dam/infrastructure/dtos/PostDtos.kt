@@ -15,7 +15,8 @@ data class PostDto(
     val photo: String,
     @SerialName("created_at") val createdAt: String,
     val likes: Int,
-    @SerialName("liked_by_me") val likedByMe: Boolean = false
+    @SerialName("liked_by_me") val likedByMe: Boolean = false,
+    @SerialName("comments")    val comments: Int = 0
 )
 
 @Serializable
