@@ -61,9 +61,6 @@ fun AnimalMiniCard(
     modifier: Modifier = Modifier
 ) {
 
-    val isDark = isSystemInDarkTheme()
-    val cardBg = if (isDark) PawpSurfaceDark else Color.White
-
     // box sin clickable — el corazon es hermano de la surface,
     // no hijo, asi su clickable no propaga al de la card.
     Box(
@@ -75,7 +72,7 @@ fun AnimalMiniCard(
         // surface: card completa con clickable de navegacion
         Surface(
             shape = CardShape,
-            color = cardBg,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
@@ -133,7 +130,7 @@ fun AnimalMiniCard(
                             text = name,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isDark) Color.White else Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1
                         )
                         if (!locationName.isNullOrBlank()) {
@@ -159,7 +156,7 @@ fun AnimalMiniCard(
                     val (genderSymbol, genderColor) = when (gender) {
                         "male"   -> "♂" to Color(0xFF4A90D9)
                         "female" -> "♀" to Color(0xFFD94A8B)
-                        else     -> "?" to (if (isDark) PawpPurpleLight else PawpPurple)
+                        else     -> "?" to PawpPurple
                     }
                     Box(
                         modifier = Modifier

@@ -53,12 +53,9 @@ fun PostCard(
     showCommentBar: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
-    val cardBg = if (isDark) PawpSurfaceDark else Color.White
-
     Surface(
         shape = CardShape,
-        color = cardBg,
+        color = MaterialTheme.colorScheme.surface,
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 4.dp, shape = CardShape)
