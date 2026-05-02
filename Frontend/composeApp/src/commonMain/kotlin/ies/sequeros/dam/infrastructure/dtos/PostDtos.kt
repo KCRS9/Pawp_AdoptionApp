@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class PostDto(
     val id: Int,
     val user: String,
-    @SerialName("user_name")  val userName: String,
+    @SerialName("user_name") val userName: String,
     @SerialName("user_image") val userImage: String? = null,
     val animal: String? = null,
     @SerialName("animal_name") val animalName: String? = null,
@@ -16,7 +16,7 @@ data class PostDto(
     @SerialName("created_at") val createdAt: String,
     val likes: Int,
     @SerialName("liked_by_me") val likedByMe: Boolean = false,
-    @SerialName("comments")    val comments: Int = 0
+    @SerialName("comments") val comments: Int = 0
 )
 
 @Serializable

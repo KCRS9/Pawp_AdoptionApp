@@ -64,15 +64,15 @@ fun AnimalMiniCard(
     val isDark = isSystemInDarkTheme()
     val cardBg = if (isDark) PawpSurfaceDark else Color.White
 
-    // Root Box sin clickable — el corazón es hermano de la Surface,
-    // no hijo, por lo que su clickable no propaga al de la card.
+    // box sin clickable — el corazon es hermano de la surface,
+    // no hijo, asi su clickable no propaga al de la card.
     Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 4.dp, shape = CardShape)
     ) {
 
-        // Surface: toda la card, con el clickable de navegación
+        // surface: card completa con clickable de navegacion
         Surface(
             shape = CardShape,
             color = cardBg,
@@ -81,7 +81,7 @@ fun AnimalMiniCard(
                 .clickable(onClick = onClick)
         ) {
             Column {
-                // Foto (sin corazón)
+                // foto (sin corazon)
                 if (!profileImage.isNullOrBlank()) {
 
                     AsyncImage(
@@ -121,7 +121,6 @@ fun AnimalMiniCard(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Info ──────────────────────────────────────────────────
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -181,9 +180,9 @@ fun AnimalMiniCard(
             }
         }
 
-        // Corazón — hermano de Surface dentro del Box raíz.
-        // Al estar fuera del árbol clickable de la card, su propio
-        // clickable no propaga hacia arriba y la navegación no se dispara.
+        // corazon — hermano de surface dentro del box raiz.
+        // al estar fuera del arbol clickable de la card, su propio
+        // clickable no propaga hacia arriba y la navegacion no se dispara.
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)

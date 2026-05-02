@@ -183,7 +183,7 @@ val appModule = module {
     viewModel { AdoptionDetailViewModel(get(), get()) }
     viewModel { SocialViewModel(get(), get()) }
     viewModel { PostFormViewModel(get(), get()) }
-    viewModel { PostDetailViewModel(get(), get(), get(), get(), get()) }
+    viewModel { PostDetailViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { UserPostsViewModel(get(), get()) }
 }

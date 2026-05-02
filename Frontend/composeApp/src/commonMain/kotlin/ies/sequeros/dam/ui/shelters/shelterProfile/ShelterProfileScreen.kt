@@ -170,7 +170,7 @@ fun ShelterProfileScreen(
         HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
-        // ── Sección animales en adopción
+        // seccion animales en adopcion
         if (onVerAnimalesClick != null) {
             TextButton(onClick = onVerAnimalesClick) {
                 Text("En adopción (${shelter.animals.size})", style = MaterialTheme.typography.titleMedium)
