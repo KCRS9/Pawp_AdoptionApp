@@ -66,7 +66,7 @@ fun ProfileContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Foto con lápiz
+        // foto con lapiz
         Box(contentAlignment = Alignment.Center) {
 
             Box(

@@ -21,7 +21,7 @@ class ShelterEditViewModel(
     val state: StateFlow<ShelterEditState> = _state.asStateFlow()
 
     // Carga los datos actuales de la protectora para pre-rellenar el formulario.
-    // La guarda del id evita recargar si ya se inicializó con el mismo shelter.
+    // la guarda del id evita recargar si ya se inicializo con el mismo shelter.
     fun init(shelterId: String) {
 
         if (_state.value.shelterId == shelterId) return

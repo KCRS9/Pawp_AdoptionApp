@@ -22,7 +22,7 @@ data class ShelterEditState(
     val isSuccess: Boolean   = false,
     val errorMessage: String? = null
 ) {
-    // El botón de guardar se habilita cuando los campos obligatorios son válidos y sin error
+    // el boton de guardar se habilita cuando los campos obligatorios son validos y sin error
     val isValid: Boolean
         get() = name.isNotBlank() &&
                 phone.isNotBlank() &&

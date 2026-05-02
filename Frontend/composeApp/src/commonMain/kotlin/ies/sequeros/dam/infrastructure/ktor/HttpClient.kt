@@ -32,7 +32,7 @@ fun createHttpClient(
         }
 
         // Logging de todas las peticiones y respuestas.
-        // Cambia LogLevel.ALL a LogLevel.NONE para producción.
+        // cambia LogLevel.ALL a LogLevel.NONE para produccion.
         install(Logging) {
 
             logger = object : Logger {
@@ -43,21 +43,21 @@ fun createHttpClient(
             level = LogLevel.ALL
         }
 
-        // Serialización automática JSON ↔ Kotlin data classes
+        // serializacion automatica JSON <-> Kotlin data classes
         install(ContentNegotiation) {
             json(Json {
 
-                ignoreUnknownKeys = true    // Si el backend añade campos nuevos, no falla
+                ignoreUnknownKeys = true    // si el backend anade campos nuevos, no falla
                 prettyPrint = true
                 isLenient = true
             })
         }
 
-        // Plugin de autenticación Bearer.
-        // Añade automáticamente "Authorization: Bearer <token>" en cada petición.
+        // plugin de autenticacion Bearer.
+        // anade automaticamente "Authorization: Bearer <token>" en cada peticion.
         install(Auth) {
             bearer {
-                // Ktor llama a esto antes de cada petición protegida
+                // Ktor llama a esto antes de cada peticion protegida
                 loadTokens {
 
                     val token = tokenStorage.getAccessToken()
@@ -71,18 +71,18 @@ fun createHttpClient(
                     }
                 }
 
-                // Ktor llama a esto cuando el servidor devuelve 401 (token inválido/expirado)
+                // Ktor llama a esto cuando el servidor devuelve 401 (token invalido/expirado)
                 refreshTokens {
 
                     println("LOG [Ktor]: Token rechazado (401). Cerrando sesión.")
                     tokenStorage.clear()
                     onSessionExpired()
-                    null    // null = no se pudo renovar, Ktor cancelará la petición
+                    null    // null = no se pudo renovar, Ktor cancelara la peticion
                 }
             }
         }
 
-        // Si el servidor no responde en 15 segundos, la petición falla
+        // si el servidor no responde en 15 segundos, la peticion falla
         install(HttpTimeout) {
 
             requestTimeoutMillis = 15_000

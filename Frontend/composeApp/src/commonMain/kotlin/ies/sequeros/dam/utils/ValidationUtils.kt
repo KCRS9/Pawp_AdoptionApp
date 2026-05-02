@@ -7,7 +7,7 @@ object ValidationUtils {
         "^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$"
     )
 
-    // Devuelve null si el campo está vacío (el botón se deshabilita por isValid, no por el error)
+    // devuelve null si el campo esta vacio (el boton se deshabilita por isValid, no por el error)
     // Devuelve mensaje de error si el formato es incorrecto
     fun emailError(email: String): String? = when {
 
@@ -16,8 +16,8 @@ object ValidationUtils {
         else -> null
     }
 
-    // Validación fuerte: para el formulario de registro y cambio de contraseña
-    // Login usa solo longitud mínima para no bloquear contraseñas antiguas
+    // validacion fuerte: para registro y cambio de contrasena
+    // login usa solo longitud minima para no bloquear contrasenas antiguas
     fun passwordErrorStrong(password: String): String? = when {
 
         password.isEmpty() -> null

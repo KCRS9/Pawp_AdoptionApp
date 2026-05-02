@@ -46,7 +46,7 @@ fun EditProfileScreen(
 
     val snackbarHost = remember { SnackbarHostState() }
 
-    // Cuando el perfil se guarda → refrescamos sesión y volvemos
+    // cuando el perfil se guarda → refrescamos sesion y volvemos
     LaunchedEffect(state.isSaveSuccess) {
         if (state.isSaveSuccess) {
             snackbarHost.showBrief("Perfil actualizado correctamente.")
@@ -72,7 +72,7 @@ fun EditProfileScreen(
         state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
-    // Selector de imagen → guarda bytes para previsualizar (no sube todavía)
+    // selector de imagen → guarda bytes para previsualizar (no sube todavia)
     val imageLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->
         viewModel.onAvatarFileSelected(file)
     }
@@ -122,7 +122,6 @@ fun EditProfileScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        // Descripción
         OutlinedTextField(
             value         = state.description,
             onValueChange = viewModel::onDescriptionChange,
@@ -142,7 +141,6 @@ fun EditProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Botón guardar
         Button(
             onClick  = viewModel::saveProfile,
             enabled  = state.isValid && !state.isSaving,

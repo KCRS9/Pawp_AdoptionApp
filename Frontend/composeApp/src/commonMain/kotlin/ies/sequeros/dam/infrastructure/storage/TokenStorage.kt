@@ -19,10 +19,10 @@ class TokenStorage(private val settings: Settings) {
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
     }
 
-    // Devuelve el token guardado, o null si no hay sesión activa
+    // devuelve el token guardado, o null si no hay sesion activa
     fun getAccessToken(): String? = settings.getStringOrNull(KEY_ACCESS_TOKEN)
 
-    // Comprueba si hay sesión activa
+    // comprueba si hay sesion activa
     fun hasSession(): Boolean = getAccessToken() != null
 
     // Borra el token (logout)

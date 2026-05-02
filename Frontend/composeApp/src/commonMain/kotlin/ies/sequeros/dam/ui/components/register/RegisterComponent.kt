@@ -134,7 +134,6 @@ fun RegisterComponent(
 
             Spacer(Modifier.height(8.dp))
 
-            // Contraseña
             OutlinedTextField(
                 value = state.password,
                 onValueChange = onPasswordChange,
@@ -154,7 +153,6 @@ fun RegisterComponent(
 
             Spacer(Modifier.height(8.dp))
 
-            // Confirmar contraseña
             OutlinedTextField(
                 value = state.confirmPassword,
                 onValueChange = onConfirmPasswordChange,
@@ -174,7 +172,6 @@ fun RegisterComponent(
 
             Spacer(Modifier.height(8.dp))
 
-            // Ubicación
             LocalityDropdown(
                 localities = state.localities,
                 selectedName = state.locationName,
@@ -215,7 +212,7 @@ fun RegisterComponent(
                 )
             }
 
-// Los campos de protectora se despliegan con animación al marcar la casilla
+// los campos de protectora se despliegan con animacion al marcar la casilla
             AnimatedVisibility(visible = state.isShelter) {
                 Column {
                     Spacer(Modifier.height(4.dp))

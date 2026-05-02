@@ -17,7 +17,7 @@ interface IUserRepository {
 
     suspend fun changeEmail(command: ChangeEmailCommand)
 
-    // métodos para el admin
+    // metodos para el admin
     suspend fun getUserById(userId: String): User
 
     suspend fun getUsers(skip: Int = 0, limit: Int = 20, search: String? = null): List<User>
