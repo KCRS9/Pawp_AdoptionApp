@@ -11,7 +11,8 @@ data class Post(
     val photoUrl: String,
     val createdAt: String,
     val likes: Int,
-    val likedByMe: Boolean
+    val likedByMe: Boolean,
+    val comments: Int = 0
 )
 
 data class LikeResult(val likes: Int, val likedByMe: Boolean)
