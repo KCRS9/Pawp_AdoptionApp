@@ -36,6 +36,15 @@ class RestPostRepository(
         return dtos.map { it.toDomain() }
     }
 
+    override suspend fun getPostsByShelter(shelterId: String, skip: Int, limit: Int): List<Post> {
+        val dtos: List<PostDto> = client.get("$baseUrl/posts/") {
+            parameter("skip", skip)
+            parameter("limit", limit)
+            parameter("shelter_id", shelterId)
+        }.body()
+        return dtos.map { it.toDomain() }
+    }
+
     override suspend fun getPostById(postId: Int): Post {
         val dto: PostDto = client.get("$baseUrl/posts/$postId").body()
         return dto.toDomain()
