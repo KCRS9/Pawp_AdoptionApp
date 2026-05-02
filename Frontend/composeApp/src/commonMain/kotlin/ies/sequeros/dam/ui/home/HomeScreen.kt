@@ -292,7 +292,7 @@ fun HomeScreen() {
                     shelterId = selectedShelterId ?: "",
                     onBack = { homeDestination = HomeDestination.TABS },
                     onEditClick = if (isOwnShelter) { { homeDestination = HomeDestination.SHELTER_EDIT } } else null,
-                    onAdminClick = if (currentUser?.role == "admin") {
+                    onAdminClick = if (currentUser != null) {
                         { adminId ->
                             selectedUserId = adminId
                             userProfileBackDest = HomeDestination.SHELTER_PROFILE
