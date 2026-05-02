@@ -30,7 +30,24 @@ import ies.sequeros.dam.application.usecases.UpdateAvatarUseCase
 import ies.sequeros.dam.application.usecases.UpdateProfileUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserAdminUseCase
 import ies.sequeros.dam.application.usecases.UpdateUserPhotoAdminUseCase
+import ies.sequeros.dam.application.usecases.CreatePostUseCase
+import ies.sequeros.dam.application.usecases.GetPostsUseCase
+import ies.sequeros.dam.application.usecases.LikePostUseCase
+import ies.sequeros.dam.application.usecases.GetPostByIdUseCase
+import ies.sequeros.dam.application.usecases.DeletePostUseCase
+import ies.sequeros.dam.application.usecases.GetCommentsUseCase
+import ies.sequeros.dam.application.usecases.CreateCommentUseCase
+import ies.sequeros.dam.application.usecases.DeleteCommentUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
+import ies.sequeros.dam.domain.repositories.IPostRepository
+import ies.sequeros.dam.domain.repositories.ICommentRepository
+import ies.sequeros.dam.infrastructure.RestPostRepository
+import ies.sequeros.dam.infrastructure.RestCommentRepository
+import ies.sequeros.dam.ui.social.PostFormViewModel
+import ies.sequeros.dam.ui.social.SocialViewModel
+import ies.sequeros.dam.ui.social.PostDetailViewModel
+import ies.sequeros.dam.ui.social.UserPostsViewModel
+import ies.sequeros.dam.ui.profile.ProfileViewModel
 import ies.sequeros.dam.domain.repositories.IAuthRepository
 import ies.sequeros.dam.domain.repositories.IAdoptionRepository
 import ies.sequeros.dam.domain.repositories.IFavoritesRepository
@@ -51,7 +68,7 @@ import ies.sequeros.dam.ui.adoptions.AdoptionFormViewModel
 import ies.sequeros.dam.ui.adoptions.MisSolicitudesViewModel
 import ies.sequeros.dam.ui.adoptions.SolicitudesProtectoraViewModel
 import ies.sequeros.dam.ui.admin.AdminUserEditViewModel
-import ies.sequeros.dam.ui.admin.AdminUserProfileViewModel
+import ies.sequeros.dam.ui.admin.UserProfileViewModel
 import ies.sequeros.dam.ui.admin.AdminUsersViewModel
 import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailViewModel
 import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditViewModel
@@ -94,6 +111,8 @@ val appModule = module {
     single<IAnimalRepository> { RestAnimalRepository(get(), baseUrl) }
     single<IFavoritesRepository> { RestFavoritesRepository(get(), baseUrl) }
     single<IAdoptionRepository> { RestAdoptionRepository(get(), baseUrl) }
+    single<IPostRepository> { RestPostRepository(get(), baseUrl) }
+    single<ICommentRepository> { RestCommentRepository(get(), baseUrl) }
 
     // --- Capa de aplicación ---
     single { UserSessionManager(get()) }
@@ -132,6 +151,14 @@ val appModule = module {
     factory { GetShelterAdoptionsUseCase(get()) }
     factory { GetAdoptionDetailUseCase(get()) }
     factory { UpdateAdoptionStatusUseCase(get()) }
+    factory { GetPostsUseCase(get()) }
+    factory { CreatePostUseCase(get()) }
+    factory { LikePostUseCase(get()) }
+    factory { GetPostByIdUseCase(get()) }
+    factory { DeletePostUseCase(get()) }
+    factory { GetCommentsUseCase(get()) }
+    factory { CreateCommentUseCase(get()) }
+    factory { DeleteCommentUseCase(get()) }
 
     // --- Presentación ---
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -148,10 +175,15 @@ val appModule = module {
     viewModel { AnimalEditViewModel(get(), get(), get(), get(), get()) }
     viewModel { MisAnimalesViewModel(get()) }
     viewModel { AdminUsersViewModel(get()) }
-    viewModel { AdminUserProfileViewModel(get(), get()) }
+    viewModel { UserProfileViewModel(get(), get()) }
     viewModel { AdminUserEditViewModel(get(), get(), get()) }
     viewModel { AdoptionFormViewModel(get()) }
     viewModel { MisSolicitudesViewModel(get()) }
     viewModel { SolicitudesProtectoraViewModel(get()) }
     viewModel { AdoptionDetailViewModel(get(), get()) }
+    viewModel { SocialViewModel(get(), get()) }
+    viewModel { PostFormViewModel(get(), get()) }
+    viewModel { PostDetailViewModel(get(), get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get()) }
+    viewModel { UserPostsViewModel(get(), get()) }
 }

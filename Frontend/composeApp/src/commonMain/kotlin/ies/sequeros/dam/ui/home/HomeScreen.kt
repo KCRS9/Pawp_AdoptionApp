@@ -21,8 +21,8 @@ import ies.sequeros.dam.ui.adoptions.MisSolicitudesScreen
 import ies.sequeros.dam.ui.adoptions.SolicitudesProtectoraScreen
 import ies.sequeros.dam.ui.admin.AdminPanelScreen
 import ies.sequeros.dam.ui.admin.AdminUserEditScreen
-import ies.sequeros.dam.ui.admin.AdminUserProfileScreen
 import ies.sequeros.dam.ui.admin.AdminUsersScreen
+import ies.sequeros.dam.ui.admin.UserProfileScreen
 import ies.sequeros.dam.ui.animals.animalDetail.AnimalDetailScreen
 import ies.sequeros.dam.ui.animals.animalEdit.AnimalEditScreen
 import ies.sequeros.dam.ui.animals.misAnimales.MisAnimalesScreen
@@ -37,7 +37,10 @@ import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
 import ies.sequeros.dam.ui.shelters.shelterEdit.ShelterEditScreen
 import ies.sequeros.dam.ui.shelters.shelterProfile.ShelterProfileScreen
+import ies.sequeros.dam.ui.social.PostDetailScreen
+import ies.sequeros.dam.ui.social.PostFormScreen
 import ies.sequeros.dam.ui.social.SocialScreen
+import ies.sequeros.dam.ui.social.UserPostsScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -61,12 +64,15 @@ enum class HomeDestination {
     MIS_ANIMALES,
     ADMIN_PANEL,
     ADMIN_USERS,
-    ADMIN_USER_PROFILE,
+    USER_PROFILE,
     ADMIN_USER_EDIT,
     ADOPTION_FORM,
     MIS_SOLICITUDES,
     SHELTER_ADOPTIONS,
     ADOPTION_DETAIL,
+    POST_FORM,
+    POST_DETAIL,
+    USER_POSTS,
 }
 
 @Composable
@@ -86,6 +92,10 @@ fun HomeScreen() {
     var selectedShelterId by remember { mutableStateOf<String?>(null) }
     var selectedAnimalId by remember { mutableStateOf<String?>(null) }
     var selectedUserId by remember { mutableStateOf<String?>(null) }
+    var selectedPostId by remember { mutableStateOf<Int?>(null) }
+    var userPostsUserId by remember { mutableStateOf("") }
+    var userPostsUserName by remember { mutableStateOf("") }
+    var userPostsBackDest by remember { mutableStateOf(HomeDestination.PROFILE) }
     var selectedAdoptionId by remember { mutableStateOf<Int?>(null) }
     var adoptionAnimalId by remember { mutableStateOf("") }
     var adoptionAnimalName by remember { mutableStateOf("") }
@@ -178,6 +188,16 @@ fun HomeScreen() {
                         selectedAnimalId = id
                         animalDetailBackDest = HomeDestination.PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onPostClick = { id ->
+                        selectedPostId = id
+                        homeDestination = HomeDestination.POST_DETAIL
+                    },
+                    onPublicationsClick = { userId, userName ->
+                        userPostsUserId = userId
+                        userPostsUserName = userName
+                        userPostsBackDest = HomeDestination.PROFILE
+                        homeDestination = HomeDestination.USER_POSTS
                     }
                 )
             }
@@ -196,7 +216,7 @@ fun HomeScreen() {
                         PawpBottomNavigation(
                             selectedTab = selectedTab,
                             onTabSelected = { selectedTab = it },
-                            onAddClick = { }
+                            onAddClick = { homeDestination = HomeDestination.POST_FORM }
                         )
                     }
                 ) { innerPadding ->
@@ -213,7 +233,22 @@ fun HomeScreen() {
                                     homeDestination = HomeDestination.ANIMAL_DETAIL
                                 }
                             )
-                            HomeTab.SOCIAL -> SocialScreen()
+                            HomeTab.SOCIAL -> SocialScreen(
+                                onAnimalClick = { id ->
+                                    selectedAnimalId = id
+                                    animalDetailBackDest = HomeDestination.TABS
+                                    homeDestination = HomeDestination.ANIMAL_DETAIL
+                                },
+                                onUserClick = { id ->
+                                    selectedUserId = id
+                                    userProfileBackDest = HomeDestination.TABS
+                                    homeDestination = HomeDestination.USER_PROFILE
+                                },
+                                onPostClick = { id ->
+                                    selectedPostId = id
+                                    homeDestination = HomeDestination.POST_DETAIL
+                                }
+                            )
                             HomeTab.MENSAJES -> MensajesScreen()
                             HomeTab.PROTECTORAS -> ProtectorasScreen(
                                 onShelterClick = { shelterId ->
@@ -251,7 +286,7 @@ fun HomeScreen() {
                         { adminId ->
                             selectedUserId = adminId
                             userProfileBackDest = HomeDestination.SHELTER_PROFILE
-                            homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                            homeDestination = HomeDestination.USER_PROFILE
                         }
                     } else null,
                     onAnimalClick = { id ->
@@ -338,20 +373,30 @@ fun HomeScreen() {
                     onUserClick = { userId ->
                         selectedUserId = userId
                         userProfileBackDest = HomeDestination.ADMIN_USERS
-                        homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                        homeDestination = HomeDestination.USER_PROFILE
                     }
                 )
             }
 
-            HomeDestination.ADMIN_USER_PROFILE -> {
-                AdminUserProfileScreen(
+            HomeDestination.USER_PROFILE -> {
+                UserProfileScreen(
                     userId = selectedUserId ?: "",
                     onBack = { homeDestination = userProfileBackDest },
                     onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT },
                     onAnimalClick = { id ->
                         selectedAnimalId = id
-                        animalDetailBackDest = HomeDestination.ADMIN_USER_PROFILE
+                        animalDetailBackDest = HomeDestination.USER_PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onPostClick = { id ->
+                        selectedPostId = id
+                        homeDestination = HomeDestination.POST_DETAIL
+                    },
+                    onPublicationsClick = { userId, userName ->
+                        userPostsUserId = userId
+                        userPostsUserName = userName
+                        userPostsBackDest = HomeDestination.USER_PROFILE
+                        homeDestination = HomeDestination.USER_POSTS
                     }
                 )
             }
@@ -359,7 +404,7 @@ fun HomeScreen() {
             HomeDestination.ADMIN_USER_EDIT -> {
                 AdminUserEditScreen(
                     userId = selectedUserId ?: "",
-                    onBack = { homeDestination = HomeDestination.ADMIN_USER_PROFILE }
+                    onBack = { homeDestination = HomeDestination.USER_PROFILE }
                 )
             }
 
@@ -394,6 +439,55 @@ fun HomeScreen() {
                 )
             }
 
+            HomeDestination.POST_FORM -> {
+                PostFormScreen(
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onPostCreated = {
+                        selectedTab = HomeTab.SOCIAL
+                        homeDestination = HomeDestination.TABS
+                    }
+                )
+            }
+
+            HomeDestination.POST_DETAIL -> {
+                PostDetailScreen(
+                    postId = selectedPostId ?: 0,
+                    onBack = { homeDestination = HomeDestination.TABS },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.TABS
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onUserClick = { id ->
+                        selectedUserId = id
+                        userProfileBackDest = HomeDestination.TABS
+                        homeDestination = HomeDestination.USER_PROFILE
+                    }
+                )
+            }
+
+            HomeDestination.USER_POSTS -> {
+                UserPostsScreen(
+                    userId = userPostsUserId,
+                    userName = userPostsUserName,
+                    onBack = { homeDestination = userPostsBackDest },
+                    onPostClick = { id ->
+                        selectedPostId = id
+                        homeDestination = HomeDestination.POST_DETAIL
+                    },
+                    onAnimalClick = { id ->
+                        selectedAnimalId = id
+                        animalDetailBackDest = HomeDestination.USER_POSTS
+                        homeDestination = HomeDestination.ANIMAL_DETAIL
+                    },
+                    onUserClick = { id ->
+                        selectedUserId = id
+                        userProfileBackDest = HomeDestination.USER_POSTS
+                        homeDestination = HomeDestination.USER_PROFILE
+                    }
+                )
+            }
+
             HomeDestination.ADOPTION_DETAIL -> {
                 AdoptionDetailScreen(
                     adoptionId = selectedAdoptionId ?: 0,
@@ -410,7 +504,7 @@ fun HomeScreen() {
                     onUserClick = { id ->
                         selectedUserId = id
                         userProfileBackDest = HomeDestination.ADOPTION_DETAIL
-                        homeDestination = HomeDestination.ADMIN_USER_PROFILE
+                        homeDestination = HomeDestination.USER_PROFILE
                     }
                 )
             }

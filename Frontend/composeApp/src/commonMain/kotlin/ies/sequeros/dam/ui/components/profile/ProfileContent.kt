@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,10 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import ies.sequeros.dam.domain.models.AnimalSummary
+import ies.sequeros.dam.domain.models.Post
 import ies.sequeros.dam.domain.models.User
 import ies.sequeros.dam.ui.components.common.AnimalMiniCard
 import ies.sequeros.dam.ui.extensions.toRoleLabel
 import ies.sequeros.dam.ui.extensions.toTitleCase
+import ies.sequeros.dam.ui.social.PostCard
 import ies.sequeros.dam.ui.theme.PawpPurple
 import ies.sequeros.dam.ui.theme.PawpSurfaceDark
 
@@ -50,7 +53,11 @@ fun ProfileContent(
     isOwnProfile: Boolean = true,
     onEditClick: () -> Unit = {},
     favoriteAnimals: List<AnimalSummary> = emptyList(),
-    onAnimalClick: (String) -> Unit = {}
+    onAnimalClick: (String) -> Unit = {},
+    posts: List<Post> = emptyList(),
+    onPostClick: (Int) -> Unit = {},
+    isLoadingPosts: Boolean = false,
+    onPublicationsClick: ((String, String) -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -167,7 +174,11 @@ fun ProfileContent(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
+            ProfileStatColumn(
+                label   = "Publicaciones",
+                value   = posts.size.toString(),
+                onClick = { onPublicationsClick?.invoke(user.id, user.name) }
+            )
             ProfileStatColumn(label = "Favoritos",     value = favoriteAnimals.size.toString(), onClick = {})
             ProfileStatColumn(label = "Seguidores",    value = "0", onClick = {})
         }
@@ -237,10 +248,33 @@ fun ProfileContent(
 
         //Publicaciones
         ProfileSection(title = "Publicaciones") {
-
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                repeat(3) { PublicationCardPlaceholder() }
+            when {
+                isLoadingPosts -> {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator(modifier = Modifier.size(24.dp)) }
+                }
+                posts.isEmpty() -> {
+                    Text(
+                        text = if (isOwnProfile) "Anímate a publicar tus experiencias animales"
+                               else "Este usuario aún no tiene publicaciones",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                else -> {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        posts.forEach { post ->
+                            PostCard(
+                                post        = post,
+                                onLikeClick = {},
+                                onPostClick = { onPostClick(post.id) },
+                                modifier    = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -300,30 +334,6 @@ internal fun AnimalCardPlaceholder() {
                     modifier = Modifier.padding(8.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-internal fun PublicationCardPlaceholder() {
-
-    Surface(
-
-        shape    = RoundedCornerShape(12.dp),
-        color    = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.fillMaxWidth().height(80.dp)
-    ) {
-        Box(
-
-            modifier         = Modifier.padding(12.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-
-                text  = "Publicación",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
