@@ -93,8 +93,8 @@ import org.koin.dsl.module
 val appModule = module {
 
     //val baseUrl = "http://10.0.2.2:8000"
-    //val baseUrl = "http://localhost:8000"
-    val baseUrl = "http://192.168.18.13:8000"
+    val baseUrl = "http://localhost:8000"
+    //val baseUrl = "http://192.168.18.13:8000"
 
     // infraestructura
     single {
