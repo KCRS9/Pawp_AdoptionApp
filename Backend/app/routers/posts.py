@@ -50,12 +50,14 @@ async def list_posts(
     skip: int = 0,
     limit: int = 20,
     user_id: str = None,
+    shelter_id: str = None,
     current_user: UserDb = Depends(get_current_user)
 ):
     return get_posts(
         skip=skip, limit=limit,
         current_user_id=current_user.id,
-        user_id=user_id
+        user_id=user_id,
+        shelter_id=shelter_id
     )
 
 

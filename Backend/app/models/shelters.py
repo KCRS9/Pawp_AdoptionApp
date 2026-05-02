@@ -54,6 +54,8 @@ class ShelterProfileAnimal(BaseModel):
     id: str
     name: str
     species: str
+    breed: str = ""
+    gender: str = "unknown"
     profile_image: Optional[str] = None
 
 class ShelterFullProfile(BaseModel):

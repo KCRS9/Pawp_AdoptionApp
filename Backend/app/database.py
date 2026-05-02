@@ -853,7 +853,7 @@ def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Op
             }
 
 
-def get_posts(skip: int, limit: int, current_user_id: str, user_id: str = None) -> list[dict]:
+def get_posts(skip: int, limit: int, current_user_id: str, user_id: str = None, shelter_id: str = None) -> list[dict]:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
             filters = []
@@ -862,6 +862,10 @@ def get_posts(skip: int, limit: int, current_user_id: str, user_id: str = None) 
             if user_id:
                 filters.append("p.user = ?")
                 params.append(user_id)
+
+            if shelter_id:
+                filters.append("a.shelter_id = ?")
+                params.append(shelter_id)
 
             where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
 
