@@ -1,145 +1,542 @@
-INSERT INTO FAVORITE (user, animal) VALUES
--- Admin
+USE `animal_shelter_db`;
+
+-- Limpia en orden inverso a las FK
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE `COMMENT`;
+TRUNCATE TABLE `POST_LIKE`;
+TRUNCATE TABLE `RESERVATION`;
+TRUNCATE TABLE `ADOPTION`;
+TRUNCATE TABLE `FAVORITE`;
+TRUNCATE TABLE `POST`;
+TRUNCATE TABLE `ANIMAL`;
+TRUNCATE TABLE `SHELTER`;
+TRUNCATE TABLE `USERS`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ─── Usuarios ────────────────────────────────────────────────────────────────
+
+INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Admin',           'admin@admin.com',    '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'admin',   1, 'Administrador principal de la plataforma Pawp. Responsable de la gestión global y supervisión de protectoras.', '/static/images/admin_profile.jpg'),
+('102fb036-77ef-4003-9688-4a1f27da66cc', 'Juan Pérez',       'juan@perez.com',     '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Amante de los animales y voluntario ocasional.',                                                                '/static/images/user_0.jpg'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'María García',     'maria@garcia.com',   '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Apasionada del mundo canino con amplio jardín.',                                                                '/static/images/user_5.jpg'),
+('cedee2d2-c731-4371-8bbf-914f469cae30', 'Carlos López',     'carlos@lopez.com',   '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Busco un gato tranquilo para mi apartamento.',                                                                  '/static/images/user_2.jpg'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 'Ana Martínez',     'ana@martinez.com',   '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Defensora de los derechos de los animales.',                                                                    '/static/images/user_1.jpg'),
+('9dd72ecf-50b4-43c8-a282-76896b38947f', 'Pedro Sánchez',    'pedro@sanchez.com',  '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Deportista que busca un compañero de running.',                                                                 '/static/images/user_6.jpg'),
+('a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Elena Navarro',    'elena@shelter.com',  '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Directora y fundadora de Huellas Felices. Apasionada del rescate felino desde hace más de doce años.',           '/static/images/owner_0.jpg'),
+('ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Roberto Vidal',    'roberto@shelter.com','$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Coordinador de Amigos Peludos. Especialista en rehabilitación canina.',                                         '/static/images/owner_1.jpg'),
+('d6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Lucía Ferrer',    'lucia@shelter.com',  '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Fundadora de Refugio del Sol. Lleva más de diez años rescatando animales de la calle.',                        '/static/images/owner_2.jpg'),
+('dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Marcos Delgado',   'marcos@shelter.com', '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Veterinario y gestor de Esperanza Animal. Comprometido con la adopción responsable.',                           '/static/images/owner_3.jpg'),
+('a6fbf455-d615-4040-b928-fdc600b3f569', 'Sofía Romero',     'sofia@shelter.com',  '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'shelter', 3, 'Activista y responsable de Patas Solidarias. Defensora del sacrificio cero.',                                   '/static/images/owner_4.jpg');
+
+-- ─── Protectoras ─────────────────────────────────────────────────────────────
+
+INSERT INTO `SHELTER` (id, name, address, location, phone, email, website, description, admin, profile_image) VALUES
+('b4e2f1a0-cc33-4d55-9e77-f12345678901', 'Pawp Protectora', 'Calle Adopción 1, Alicante',         3, '600000000', 'protectora@pawp.com',  'https://pawp.com',             'Protectora oficial de la plataforma Pawp en Alicante.',          '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', '/static/images/shelter_logo.jpg'),
+('d0627579-2267-491f-af6d-37c0b508f52d', 'Huellas Felices', 'Calle de la Suerte 12, Alicante',    3, '600112233', 'elena@shelter.com',    'http://huellasfelices.es',     'Rescate de animales abandonados en Alicante.',                   'a4cd3d59-425e-4848-a5a2-9ffc674dec92', '/static/images/shelter_0.jpg'),
+('43847f6b-1959-4d9b-bca1-75a11e598262', 'Amigos Peludos',  'Avenida de la Amistad 5, San Vicente',3,'600112233', 'roberto@shelter.com',  'http://amigospeludos.es',      'Rehabilitación de perros y gatos.',                              'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', '/static/images/shelter_1.jpg'),
+('4a1455be-95c7-4caf-8960-18157c1733dd', 'Refugio del Sol', 'Plaza Mayor 3, San Juan',            3, '600112233', 'lucia@shelter.com',    'http://refugiodelsol.es',      'Entorno tranquilo para animales rescatados.',                    'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', '/static/images/shelter_2.jpg'),
+('30460414-b36e-4f92-b889-22dad9798015', 'Esperanza Animal','Calle del Esperanza 8, Alicante',    3, '600112233', 'marcos@shelter.com',   'http://esperanzaanimal.es',    'Centrada en la adopción responsable.',                           'dfbe1309-31b2-4a62-85e4-0c309c10564f', '/static/images/shelter_3.jpg'),
+('ab451f19-8e49-4705-a106-164a0c5d0955', 'Patas Solidarias','Vía de la Solidaridad 1, Muchamiel', 3, '600112233', 'sofia@shelter.com',    'http://patassolidarias.es',    'Comprometidos con el sacrificio cero.',                          'a6fbf455-d615-4040-b928-fdc600b3f569', '/static/images/shelter_4.jpg');
+
+-- ─── Animales ─────────────────────────────────────────────────────────────────
+-- Pawp Protectora
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('c852c864-7bd5-4da2-afcf-8250fb08453b', 'Tango',  'Perro', 'Galgo',          '2024-12-02', 'male',   'small',  'Un galgo muy equilibrado y listo para encontrar un hogar.',      'available', 'Excelente salud, con todas las vacunas',        '/static/images/foto_perro_0.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('73c662d0-9102-4c8f-a076-7ecceac6d312', 'Rayo',   'Perro', 'Galgo',          '2024-08-22', 'male',   'large',  'Un galgo muy equilibrado y listo para encontrar un hogar.',      'available', 'En perfecto estado sanitario',                  '/static/images/foto_perro_1.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('c8837f91-23bd-4d22-aab3-73597ddfd64f', 'Jack',   'Perro', 'Boxer',          '2019-01-16', 'male',   'medium', 'Un boxer muy equilibrado y listo para encontrar un hogar.',      'available', 'Sano y con mucha energía',                      '/static/images/foto_perro_2.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('c05f82aa-949e-4db7-b437-9774d1070222', 'Bella',  'Perro', 'Pastor Alemán',  '2019-02-22', 'female', 'large',  'Un pastor alemán muy equilibrado y listo para encontrar un hogar.', 'available', 'Excelente salud, con todas las vacunas',    '/static/images/foto_perro_3.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('b5878aae-7dcc-40b6-bddd-c05e0529b9cc', 'Leo',    'Perro', 'Mestizo',        '2025-02-20', 'male',   'small',  'Un mestizo muy equilibrado y listo para encontrar un hogar.',    'available', 'Vacunado y desparasitado',                      '/static/images/foto_perro_4.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('348cca43-b9fa-4784-8532-1e5e8b0e7266', 'Hugo',   'Perro', 'Galgo',          '2019-04-09', 'male',   'large',  'Un galgo muy equilibrado y listo para encontrar un hogar.',      'available', 'En perfecto estado sanitario',                  '/static/images/foto_perro_5.jpg',  'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('19038aab-5c64-4a27-ae9f-18d8a45d42e2', 'Tito',   'Gato',  'Mestizo',        '2024-02-28', 'male',   'small',  'Un mestizo rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Vacunado y desparasitado',                '/static/images/foto_gato_0.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('7615b800-bb89-4994-b533-69acc31d4f23', 'Cleo',   'Gato',  'Angora',         '2021-07-10', 'female', 'small',  'Un angora rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Vacunado y desparasitado',                 '/static/images/foto_gato_1.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('4ee8202a-6bca-43b2-b8c6-bdf0303254fc', 'Dora',   'Gato',  'Bengala',        '2022-04-16', 'female', 'small',  'Un bengala rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Revisión veterinaria completa realizada',  '/static/images/foto_gato_2.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('2e539674-5ad9-4241-9792-1bf3ffa46a63', 'Tito',   'Gato',  'Siamés',         '2025-11-19', 'male',   'small',  'Un siamés rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Revisión veterinaria completa realizada',  '/static/images/foto_gato_3.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('9c4c7305-095a-4857-a3d6-772d2ef38995', 'Oliver', 'Gato',  'Persa',          '2025-06-12', 'male',   'small',  'Un persa rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Vacunado y desparasitado',                 '/static/images/foto_gato_4.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901'),
+('e82a9f18-cfa3-4b59-a176-cf29e7e7ad33', 'Zoe',    'Gato',  'Bengala',        '2022-04-02', 'female', 'small',  'Un bengala rescatado. Tranquilo y acostumbrado al contacto humano.', 'available', 'Excelente salud, con todas las vacunas',   '/static/images/foto_gato_5.png',   'b4e2f1a0-cc33-4d55-9e77-f12345678901');
+
+-- Huellas Felices
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 'Zeus',    'Perro', 'Golden Retriever','2019-05-30', 'male',   'large',  'Un golden retriever muy cariñoso que busca un hogar estable.',  'available', 'Revisión veterinaria completa realizada',       '/static/images/foto_perro_6.jpg',  'd0627579-2267-491f-af6d-37c0b508f52d'),
+('20203226-c5c0-49df-8bae-a078047ddd2e', 'Coco',    'Perro', 'Podenco',        '2018-02-26', 'male',   'small',  'Un podenco muy cariñoso que busca un hogar estable.',           'available', 'Vacunado y desparasitado',                      '/static/images/foto_perro_7.jpg',  'd0627579-2267-491f-af6d-37c0b508f52d'),
+('03873108-59e6-4cb4-84b9-8a5b32f7d8df', 'Simba',   'Perro', 'Boxer',          '2018-06-03', 'male',   'large',  'Un boxer muy cariñoso que busca un hogar estable.',             'available', 'Sano y con mucha energía',                      '/static/images/foto_perro_8.jpg',  'd0627579-2267-491f-af6d-37c0b508f52d'),
+('4a23b5e7-5632-467e-81df-d435b857963d', 'Pipo',    'Perro', 'Pastor Alemán',  '2019-05-15', 'male',   'small',  'Un pastor alemán muy cariñoso que busca un hogar estable.',     'available', 'Sano y con mucha energía',                      '/static/images/foto_perro_9.jpg',  'd0627579-2267-491f-af6d-37c0b508f52d'),
+('06b69eef-abc0-436f-8fec-e638d7f4268c', 'Dana',    'Perro', 'Mastín',         '2021-11-01', 'female', 'large',  'Un mastín muy cariñoso que busca un hogar estable.',            'available', 'En perfecto estado sanitario',                  '/static/images/foto_perro_10.jpg', 'd0627579-2267-491f-af6d-37c0b508f52d'),
+('c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 'Duna',    'Perro', 'Labrador',       '2021-08-31', 'female', 'small',  'Un labrador muy cariñoso que busca un hogar estable.',          'available', 'En perfecto estado sanitario',                  '/static/images/foto_perro_11.jpg', 'd0627579-2267-491f-af6d-37c0b508f52d'),
+('498c697d-fcd1-447e-b373-4dd349e08ef8', 'Suki',    'Gato',  'Maine Coon',     '2020-09-09', 'female', 'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Sano y con mucha energía',                     '/static/images/foto_gato_6.png',   'd0627579-2267-491f-af6d-37c0b508f52d'),
+('1b655496-9586-4653-896c-7dfece812e61', 'Rony',    'Gato',  'Bengala',        '2024-02-18', 'male',   'small',  'Este bengala es muy tranquilo e ideal para vivir en un piso.',  'available', 'Revisión veterinaria completa realizada',       '/static/images/foto_gato_7.png',   'd0627579-2267-491f-af6d-37c0b508f52d'),
+('cd7e45ac-7ff9-48f9-9318-4d80fe7deeba', 'Nana',    'Gato',  'Bengala',        '2023-07-27', 'female', 'small',  'Este bengala es muy tranquilo e ideal para vivir en un piso.',  'available', 'Revisión veterinaria completa realizada',       '/static/images/foto_gato_8.png',   'd0627579-2267-491f-af6d-37c0b508f52d'),
+('b5c5134d-7f96-43d3-8142-7542f5e7c11c', 'Garfield','Gato',  'Europeo Común',  '2021-12-21', 'male',   'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','Revisión veterinaria completa realizada',  '/static/images/foto_gato_9.png',   'd0627579-2267-491f-af6d-37c0b508f52d'),
+('06b2aa85-6e76-486e-857f-50c5afd0f545', 'Pixel',   'Gato',  'Persa',          '2023-12-10', 'male',   'small',  'Este persa es muy tranquilo e ideal para vivir en un piso.',    'available', 'Vacunado y desparasitado',                      '/static/images/foto_gato_10.png',  'd0627579-2267-491f-af6d-37c0b508f52d'),
+('3ffb11c6-0ed0-4e10-adbb-f97008aef47f', 'Salem',   'Gato',  'Europeo Común',  '2023-05-24', 'male',   'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','Excelente salud, con todas las vacunas',    '/static/images/foto_gato_11.png',  'd0627579-2267-491f-af6d-37c0b508f52d');
+
+-- Amigos Peludos
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('51ccd50a-e0f5-4682-8431-6b50a63f35eb', 'Mila',    'Perro', 'Labrador',  '2022-09-30', 'female', 'small',  'Un labrador muy cariñoso que busca un hogar estable.',  'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_12.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('b2ce72be-f7c8-45a2-9984-70277e0ab56f', 'Thor',    'Perro', 'Beagle',    '2021-12-03', 'male',   'medium', 'Un beagle muy cariñoso que busca un hogar estable.',    'available', 'En perfecto estado sanitario',           '/static/images/foto_perro_13.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('6cbf0160-3351-4f83-af48-7024ac0a947a', 'Rex',     'Perro', 'Beagle',    '2022-11-14', 'male',   'small',  'Un beagle muy cariñoso que busca un hogar estable.',    'available', 'Sano y con mucha energía',               '/static/images/foto_perro_14.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('199f58b1-8e3c-40d1-a40b-f97642d0593a', 'Hugo',    'Perro', 'Beagle',    '2025-04-28', 'male',   'medium', 'Un beagle muy cariñoso que busca un hogar estable.',    'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_15.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('e9dbe9c3-db76-4d85-a353-17eca5d029ee', 'Rocky',   'Perro', 'Mestizo',   '2019-09-27', 'male',   'small',  'Un mestizo muy cariñoso que busca un hogar estable.',   'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_16.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('28b33ecd-1d2f-4281-b165-f6e2c163cc3f', 'Mila',    'Perro', 'Beagle',    '2022-10-30', 'female', 'large',  'Un beagle muy cariñoso que busca un hogar estable.',    'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_perro_17.jpg', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('b37ad831-b259-440c-bd10-f32016a2471a', 'Chloe',   'Gato',  'Siamés',    '2026-03-17', 'female', 'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.', 'available', 'Revisión veterinaria completa realizada', '/static/images/foto_gato_12.png', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('944887b1-1c01-4cf8-8004-ccfd39bb56c0', 'Simba',   'Gato',  'Maine Coon','2025-05-16', 'male',   'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Excelente salud, con todas las vacunas', '/static/images/foto_gato_13.png', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('5f88b345-bd2c-4e02-94c4-c07dfd79fcb1', 'Tito',    'Gato',  'Mestizo',   '2023-12-18', 'male',   'small',  'Este mestizo es muy tranquilo e ideal para vivir en un piso.', 'available', 'Vacunado y desparasitado',               '/static/images/foto_gato_14.png', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('748bd779-0bb3-4e0a-ab3e-b02a9f3dafd9', 'Lulu',    'Gato',  'Maine Coon','2020-09-11', 'female', 'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Vacunado y desparasitado',              '/static/images/foto_gato_15.png', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('6c2c4096-2511-4a7d-894a-1d9d7b0425ba', 'Tobi',    'Gato',  'Persa',     '2024-03-23', 'male',   'small',  'Este persa es muy tranquilo e ideal para vivir en un piso.',  'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_gato_16.png', '43847f6b-1959-4d9b-bca1-75a11e598262'),
+('b6deee3c-53c4-4a9d-9f34-56627549e4ff', 'Kitty',   'Gato',  'Maine Coon','2020-08-28', 'female', 'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Vacunado y desparasitado',              '/static/images/foto_gato_17.png', '43847f6b-1959-4d9b-bca1-75a11e598262');
+
+-- Refugio del Sol
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('3991eb98-f127-47f8-9718-67734c74a3ce', 'Coco',    'Perro', 'Podenco',   '2016-05-05', 'male',   'medium', 'Un podenco muy cariñoso que busca un hogar estable.',           'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_perro_18.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('5898de6c-28fe-4bb8-93ba-3518437486ce', 'Mila',    'Perro', 'Galgo',     '2025-06-11', 'female', 'medium', 'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Sano y con mucha energía',               '/static/images/foto_perro_19.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('53f3df1a-08aa-4056-a93d-aa44cbd1e072', 'Pipo',    'Perro', 'Galgo',     '2020-03-08', 'male',   'small',  'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_perro_20.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('0329515f-49b4-4fc9-a104-64e0169930b0', 'Kira',    'Perro', 'Chihuahua', '2020-03-16', 'female', 'small',  'Un chihuahua muy cariñoso que busca un hogar estable.',         'available', 'En perfecto estado sanitario',           '/static/images/foto_perro_21.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('c0f2333a-c8d6-468c-bfdb-415e51029ae0', 'Leo',     'Perro', 'Galgo',     '2017-08-04', 'male',   'medium', 'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_22.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('ed58fc45-760b-451c-9dfd-b4a69e29e264', 'Maya',    'Perro', 'Galgo',     '2016-06-27', 'female', 'medium', 'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Sano y con mucha energía',               '/static/images/foto_perro_23.jpg', '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('8e27b2e7-7b28-4899-921a-c5096f45f831', 'Nina',    'Gato',  'Angora',    '2025-07-15', 'female', 'small',  'Este angora es muy tranquilo e ideal para vivir en un piso.',   'available', 'En perfecto estado sanitario',           '/static/images/foto_gato_18.png',  '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('12ec3b49-55d1-43e1-861c-de6ae563820b', 'Samy',    'Gato',  'Siamés',    '2021-05-23', 'female', 'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.',   'available', 'En perfecto estado sanitario',           '/static/images/foto_gato_19.png',  '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('5af335e2-e5e9-47e2-b426-eebee1945367', 'Suki',    'Gato',  'Angora',    '2022-06-20', 'female', 'small',  'Este angora es muy tranquilo e ideal para vivir en un piso.',   'available', 'Sano y con mucha energía',               '/static/images/foto_gato_20.jpg',  '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('0f91857f-715e-44da-b811-7640d2c2b69f', 'Kitty',   'Gato',  'Europeo Común','2026-01-17','male',  'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','Excelente salud, con todas las vacunas','/static/images/foto_gato_21.jpg',  '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('a80c21c4-aa10-472c-b24a-8f4e6533d803', 'Suki',    'Gato',  'Bengala',   '2023-08-27', 'male',   'small',  'Este bengala es muy tranquilo e ideal para vivir en un piso.',  'available', 'Vacunado y desparasitado',               '/static/images/foto_gato_22.jpg',  '4a1455be-95c7-4caf-8960-18157c1733dd'),
+('a8af8195-57a1-4387-a6ab-8b8a570f501f', 'Dora',    'Gato',  'Siamés',    '2025-02-07', 'female', 'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.',   'available', 'Revisión veterinaria completa realizada', '/static/images/foto_gato_23.jpg',  '4a1455be-95c7-4caf-8960-18157c1733dd');
+
+-- Esperanza Animal
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855', 'Dana',    'Perro', 'Mestizo',   '2025-01-07', 'female', 'large',  'Un mestizo muy cariñoso que busca un hogar estable.',           'available', 'Vacunado y desparasitado',               '/static/images/foto_perro_24.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('1a98305e-091d-4d4e-abc2-842256441e50', 'Rocco',   'Perro', 'Galgo',     '2017-11-23', 'male',   'small',  'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_perro_25.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('08e6e2f7-74fa-4022-9ae4-c79dade3b173', 'Rex',     'Perro', 'Pastor Alemán','2020-08-20','male',  'large',  'Un pastor alemán muy cariñoso que busca un hogar estable.',     'available', 'En perfecto estado sanitario',           '/static/images/foto_perro_26.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('ccd1573e-c01e-406e-819b-d0853b72e6f7', 'Lucas',   'Perro', 'Mestizo',   '2018-06-07', 'male',   'small',  'Un mestizo muy cariñoso que busca un hogar estable.',           'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_perro_27.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('6849a3a6-8b27-405b-9171-a79688ab11b4', 'Tango',   'Perro', 'Boxer',     '2024-09-20', 'male',   'small',  'Un boxer muy cariñoso que busca un hogar estable.',             'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_28.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('33899650-3896-4491-9bea-693b7d57370e', 'Rex',     'Perro', 'Galgo',     '2016-08-11', 'male',   'large',  'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Vacunado y desparasitado',               '/static/images/foto_perro_29.jpg', '30460414-b36e-4f92-b889-22dad9798015'),
+('fff4016b-4796-4483-8391-60207c32931b', 'Rony',    'Gato',  'Maine Coon','2026-04-19', 'male',   'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Excelente salud, con todas las vacunas', '/static/images/foto_gato_24.jpg',  '30460414-b36e-4f92-b889-22dad9798015'),
+('ac7848cc-f4b9-413a-b5bb-c98cf1aa5267', 'Milo',    'Gato',  'Europeo Común','2023-07-12','male',  'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','En perfecto estado sanitario',         '/static/images/foto_gato_25.jpg',  '30460414-b36e-4f92-b889-22dad9798015'),
+('58292c56-df2a-4a90-be0f-646e2206fbf3', 'Nico',    'Gato',  'Siamés',    '2022-07-16', 'male',   'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.',   'available', 'Revisión veterinaria completa realizada', '/static/images/foto_gato_26.jpg',  '30460414-b36e-4f92-b889-22dad9798015'),
+('31dc3045-f675-4e59-9c4d-6ebb5698144c', 'Lulu',    'Gato',  'Mestizo',   '2020-11-05', 'female', 'small',  'Este mestizo es muy tranquilo e ideal para vivir en un piso.',  'available', 'En perfecto estado sanitario',           '/static/images/foto_gato_27.jpg',  '30460414-b36e-4f92-b889-22dad9798015'),
+('0403bdf8-845f-4870-b83e-0cc45ba138e5', 'Tobi',    'Gato',  'Maine Coon','2020-11-12', 'male',   'small',  'Este maine coon es muy tranquilo e ideal para vivir en un piso.','available', 'Excelente salud, con todas las vacunas', '/static/images/foto_gato_28.jpg',  '30460414-b36e-4f92-b889-22dad9798015'),
+('7c5a6f8e-6818-44d3-b6a6-54bf9e19bb7c', 'Mochi',   'Gato',  'Bengala',   '2024-03-13', 'male',   'small',  'Este bengala es muy tranquilo e ideal para vivir en un piso.',  'available', 'Vacunado y desparasitado',               '/static/images/foto_gato_29.jpg',  '30460414-b36e-4f92-b889-22dad9798015');
+
+-- Patas Solidarias
+
+INSERT INTO `ANIMAL` (id, name, species, breed, birth_date, gender, size, description, status, health, profile_image, shelter_id) VALUES
+('5cd327ae-ddf4-43b3-b431-92927c1ad651', 'Dana',    'Perro', 'Boxer',       '2025-08-21', 'female', 'small',  'Un boxer muy cariñoso que busca un hogar estable.',             'available', 'Vacunado y desparasitado',               '/static/images/foto_perro_30.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('c5291f23-9a23-4b72-8514-e158a7dac6d1', 'Pipo',    'Perro', 'Mestizo',     '2017-09-21', 'male',   'large',  'Un mestizo muy cariñoso que busca un hogar estable.',           'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_31.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('8937a008-5a71-4c06-97e3-e87d55be4129', 'Sira',    'Perro', 'Labrador',    '2020-03-24', 'female', 'medium', 'Un labrador muy cariñoso que busca un hogar estable.',          'available', 'Sano y con mucha energía',               '/static/images/foto_perro_32.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('aa3839ce-4c04-4807-a489-3742dc317781', 'Rayo',    'Perro', 'Mastín',      '2019-06-07', 'male',   'small',  'Un mastín muy cariñoso que busca un hogar estable.',            'available', 'Revisión veterinaria completa realizada', '/static/images/foto_perro_33.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('80aaa9ca-a1ef-4fc5-a2ab-a436b44fde76', 'Duna',    'Perro', 'Mastín',      '2017-06-22', 'female', 'medium', 'Un mastín muy cariñoso que busca un hogar estable.',            'available', 'Sano y con mucha energía',               '/static/images/foto_perro_34.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('129cafe5-af14-4773-b367-9033b77dcb1a', 'Rex',     'Perro', 'Galgo',       '2019-02-04', 'male',   'large',  'Un galgo muy cariñoso que busca un hogar estable.',             'available', 'Vacunado y desparasitado',               '/static/images/foto_perro_35.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('03f8568f-5ea2-41dc-94d5-6e5d69ef7850', 'Momo',    'Gato',  'Persa',       '2020-10-07', 'female', 'small',  'Este persa es muy tranquilo e ideal para vivir en un piso.',    'available', 'Revisión veterinaria completa realizada', '/static/images/foto_gato_30.jpg',  'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('f9e0180b-ba82-4cf5-a95c-7abed953d137', 'Cleo',    'Gato',  'Europeo Común','2024-04-16','female', 'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','Revisión veterinaria completa realizada','/static/images/foto_gato_31.jpg', 'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('154cd4af-95ae-4c87-a153-94c20f98fd6f', 'Pixel',   'Gato',  'Persa',       '2024-04-27', 'female', 'small',  'Este persa es muy tranquilo e ideal para vivir en un piso.',    'available', 'Excelente salud, con todas las vacunas',  '/static/images/foto_gato_32.jpg',  'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('2df254ca-2747-4946-89aa-8e3490d035a8', 'Cleo',    'Gato',  'Siamés',      '2022-11-14', 'male',   'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.',   'available', 'Sano y con mucha energía',               '/static/images/foto_gato_33.jpg',  'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('0b51c66e-7924-4773-9e49-7d2d755fcb75', 'Chloe',   'Gato',  'Siamés',      '2023-12-12', 'female', 'small',  'Este siamés es muy tranquilo e ideal para vivir en un piso.',   'available', 'Revisión veterinaria completa realizada', '/static/images/foto_gato_34.jpg',  'ab451f19-8e49-4705-a106-164a0c5d0955'),
+('7b878b25-edf3-4341-a844-fc13b4375576', 'Guty',    'Gato',  'Europeo Común','2022-12-14','male',   'small',  'Este europeo común es muy tranquilo e ideal para vivir en un piso.','available','Excelente salud, con todas las vacunas','/static/images/foto_gato_35.jpg',  'ab451f19-8e49-4705-a106-164a0c5d0955');
+
+-- ─── Favoritos ────────────────────────────────────────────────────────────────
+
+INSERT INTO `FAVORITE` (`user`, `animal`) VALUES
 ('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6','c852c864-7bd5-4da2-afcf-8250fb08453b'),
 ('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6','19038aab-5c64-4a27-ae9f-18d8a45d42e2'),
 ('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6','b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3'),
-
--- Juan
 ('102fb036-77ef-4003-9688-4a1f27da66cc','c8837f91-23bd-4d22-aab3-73597ddfd64f'),
 ('102fb036-77ef-4003-9688-4a1f27da66cc','7615b800-bb89-4994-b533-69acc31d4f23'),
 ('102fb036-77ef-4003-9688-4a1f27da66cc','20203226-c5c0-49df-8bae-a078047ddd2e'),
 ('102fb036-77ef-4003-9688-4a1f27da66cc','498c697d-fcd1-447e-b373-4dd349e08ef8'),
-
--- María
 ('e2ad0f4a-b83a-4150-abad-99cc32093c8b','c05f82aa-949e-4db7-b437-9774d1070222'),
 ('e2ad0f4a-b83a-4150-abad-99cc32093c8b','4ee8202a-6bca-43b2-b8c6-bdf0303254fc'),
 ('e2ad0f4a-b83a-4150-abad-99cc32093c8b','03873108-59e6-4cb4-84b9-8a5b32f7d8df'),
-
--- Carlos
 ('cedee2d2-c731-4371-8bbf-914f469cae30','2e539674-5ad9-4241-9792-1bf3ffa46a63'),
 ('cedee2d2-c731-4371-8bbf-914f469cae30','b5c5134d-7f96-43d3-8142-7542f5e7c11c'),
 ('cedee2d2-c731-4371-8bbf-914f469cae30','1b655496-9586-4653-896c-7dfece812e61'),
-
--- Ana
 ('fc7aa6f3-2762-4513-8c77-629bd904f236','c64c0a71-9d83-445e-ba49-6ea4e49d3f13'),
 ('fc7aa6f3-2762-4513-8c77-629bd904f236','06b69eef-abc0-436f-8fec-e638d7f4268c'),
 ('fc7aa6f3-2762-4513-8c77-629bd904f236','cd7e45ac-7ff9-48f9-9318-4d80fe7deeba'),
-
--- Pedro
 ('9dd72ecf-50b4-43c8-a282-76896b38947f','51ccd50a-e0f5-4682-8431-6b50a63f35eb'),
 ('9dd72ecf-50b4-43c8-a282-76896b38947f','6cbf0160-3351-4f83-af48-7024ac0a947a'),
 ('9dd72ecf-50b4-43c8-a282-76896b38947f','b37ad831-b259-440c-bd10-f32016a2471a'),
-
--- Elena Shelter
 ('a4cd3d59-425e-4848-a5a2-9ffc674dec92','3991eb98-f127-47f8-9718-67734c74a3ce'),
 ('a4cd3d59-425e-4848-a5a2-9ffc674dec92','0329515f-49b4-4fc9-a104-64e0169930b0'),
 ('a4cd3d59-425e-4848-a5a2-9ffc674dec92','8e27b2e7-7b28-4899-921a-c5096f45f831'),
-
--- Roberto Shelter
 ('ab51a4b5-7985-4f6e-baeb-01ba350be3f2','b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855'),
 ('ab51a4b5-7985-4f6e-baeb-01ba350be3f2','ccd1573e-c01e-406e-819b-d0853b72e6f7'),
 ('ab51a4b5-7985-4f6e-baeb-01ba350be3f2','fff4016b-4796-4483-8391-60207c32931b'),
-
--- Lucía Shelter
 ('d6516a8d-ef3b-4bf4-9832-e5a63d34d0a8','ac7848cc-f4b9-413a-b5bb-c98cf1aa5267'),
 ('d6516a8d-ef3b-4bf4-9832-e5a63d34d0a8','58292c56-df2a-4a90-be0f-646e2206fbf3'),
 ('d6516a8d-ef3b-4bf4-9832-e5a63d34d0a8','7c5a6f8e-6818-44d3-b6a6-54bf9e19bb7c'),
-
--- Marcos Shelter
 ('dfbe1309-31b2-4a62-85e4-0c309c10564f','6849a3a6-8b27-405b-9171-a79688ab11b4'),
 ('dfbe1309-31b2-4a62-85e4-0c309c10564f','33899650-3896-4491-9bea-693b7d57370e'),
 ('dfbe1309-31b2-4a62-85e4-0c309c10564f','0403bdf8-845f-4870-b83e-0cc45ba138e5'),
-
--- Sofía Shelter
 ('a6fbf455-d615-4040-b928-fdc600b3f569','5cd327ae-ddf4-43b3-b431-92927c1ad651'),
 ('a6fbf455-d615-4040-b928-fdc600b3f569','8937a008-5a71-4c06-97e3-e87d55be4129'),
 ('a6fbf455-d615-4040-b928-fdc600b3f569','03f8568f-5ea2-41dc-94d5-6e5d69ef7850');
 
-----
+-- ─── Publicaciones ────────────────────────────────────────────────────────────
 
-INSERT INTO POST (id, photo, animal, likes, user, text) VALUES
+INSERT INTO `POST` (id, photo, animal, likes, `user`, text) VALUES
+(1,  '/static/images/posts/primera_publicacion.png', NULL,                                        11, '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Mi primer post'),
+(2,  '/static/images/posts/0.png',  '19038aab-5c64-4a27-ae9f-18d8a45d42e2',  6,  '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Este pequeño ya está listo para encontrar un hogar 🐾'),
+(3,  '/static/images/posts/1.png',  NULL,                                         2,  '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Seguimos trabajando por ellos 💙'),
+(4,  '/static/images/posts/2.png',  '7615b800-bb89-4994-b533-69acc31d4f23',  4,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Creo que este gato me ha elegido 😅'),
+(5,  '/static/images/posts/3.png',  NULL,                                         1,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Visitando la protectora hoy'),
+(6,  '/static/images/posts/4.png',  'c05f82aa-949e-4db7-b437-9774d1070222',  5,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Este perrito necesita un jardín grande ❤️'),
+(7,  '/static/images/posts/5.png',  NULL,                                         0,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Día de voluntariado'),
+(8,  '/static/images/posts/6.png',  '2e539674-5ad9-4241-9792-1bf3ffa46a63',  3,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Perfecto para mi piso 🐱'),
+(9,  '/static/images/posts/7.png',  NULL,                                         0,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Buscando compañero tranquilo'),
+(10, '/static/images/posts/8.png',  'c64c0a71-9d83-445e-ba49-6ea4e49d3f13',  6,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Se merece todo el amor del mundo'),
+(11, '/static/images/posts/9.png',  NULL,                                         2,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'No al abandono'),
+(12, '/static/images/posts/10.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 7,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando una familia'),
+(13, '/static/images/posts/11.png', NULL,                                         1,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Gracias a todos los voluntarios'),
+(14, '/static/images/posts/12.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila es puro amor ❤️'),
+(15, '/static/images/posts/13.png', NULL,                                         0,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Seguimos creciendo'),
+(16, '/static/images/posts/14.png', '3991eb98-f127-47f8-9718-67734c74a3ce', 4,  'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Coco ha mejorado muchísimo'),
+(17, '/static/images/posts/15.png', NULL,                                         1,  'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Día tranquilo en el refugio'),
+(18, '/static/images/posts/16.png', 'b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855', 3,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Dana lista para adopción'),
+(19, '/static/images/posts/17.png', NULL,                                         0,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Trabajo diario 💪'),
+(20, '/static/images/posts/18.png', '5cd327ae-ddf4-43b3-b431-92927c1ad651', 5,  'a6fbf455-d615-4040-b928-fdc600b3f569', 'Este pequeño necesita familia'),
+(21, '/static/images/posts/19.png', NULL,                                         2,  'a6fbf455-d615-4040-b928-fdc600b3f569', 'Gracias por el apoyo'),
+(22, '/static/images/posts/20.png', '6849a3a6-8b27-405b-9171-a79688ab11b4', 6,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Tango es increíble'),
+(23, '/static/images/posts/21.png', NULL,                                         1,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Seguimos adelante'),
+(24, '/static/images/posts/22.png', '19038aab-5c64-4a27-ae9f-18d8a45d42e2', 4,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Creo que ya tengo favorito 😍'),
+(25, '/static/images/posts/23.png', NULL,                                         0,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Pensando en adoptar'),
+(26, '/static/images/posts/24.png', '7615b800-bb89-4994-b533-69acc31d4f23', 3,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Este gato es perfecto'),
+(27, '/static/images/posts/25.png', NULL,                                         1,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Cada vez más cerca'),
+(28, '/static/images/posts/26.png', 'c05f82aa-949e-4db7-b437-9774d1070222', 5,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'No puedo dejar de mirarlo'),
+(29, '/static/images/posts/27.png', NULL,                                         0,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Algún día...'),
+(30, '/static/images/posts/28.png', 'c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 4,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Se merece una oportunidad'),
+(31, '/static/images/posts/29.png', NULL,                                         2,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Difundiendo 🙏'),
+(32, '/static/images/posts/30.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 6,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando 🐶'),
+(33, '/static/images/posts/31.png', NULL,                                         1,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Gracias por compartir'),
+(34, '/static/images/posts/32.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila necesita hogar'),
+(35, '/static/images/posts/33.png', NULL,                                         0,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Seguimos luchando'),
+(36, '/static/images/posts/34.png', '3991eb98-f127-47f8-9718-67734c74a3ce', 4,  'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Coco ha avanzado mucho'),
+(37, '/static/images/posts/35.png', NULL,                                         2,  'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Día de limpieza en el refugio'),
+(38, '/static/images/posts/36.png', 'c852c864-7bd5-4da2-afcf-8250fb08453b', 5,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Este perro me tiene enamorado'),
+(39, '/static/images/posts/37.png', NULL,                                         0,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Cada vez más decidido'),
+(40, '/static/images/posts/38.png', 'c8837f91-23bd-4d22-aab3-73597ddfd64f', 4,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Necesita espacio para correr'),
+(41, '/static/images/posts/39.png', NULL,                                         1,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Pensando seriamente'),
+(42, '/static/images/posts/40.png', '2e539674-5ad9-4241-9792-1bf3ffa46a63', 3,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Ideal para casa'),
+(43, '/static/images/posts/41.png', NULL,                                         0,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Aún dudando'),
+(44, '/static/images/posts/42.png', 'b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855', 6,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Dana está lista para irse a casa'),
+(45, '/static/images/posts/43.png', NULL,                                         1,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Gracias por confiar en nosotros'),
+(46, '/static/images/posts/44.png', '5cd327ae-ddf4-43b3-b431-92927c1ad651', 5,  'a6fbf455-d615-4040-b928-fdc600b3f569', 'Otro caso feliz 🐾'),
+(47, '/static/images/posts/45.png', NULL,                                         0,  'a6fbf455-d615-4040-b928-fdc600b3f569', 'Seguimos rescatando'),
+(48, '/static/images/posts/46.png', '6849a3a6-8b27-405b-9171-a79688ab11b4', 4,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Tango necesita familia'),
+(49, '/static/images/posts/47.png', NULL,                                         2,  'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Difusión importante'),
+(50, '/static/images/posts/48.png', '19038aab-5c64-4a27-ae9f-18d8a45d42e2', 3,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'No puedo resistirme'),
+(51, '/static/images/posts/49.png', NULL,                                         0,  '102fb036-77ef-4003-9688-4a1f27da66cc', 'Algún día será mío'),
+(52, '/static/images/posts/50.png', '7615b800-bb89-4994-b533-69acc31d4f23', 4,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Este gato es perfecto'),
+(53, '/static/images/posts/51.png', NULL,                                         1,  'cedee2d2-c731-4371-8bbf-914f469cae30', 'Ya queda menos'),
+(54, '/static/images/posts/52.png', 'c05f82aa-949e-4db7-b437-9774d1070222', 5,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Imposible no enamorarse'),
+(55, '/static/images/posts/53.png', NULL,                                         0,  'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Todo a su tiempo'),
+(56, '/static/images/posts/54.png', 'c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 4,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Difundir salva vidas'),
+(57, '/static/images/posts/55.png', NULL,                                         1,  'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Nunca abandones'),
+(58, '/static/images/posts/56.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 6,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando'),
+(59, '/static/images/posts/57.png', NULL,                                         0,  'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Comparte 🙏'),
+(60, '/static/images/posts/58.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila merece un hogar'),
+(61, '/static/images/posts/59.png', NULL,                                         2,  'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Gracias a todos');
 
--- POST 1 (especial)
-(1, '/static/images/posts/primera_publicacion.png', NULL, 11, '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Mi primer post'),
+-- ─── Likes ───────────────────────────────────────────────────────────────────
 
--- ADMIN
-(2, '/static/images/posts/0.png', '19038aab-5c64-4a27-ae9f-18d8a45d42e2', 6, '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Este pequeño ya está listo para encontrar un hogar 🐾'),
-(3, '/static/images/posts/1.png', NULL, 2, '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Seguimos trabajando por ellos 💙'),
+INSERT INTO `POST_LIKE` (`user`, `post`) VALUES
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',1),('102fb036-77ef-4003-9688-4a1f27da66cc',1),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',1),('cedee2d2-c731-4371-8bbf-914f469cae30',1),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',1),('9dd72ecf-50b4-43c8-a282-76896b38947f',1),
+('a4cd3d59-425e-4848-a5a2-9ffc674dec92',1),('ab51a4b5-7985-4f6e-baeb-01ba350be3f2',1),
+('d6516a8d-ef3b-4bf4-9832-e5a63d34d0a8',1),('dfbe1309-31b2-4a62-85e4-0c309c10564f',1),
+('a6fbf455-d615-4040-b928-fdc600b3f569',1),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',2),('102fb036-77ef-4003-9688-4a1f27da66cc',2),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',2),('cedee2d2-c731-4371-8bbf-914f469cae30',2),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',2),('9dd72ecf-50b4-43c8-a282-76896b38947f',2),
+('102fb036-77ef-4003-9688-4a1f27da66cc',3),('e2ad0f4a-b83a-4150-abad-99cc32093c8b',3),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',4),('102fb036-77ef-4003-9688-4a1f27da66cc',4),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',4),('cedee2d2-c731-4371-8bbf-914f469cae30',4),
+('102fb036-77ef-4003-9688-4a1f27da66cc',5),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',6),('102fb036-77ef-4003-9688-4a1f27da66cc',6),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',6),('cedee2d2-c731-4371-8bbf-914f469cae30',6),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',6),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',8),('102fb036-77ef-4003-9688-4a1f27da66cc',8),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',8),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',10),('102fb036-77ef-4003-9688-4a1f27da66cc',10),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',10),('cedee2d2-c731-4371-8bbf-914f469cae30',10),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',10),('9dd72ecf-50b4-43c8-a282-76896b38947f',10),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',11),('102fb036-77ef-4003-9688-4a1f27da66cc',11),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',12),('102fb036-77ef-4003-9688-4a1f27da66cc',12),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',12),('cedee2d2-c731-4371-8bbf-914f469cae30',12),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',12),('9dd72ecf-50b4-43c8-a282-76896b38947f',12),
+('a4cd3d59-425e-4848-a5a2-9ffc674dec92',12),
+('102fb036-77ef-4003-9688-4a1f27da66cc',13),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',14),('102fb036-77ef-4003-9688-4a1f27da66cc',14),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',14),('cedee2d2-c731-4371-8bbf-914f469cae30',14),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',14),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',16),('102fb036-77ef-4003-9688-4a1f27da66cc',16),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',16),('cedee2d2-c731-4371-8bbf-914f469cae30',16),
+('102fb036-77ef-4003-9688-4a1f27da66cc',17),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',18),('102fb036-77ef-4003-9688-4a1f27da66cc',18),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',18),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',20),('102fb036-77ef-4003-9688-4a1f27da66cc',20),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',20),('cedee2d2-c731-4371-8bbf-914f469cae30',20),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',20),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',21),('102fb036-77ef-4003-9688-4a1f27da66cc',21),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',22),('102fb036-77ef-4003-9688-4a1f27da66cc',22),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',22),('cedee2d2-c731-4371-8bbf-914f469cae30',22),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',22),('9dd72ecf-50b4-43c8-a282-76896b38947f',22),
+('102fb036-77ef-4003-9688-4a1f27da66cc',23),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',24),('102fb036-77ef-4003-9688-4a1f27da66cc',24),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',24),('cedee2d2-c731-4371-8bbf-914f469cae30',24),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',26),('102fb036-77ef-4003-9688-4a1f27da66cc',26),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',26),
+('102fb036-77ef-4003-9688-4a1f27da66cc',27),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',28),('102fb036-77ef-4003-9688-4a1f27da66cc',28),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',28),('cedee2d2-c731-4371-8bbf-914f469cae30',28),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',28),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',30),('102fb036-77ef-4003-9688-4a1f27da66cc',30),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',30),('cedee2d2-c731-4371-8bbf-914f469cae30',30),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',31),('102fb036-77ef-4003-9688-4a1f27da66cc',31),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',32),('102fb036-77ef-4003-9688-4a1f27da66cc',32),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',32),('cedee2d2-c731-4371-8bbf-914f469cae30',32),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',32),('9dd72ecf-50b4-43c8-a282-76896b38947f',32),
+('102fb036-77ef-4003-9688-4a1f27da66cc',33),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',34),('102fb036-77ef-4003-9688-4a1f27da66cc',34),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',34),('cedee2d2-c731-4371-8bbf-914f469cae30',34),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',34),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',36),('102fb036-77ef-4003-9688-4a1f27da66cc',36),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',36),('cedee2d2-c731-4371-8bbf-914f469cae30',36),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',37),('102fb036-77ef-4003-9688-4a1f27da66cc',37),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',38),('102fb036-77ef-4003-9688-4a1f27da66cc',38),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',38),('cedee2d2-c731-4371-8bbf-914f469cae30',38),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',38),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',40),('102fb036-77ef-4003-9688-4a1f27da66cc',40),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',40),('cedee2d2-c731-4371-8bbf-914f469cae30',40),
+('102fb036-77ef-4003-9688-4a1f27da66cc',41),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',42),('102fb036-77ef-4003-9688-4a1f27da66cc',42),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',42),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',44),('102fb036-77ef-4003-9688-4a1f27da66cc',44),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',44),('cedee2d2-c731-4371-8bbf-914f469cae30',44),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',44),('9dd72ecf-50b4-43c8-a282-76896b38947f',44),
+('102fb036-77ef-4003-9688-4a1f27da66cc',45),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',46),('102fb036-77ef-4003-9688-4a1f27da66cc',46),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',46),('cedee2d2-c731-4371-8bbf-914f469cae30',46),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',46),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',48),('102fb036-77ef-4003-9688-4a1f27da66cc',48),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',48),('cedee2d2-c731-4371-8bbf-914f469cae30',48),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',49),('102fb036-77ef-4003-9688-4a1f27da66cc',49),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',50),('102fb036-77ef-4003-9688-4a1f27da66cc',50),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',50),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',52),('102fb036-77ef-4003-9688-4a1f27da66cc',52),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',52),('cedee2d2-c731-4371-8bbf-914f469cae30',52),
+('102fb036-77ef-4003-9688-4a1f27da66cc',53),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',54),('102fb036-77ef-4003-9688-4a1f27da66cc',54),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',54),('cedee2d2-c731-4371-8bbf-914f469cae30',54),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',54),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',56),('102fb036-77ef-4003-9688-4a1f27da66cc',56),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',56),('cedee2d2-c731-4371-8bbf-914f469cae30',56),
+('102fb036-77ef-4003-9688-4a1f27da66cc',57),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',58),('102fb036-77ef-4003-9688-4a1f27da66cc',58),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',58),('cedee2d2-c731-4371-8bbf-914f469cae30',58),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',58),('9dd72ecf-50b4-43c8-a282-76896b38947f',58),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',60),('102fb036-77ef-4003-9688-4a1f27da66cc',60),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b',60),('cedee2d2-c731-4371-8bbf-914f469cae30',60),
+('fc7aa6f3-2762-4513-8c77-629bd904f236',60),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',61),('102fb036-77ef-4003-9688-4a1f27da66cc',61);
 
--- USERS
-(4, '/static/images/posts/2.png', '7615b800-bb89-4994-b533-69acc31d4f23', 4, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Creo que este gato me ha elegido 😅'),
-(5, '/static/images/posts/3.png', NULL, 1, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Visitando la protectora hoy'),
-(6, '/static/images/posts/4.png', 'c05f82aa-949e-4db7-b437-9774d1070222', 5, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Este perrito necesita un jardín grande ❤️'),
-(7, '/static/images/posts/5.png', NULL, 0, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Día de voluntariado'),
-(8, '/static/images/posts/6.png', '2e539674-5ad9-4241-9792-1bf3ffa46a63', 3, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Perfecto para mi piso 🐱'),
-(9, '/static/images/posts/7.png', NULL, 0, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Buscando compañero tranquilo'),
-(10, '/static/images/posts/8.png', 'c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 6, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Se merece todo el amor del mundo'),
-(11, '/static/images/posts/9.png', NULL, 2, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'No al abandono'),
+-- ─── Comentarios ─────────────────────────────────────────────────────────────
 
--- SHELTERS
-(12, '/static/images/posts/10.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 7, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando una familia'),
-(13, '/static/images/posts/11.png', NULL, 1, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Gracias a todos los voluntarios'),
-(14, '/static/images/posts/12.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila es puro amor ❤️'),
-(15, '/static/images/posts/13.png', NULL, 0, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Seguimos creciendo'),
-(16, '/static/images/posts/14.png', '3991eb98-f127-47f8-9718-67734c74a3ce', 4, 'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Coco ha mejorado muchísimo'),
-(17, '/static/images/posts/15.png', NULL, 1, 'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Día tranquilo en el refugio'),
+INSERT INTO `COMMENT` (`user`, `post`, `text`, `date`) VALUES
+('102fb036-77ef-4003-9688-4a1f27da66cc',1, '¡Enhorabuena por el primer post!',          '2026-04-20 10:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 1, 'Tiene muy buena pinta esto 👏',              '2026-04-20 10:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',1, 'Seguiremos atentos',                          '2026-04-20 10:10:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',2, 'Es precioso 😍',                              '2026-04-21 09:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 2, 'Ojalá encuentre familia pronto',             '2026-04-21 09:05:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 2, 'Me encanta 🐾',                              '2026-04-21 09:10:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',3, 'Gran trabajo 💙',                             '2026-04-21 10:00:00'),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',4, 'Tiene buena pinta 😊',                       '2026-04-22 09:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 4, 'Seguro que sí 😅',                           '2026-04-22 09:05:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 5, 'Qué buen plan',                              '2026-04-22 10:00:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 6, 'Me encanta ❤️',                              '2026-04-23 09:00:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',6, '¿Sigue disponible?',                          '2026-04-23 09:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',6, 'Es adorable',                                 '2026-04-23 09:10:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',8, 'Perfecto para piso',                          '2026-04-23 11:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 8, 'Qué bonito 🐱',                              '2026-04-23 11:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',10,'Totalmente de acuerdo',                       '2026-04-24 09:00:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',10,'Se merece todo',                              '2026-04-24 09:05:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 10,'Difundiendo 🙏',                             '2026-04-24 09:10:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',11,'Muy importante mensaje',                      '2026-04-24 10:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',12,'Compartido!',                                 '2026-04-25 09:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 12,'Qué bonito es',                              '2026-04-25 09:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',12,'Ojalá salga pronto',                          '2026-04-25 09:10:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 13,'Gracias a vosotros',                         '2026-04-25 10:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',14,'Es adorable',                                 '2026-04-26 09:00:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 14,'Me encanta ❤️',                              '2026-04-26 09:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',16,'Se nota el cambio',                           '2026-04-26 10:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 16,'Qué bien 😊',                                '2026-04-26 10:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',17,'Gran labor',                                  '2026-04-26 11:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',18,'Lista para adopción',                         '2026-04-26 12:00:00'),
+('a6fbf455-d615-4040-b928-fdc600b3f569', 18,'Seguro que encuentra hogar',                 '2026-04-26 12:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',20,'Necesita familia ya',                         '2026-04-26 13:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 20,'Qué ternura',                                '2026-04-26 13:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',21,'Gracias por compartir',                       '2026-04-27 11:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 21,'Muy importante lo que hacéis',               '2026-04-27 11:05:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',22,'Qué bonito es',                               '2026-04-27 12:00:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',22,'Me encanta este caso',                        '2026-04-27 12:05:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 23,'Seguís haciendo un gran trabajo',            '2026-04-27 13:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',24,'Este me gusta mucho 😍',                      '2026-04-27 14:00:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 24,'Se ve increíble',                            '2026-04-27 14:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',25,'Yo también estoy pensando en adoptar',        '2026-04-27 15:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',26,'Perfecto para casa',                          '2026-04-28 09:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 26,'Qué bonito 🐱',                              '2026-04-28 09:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',27,'Cada vez más cerca de decidirme',             '2026-04-28 10:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 28,'Es imposible no enamorarse',                 '2026-04-28 11:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',28,'Totalmente ❤️',                               '2026-04-28 11:05:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 29,'Mucho ánimo',                                '2026-04-28 12:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',30,'Gran oportunidad',                            '2026-04-28 13:00:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 31,'Difundido 🙏',                               '2026-04-28 14:00:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',32,'Zeus es precioso',                            '2026-04-28 15:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',32,'Ojalá encuentre hogar pronto',                '2026-04-28 15:05:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 33,'Gracias por vuestro trabajo',                '2026-04-28 16:00:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 34,'Qué bonito caso',                            '2026-04-28 17:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',35,'Seguimos apoyando',                           '2026-04-29 09:00:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',36,'Qué avance tan bueno',                        '2026-04-29 09:05:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 37,'Buen trabajo equipo',                        '2026-04-29 09:10:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',38,'Me encanta este perro',                       '2026-04-29 09:15:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 39,'Cada vez más cerca 🐶',                      '2026-04-29 09:20:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 40,'Necesita espacio seguro',                    '2026-04-29 09:25:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',41,'Sigo pensándolo',                             '2026-04-29 09:30:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 41,'Es normal tener dudas',                      '2026-04-29 09:31:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',41,'Tómate tu tiempo',                            '2026-04-29 09:32:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',42,'Ideal para familia',                          '2026-04-29 09:33:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 42,'Qué bonito 🐾',                              '2026-04-29 09:34:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 42,'Me encanta',                                 '2026-04-29 09:35:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 43,'Ánimo con el proceso',                       '2026-04-29 09:36:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',43,'Todo saldrá bien',                            '2026-04-29 09:37:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',43,'Mucho ánimo',                                 '2026-04-29 09:38:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',44,'Dana es preciosa',                            '2026-04-29 09:39:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',44,'Ojalá tenga suerte',                          '2026-04-29 09:40:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 44,'Muy bonita historia',                         '2026-04-29 09:41:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 45,'Gracias por el trabajo',                     '2026-04-29 09:42:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',45,'Gran labor',                                  '2026-04-29 09:43:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',45,'Seguís haciendo mucho bien',                  '2026-04-29 09:44:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 46,'Otro caso precioso',                          '2026-04-29 09:45:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',46,'Me encanta ❤️',                               '2026-04-29 09:46:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 46,'Qué bonito',                                 '2026-04-29 09:47:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',47,'Seguimos apoyando',                           '2026-04-29 09:48:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',47,'Gran trabajo',                                '2026-04-29 09:49:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 47,'Muy importante',                             '2026-04-29 09:50:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 48,'Tango es increíble',                         '2026-04-29 09:51:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',48,'Qué evolución',                               '2026-04-29 09:52:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 48,'Me encanta verlo así',                        '2026-04-29 09:53:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 49,'Difusión importante',                         '2026-04-29 09:54:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 49,'Compartido',                                 '2026-04-29 09:55:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',49,'Mucho ánimo',                                 '2026-04-29 09:56:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',50,'Me encanta este caso',                        '2026-04-29 09:57:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',50,'Muy bonito',                                  '2026-04-29 09:58:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 50,'Qué ternura',                                '2026-04-29 09:59:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 51,'Ojalá lo consigas',                          '2026-04-29 10:00:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',51,'Mucho ánimo',                                 '2026-04-29 10:01:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 51,'Se puede 💪',                                '2026-04-29 10:02:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',52,'Es perfecto',                                 '2026-04-29 10:03:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 52,'Qué bonito gato',                            '2026-04-29 10:04:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',52,'Me encanta 🐱',                               '2026-04-29 10:05:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',53,'Ya queda poco',                               '2026-04-29 10:06:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 53,'Ánimo',                                      '2026-04-29 10:07:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',53,'Casi está',                                   '2026-04-29 10:08:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 54,'Imposible no quererlo',                      '2026-04-29 10:09:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',54,'Totalmente ❤️',                               '2026-04-29 10:10:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 54,'Qué bonito',                                 '2026-04-29 10:11:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 55,'Todo llega',                                 '2026-04-29 10:12:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 55,'Paciencia',                                  '2026-04-29 10:13:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',55,'Así es',                                      '2026-04-29 10:14:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',56,'Difundir ayuda mucho',                        '2026-04-29 10:15:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 56,'Gran mensaje',                               '2026-04-29 10:16:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 56,'Importante',                                 '2026-04-29 10:17:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',57,'Muy cierto',                                  '2026-04-29 10:18:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 57,'Totalmente',                                 '2026-04-29 10:19:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',57,'De acuerdo',                                  '2026-04-29 10:20:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 58,'Zeus es increíble',                          '2026-04-29 10:21:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',58,'Ojalá tenga suerte',                          '2026-04-29 10:22:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',58,'Muy bonito caso',                             '2026-04-29 10:23:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 59,'Compartido 🙏',                              '2026-04-29 10:24:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',59,'Difusión hecha',                              '2026-04-29 10:25:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 59,'Importante',                                 '2026-04-29 10:26:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',60,'Mila merece lo mejor',                        '2026-04-29 10:27:00'),
+('fc7aa6f3-2762-4513-8c77-629bd904f236', 60,'Qué bonito caso',                            '2026-04-29 10:28:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 60,'Totalmente de acuerdo',                      '2026-04-29 10:29:00'),
+('cedee2d2-c731-4371-8bbf-914f469cae30',61,'Gracias por todo el trabajo',                 '2026-04-29 10:30:00'),
+('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 61,'Gran labor',                                 '2026-04-29 10:31:00'),
+('102fb036-77ef-4003-9688-4a1f27da66cc',61,'Muy importante lo que hacéis',                '2026-04-29 10:32:00');
 
--- MÁS VARIADOS
-(18, '/static/images/posts/16.png', 'b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855', 3, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Dana lista para adopción'),
-(19, '/static/images/posts/17.png', NULL, 0, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Trabajo diario 💪'),
-(20, '/static/images/posts/18.png', '5cd327ae-ddf4-43b3-b431-92927c1ad651', 5, 'a6fbf455-d615-4040-b928-fdc600b3f569', 'Este pequeño necesita familia'),
-(21, '/static/images/posts/19.png', NULL, 2, 'a6fbf455-d615-4040-b928-fdc600b3f569', 'Gracias por el apoyo'),
-(22, '/static/images/posts/20.png', '6849a3a6-8b27-405b-9171-a79688ab11b4', 6, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Tango es increíble'),
-(23, '/static/images/posts/21.png', NULL, 1, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Seguimos adelante'),
+-- ─── Solicitudes de adopción ─────────────────────────────────────────────────
 
--- MÁS USUARIOS
-(24, '/static/images/posts/22.png', '19038aab-5c64-4a27-ae9f-18d8a45d42e2', 4, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Creo que ya tengo favorito 😍'),
-(25, '/static/images/posts/23.png', NULL, 0, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Pensando en adoptar'),
-(26, '/static/images/posts/24.png', '7615b800-bb89-4994-b533-69acc31d4f23', 3, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Este gato es perfecto'),
-(27, '/static/images/posts/25.png', NULL, 1, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Cada vez más cerca'),
-(28, '/static/images/posts/26.png', 'c05f82aa-949e-4db7-b437-9774d1070222', 5, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'No puedo dejar de mirarlo'),
-(29, '/static/images/posts/27.png', NULL, 0, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Algún día...'),
-(30, '/static/images/posts/28.png', 'c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 4, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Se merece una oportunidad'),
-(31, '/static/images/posts/29.png', NULL, 2, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Difundiendo 🙏');
+INSERT INTO `ADOPTION` (`user`, `shelter`, `animal`, `status`, `date`, `time`, `text`, `contact`, `housing_type`, `other_animals`, `hours_alone`, `experience`) VALUES
+(
+  '102fb036-77ef-4003-9688-4a1f27da66cc',
+  'b4e2f1a0-cc33-4d55-9e77-f12345678901',
+  'c05f82aa-949e-4db7-b437-9774d1070222',
+  'pending', '2026-04-20', '10:30:00',
+  'Me gustaría adoptar a Bella. Tengo jardín y mucho tiempo libre para dedicarle.',
+  '600111222', 'casa_con_jardin', 0, 4,
+  'Tuve un perro de pequeño durante diez años y me encantaría volver a tener uno.'
+),
+(
+  'e2ad0f4a-b83a-4150-abad-99cc32093c8b',
+  'd0627579-2267-491f-af6d-37c0b508f52d',
+  'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3',
+  'reviewing', '2026-04-22', '11:00:00',
+  'Quiero adoptar a Zeus. Tenemos amplio jardín y somos una familia muy activa con dos niños.',
+  '600222333', 'casa_con_jardin', 1, 2,
+  'Tenemos experiencia con perros grandes. Nuestro anterior golden vivió hasta los catorce años.'
+),
+(
+  'cedee2d2-c731-4371-8bbf-914f469cae30',
+  'b4e2f1a0-cc33-4d55-9e77-f12345678901',
+  '2e539674-5ad9-4241-9792-1bf3ffa46a63',
+  'approved', '2026-04-24', '16:00:00',
+  'Me encantaría tener a Tito en casa. Trabajo desde casa y puedo dedicarle todo el tiempo que necesite.',
+  '600333444', 'piso', 0, 1,
+  'Primera vez adoptando pero he investigado mucho sobre la raza y sus necesidades.'
+),
+(
+  'fc7aa6f3-2762-4513-8c77-629bd904f236',
+  'd0627579-2267-491f-af6d-37c0b508f52d',
+  '06b69eef-abc0-436f-8fec-e638d7f4268c',
+  'rejected', '2026-04-15', '09:30:00',
+  'Me gustaría adoptar a Dana. Vivo sola con espacio suficiente y mucho amor que dar.',
+  '600444555', 'piso', 0, 6,
+  'Nunca he tenido animales pero adoro los perros y llevaría a Dana a clases de adiestramiento.'
+),
+(
+  '9dd72ecf-50b4-43c8-a282-76896b38947f',
+  '43847f6b-1959-4d9b-bca1-75a11e598262',
+  '51ccd50a-e0f5-4682-8431-6b50a63f35eb',
+  'completed', '2026-03-10', '10:00:00',
+  'Busco un perro que me acompañe en mis rutas de running diarias. Mila parece perfecta.',
+  '600555666', 'casa_con_jardin', 0, 3,
+  'Corredor habitual con más de diez kilómetros diarios. Tengo jardín vallado y mucho espacio.'
+);
 
-INSERT INTO POST (id, photo, animal, likes, user, text) VALUES
+-- ─── Visitas reservadas ───────────────────────────────────────────────────────
 
--- CONTINUACIÓN
-(32, '/static/images/posts/30.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 6, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando 🐶'),
-(33, '/static/images/posts/31.png', NULL, 1, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Gracias por compartir'),
-(34, '/static/images/posts/32.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila necesita hogar'),
-(35, '/static/images/posts/33.png', NULL, 0, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Seguimos luchando'),
-(36, '/static/images/posts/34.png', '3991eb98-f127-47f8-9718-67734c74a3ce', 4, 'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Coco ha avanzado mucho'),
-(37, '/static/images/posts/35.png', NULL, 2, 'd6516a8d-ef3b-4bf4-9832-e5a63d34d0a8', 'Día de limpieza en el refugio'),
-
--- USUARIOS
-(38, '/static/images/posts/36.png', 'c852c864-7bd5-4da2-afcf-8250fb08453b', 5, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Este perro me tiene enamorado'),
-(39, '/static/images/posts/37.png', NULL, 0, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Cada vez más decidido'),
-(40, '/static/images/posts/38.png', 'c8837f91-23bd-4d22-aab3-73597ddfd64f', 4, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Necesita espacio para correr'),
-(41, '/static/images/posts/39.png', NULL, 1, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Pensando seriamente'),
-(42, '/static/images/posts/40.png', '2e539674-5ad9-4241-9792-1bf3ffa46a63', 3, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Ideal para casa'),
-(43, '/static/images/posts/41.png', NULL, 0, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Aún dudando'),
-
--- SHELTERS
-(44, '/static/images/posts/42.png', 'b37fd95c-7c0b-4bb5-9f2f-1c0c4f71a855', 6, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Dana está lista para irse a casa'),
-(45, '/static/images/posts/43.png', NULL, 1, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Gracias por confiar en nosotros'),
-(46, '/static/images/posts/44.png', '5cd327ae-ddf4-43b3-b431-92927c1ad651', 5, 'a6fbf455-d615-4040-b928-fdc600b3f569', 'Otro caso feliz 🐾'),
-(47, '/static/images/posts/45.png', NULL, 0, 'a6fbf455-d615-4040-b928-fdc600b3f569', 'Seguimos rescatando'),
-(48, '/static/images/posts/46.png', '6849a3a6-8b27-405b-9171-a79688ab11b4', 4, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Tango necesita familia'),
-(49, '/static/images/posts/47.png', NULL, 2, 'dfbe1309-31b2-4a62-85e4-0c309c10564f', 'Difusión importante'),
-
--- MÁS USUARIOS
-(50, '/static/images/posts/48.png', '19038aab-5c64-4a27-ae9f-18d8a45d42e2', 3, '102fb036-77ef-4003-9688-4a1f27da66cc', 'No puedo resistirme'),
-(51, '/static/images/posts/49.png', NULL, 0, '102fb036-77ef-4003-9688-4a1f27da66cc', 'Algún día será mío'),
-(52, '/static/images/posts/50.png', '7615b800-bb89-4994-b533-69acc31d4f23', 4, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Este gato es perfecto'),
-(53, '/static/images/posts/51.png', NULL, 1, 'cedee2d2-c731-4371-8bbf-914f469cae30', 'Ya queda menos'),
-(54, '/static/images/posts/52.png', 'c05f82aa-949e-4db7-b437-9774d1070222', 5, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Imposible no enamorarse'),
-(55, '/static/images/posts/53.png', NULL, 0, 'e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'Todo a su tiempo'),
-
--- FINAL
-(56, '/static/images/posts/54.png', 'c64c0a71-9d83-445e-ba49-6ea4e49d3f13', 4, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Difundir salva vidas'),
-(57, '/static/images/posts/55.png', NULL, 1, 'fc7aa6f3-2762-4513-8c77-629bd904f236', 'Nunca abandones'),
-(58, '/static/images/posts/56.png', 'b3a6ee6a-7cf4-40d1-a0fd-b135a5a9e8f3', 6, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Zeus sigue esperando'),
-(59, '/static/images/posts/57.png', NULL, 0, 'a4cd3d59-425e-4848-a5a2-9ffc674dec92', 'Comparte 🙏'),
-(60, '/static/images/posts/58.png', '51ccd50a-e0f5-4682-8431-6b50a63f35eb', 5, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Mila merece un hogar'),
-(61, '/static/images/posts/59.png', NULL, 2, 'ab51a4b5-7985-4f6e-baeb-01ba350be3f2', 'Gracias a todos');
+INSERT INTO `RESERVATION` (`user`, `animal`, `shelter`, `date`, `time`, `status`, `text`) VALUES
+(
+  '102fb036-77ef-4003-9688-4a1f27da66cc',
+  '7615b800-bb89-4994-b533-69acc31d4f23',
+  'b4e2f1a0-cc33-4d55-9e77-f12345678901',
+  '2026-04-28', '11:00:00', 'confirmed',
+  'Me gustaría conocer a Cleo antes de tomar una decisión. ¿Puedo traer a mi pareja?'
+),
+(
+  'e2ad0f4a-b83a-4150-abad-99cc32093c8b',
+  '20203226-c5c0-49df-8bae-a078047ddd2e',
+  'd0627579-2267-491f-af6d-37c0b508f52d',
+  '2026-05-05', '10:00:00', 'pending',
+  'Quiero visitar a Coco y ver si es compatible con mi ritmo de vida antes de solicitar la adopción.'
+),
+(
+  '9dd72ecf-50b4-43c8-a282-76896b38947f',
+  '6cbf0160-3351-4f83-af48-7024ac0a947a',
+  '43847f6b-1959-4d9b-bca1-75a11e598262',
+  '2026-03-05', '16:30:00', 'completed',
+  'Visita para conocer a Rex. Fue una experiencia muy positiva y el perro es exactamente como se describe.'
+);
