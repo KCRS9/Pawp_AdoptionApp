@@ -5,6 +5,7 @@ import ies.sequeros.dam.domain.models.Post
 
 interface IPostRepository {
     suspend fun getPosts(skip: Int, limit: Int, userId: String? = null): List<Post>
+    suspend fun getPostsByShelter(shelterId: String, skip: Int = 0, limit: Int = 50): List<Post>
     suspend fun getPostById(postId: Int): Post
     suspend fun createPost(
         photoBytes: ByteArray,
