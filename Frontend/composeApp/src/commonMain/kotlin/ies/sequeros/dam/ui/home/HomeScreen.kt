@@ -393,6 +393,7 @@ fun HomeScreen() {
                     userId = selectedUserId ?: "",
                     onBack = { homeDestination = userProfileBackDest },
                     onEditClick = { homeDestination = HomeDestination.ADMIN_USER_EDIT },
+                    showEditButton = currentUser?.role == "admin",
                     onAnimalClick = { id ->
                         selectedAnimalId = id
                         animalDetailBackDest = HomeDestination.USER_PROFILE
