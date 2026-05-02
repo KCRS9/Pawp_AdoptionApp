@@ -49,6 +49,8 @@ fun PostCard(
     onLikeClick: () -> Unit,
     onUserClick: ((String) -> Unit)? = null,
     onAnimalClick: ((String) -> Unit)? = null,
+    onPostClick: (() -> Unit)? = null,
+    showCommentBar: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val isDark = isSystemInDarkTheme()
@@ -72,6 +74,7 @@ fun PostCard(
                     .fillMaxWidth()
                     .height(260.dp)
                     .clip(PhotoShape)
+                    .then(if (onPostClick != null) Modifier.clickable { onPostClick() } else Modifier)
             )
 
             Spacer(Modifier.height(10.dp))
@@ -150,11 +153,12 @@ fun PostCard(
                         }
                     }
 
-                    // Contador de comentarios (sin lógica aún)
+                    // Contador de comentarios (clicable si hay onPostClick)
                     Text(
-                        text = "💬 0",
+                        text = "💬 ${post.comments}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = if (onPostClick != null) Modifier.clickable { onPostClick() } else Modifier
                     )
 
                     // Like toggle + contador
@@ -191,27 +195,31 @@ fun PostCard(
                 )
             }
 
-            // ── Barra de añadir comentario (UI sin lógica) ────────────────────
-            HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Añadir un comentario...",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Enviar comentario",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                    modifier = Modifier.size(18.dp)
-                )
+            // ── Barra de añadir comentario (oculta en PostDetailScreen) ───────
+            if (showCommentBar) {
+                HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Añadir un comentario...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .then(if (onPostClick != null) Modifier.clickable { onPostClick() } else Modifier)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Enviar comentario",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
