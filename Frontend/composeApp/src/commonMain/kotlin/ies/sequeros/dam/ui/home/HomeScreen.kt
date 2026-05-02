@@ -35,6 +35,7 @@ import ies.sequeros.dam.ui.profile.ProfileScreen
 import ies.sequeros.dam.ui.shelters.ProtectorasScreen
 import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailScreen
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordScreen
+import ies.sequeros.dam.ui.settings.deleteAccount.DeleteAccountScreen
 import ies.sequeros.dam.ui.shelters.shelterEdit.ShelterEditScreen
 import ies.sequeros.dam.ui.shelters.shelterProfile.ShelterProfileScreen
 import ies.sequeros.dam.ui.social.PostDetailScreen
@@ -57,6 +58,7 @@ enum class HomeDestination {
     EDIT_PROFILE,
     CHANGE_PASSWORD,
     CHANGE_EMAIL,
+    DELETE_ACCOUNT,
     SHELTER_PROFILE,
     SHELTER_EDIT,
     ANIMAL_DETAIL,
@@ -169,6 +171,10 @@ fun HomeScreen() {
                     homeDestination = HomeDestination.CHANGE_PASSWORD
                     scope.launch { drawerState.close() }
                 },
+                onDeleteAccountClick = {
+                    homeDestination = HomeDestination.DELETE_ACCOUNT
+                    scope.launch { drawerState.close() }
+                },
                 onMyShelterClick = {
                     selectedShelterId = currentUser?.shelterId
                     homeDestination = HomeDestination.SHELTER_PROFILE
@@ -271,6 +277,10 @@ fun HomeScreen() {
 
             HomeDestination.CHANGE_EMAIL -> {
                 ChangeEmailScreen(onBack = { homeDestination = HomeDestination.TABS })
+            }
+
+            HomeDestination.DELETE_ACCOUNT -> {
+                DeleteAccountScreen(onBack = { homeDestination = HomeDestination.TABS })
             }
 
             HomeDestination.SHELTER_PROFILE -> {

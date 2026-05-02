@@ -80,7 +80,7 @@ class RestAuthRepository(
             // Es necesario usar FormDataContent, ya que encapsula Parameters en un formato que todos los motores de Ktor entienden (JVM, JS, WasmJS).
             setBody(FormDataContent(
                 Parameters.build {
-                    append("username", email)   // FastAPI llama "username" al campo de identificación
+                    append("username", email)   // FastAPI llama "username" al campo de identificacion
                     append("password", password)
             }))
         }

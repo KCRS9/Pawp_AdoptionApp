@@ -28,7 +28,7 @@ data class RegisterResponseDto(
 data class LoginResponseDto(
 
     @SerialName("access_token") val accessToken: String,
-    @SerialName("token_type")   val tokenType: String
+    @SerialName("token_type") val tokenType: String
 )
 
 // Respuesta de error del backend

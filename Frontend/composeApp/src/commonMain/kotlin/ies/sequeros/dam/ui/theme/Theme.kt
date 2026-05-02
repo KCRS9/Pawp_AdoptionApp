@@ -66,19 +66,19 @@ fun PawpTheme(
     )
 
     val typography = Typography(
-        // Títulos de pantalla: "Iniciar Sesión", "Crear Cuenta" (SemiBold 32sp)
+        // titulos de pantalla (SemiBold 32sp)
         displaySmall = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.SemiBold,
             fontSize   = TitleFontSize
         ),
-        // Título de la card PAWP y encabezados destacados (ExtraBold 32sp)
+        // titulo de la card PAWP y encabezados destacados (ExtraBold 32sp)
         headlineLarge = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.ExtraBold,
             fontSize   = TitleFontSize
         ),
-        // Subtítulos de sección (SemiBold 17sp)
+        // subtitulos de seccion (SemiBold 17sp)
         headlineSmall = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.SemiBold,
@@ -96,7 +96,7 @@ fun PawpTheme(
             fontWeight = FontWeight.Normal,
             fontSize   = BodyFontSize
         ),
-        // Labels y texto pequeño (Regular 14sp)
+        // labels y texto pequeno (Regular 14sp)
         bodySmall = TextStyle(
             fontFamily = poppins,
             fontWeight = FontWeight.Normal,
@@ -140,7 +140,7 @@ fun loginTextFieldColors(): TextFieldColors = OutlinedTextFieldDefaults.colors(
     // Texto que escribe el usuario
     unfocusedTextColor      = Color.White,
     focusedTextColor        = Color.White,
-    // Label ("Email", "Contraseña")
+    // label ("Email", "Contrasena")
     unfocusedLabelColor     = Color.White.copy(alpha = 0.8f),
     focusedLabelColor       = Color.White,
     // Borde del campo

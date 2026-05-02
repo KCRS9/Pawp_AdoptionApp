@@ -89,7 +89,6 @@ fun ShelterCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // Nombre, ubicación, contador de animales
             Column(
 
                 modifier = Modifier
@@ -111,7 +110,6 @@ fun ShelterCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Ubicación
                     if (!shelter.locationName.isNullOrBlank()) {
 
                         Row(

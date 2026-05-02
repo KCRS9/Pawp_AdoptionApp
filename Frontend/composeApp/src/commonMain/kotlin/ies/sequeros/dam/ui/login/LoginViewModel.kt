@@ -18,7 +18,6 @@ class LoginViewModel(
 ): ViewModel() {
 
 //    init {
-//        // Credenciales de desarrollo — eliminar antes de producción
 //        onEmailChange("admin@admin.com")
 //        onPasswordChange("123456789")
 //    }

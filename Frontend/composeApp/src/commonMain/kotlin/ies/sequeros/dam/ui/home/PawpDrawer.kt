@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.DarkMode
@@ -64,6 +65,7 @@ fun PawpDrawer(
     onLogoutClick:() -> Unit,
     onChangePasswordClick: () -> Unit,
     onChangeEmailClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
     onMyShelterClick: () -> Unit,
 ) {
 
@@ -180,6 +182,12 @@ fun PawpDrawer(
                     label   = "Notificaciones",
                     onClick = onNotificationsClick
                 )
+
+                DrawerSubItem(
+                    icon    = Icons.Filled.DeleteForever,
+                    label   = "Eliminar cuenta",
+                    onClick = onDeleteAccountClick
+                )
             }
 
 
@@ -276,7 +284,7 @@ private fun DrawerItem(
     )
 }
 
-// Subítem con sangría adicional para indicar jerarquía dentro de Ajustes
+// subitem con sangria adicional para indicar jerarquia dentro de ajustes
 @Composable
 private fun DrawerSubItem(
     icon: ImageVector,

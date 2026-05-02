@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // DTO para el listado GET /shelters/
-// Solo los campos mínimos para la ficha simplificada
+// solo los campos minimos para la ficha simplificada
 @Serializable
 data class ShelterSummaryDto(
     val id: String,
@@ -26,7 +26,7 @@ data class ShelterDetailDto(
     val website: String? = null,
     val description: String,
     @SerialName("location_name") val locationName: String? = null,
-    @SerialName("admin_id")   val adminId: String,
+    @SerialName("admin_id") val adminId: String,
     @SerialName("admin_name") val adminName: String? = null,
     @SerialName("profile_image") val profileImage: String? = null,
     val animals: List<AnimalSummaryDto> = emptyList()

@@ -31,7 +31,7 @@ fun AvatarWithPencil(
     size: Dp = 96.dp,
     isUploading: Boolean = false,
     modifier: Modifier = Modifier,
-    onEditClick: (() -> Unit)? = null   // null = no se muestra el lápiz
+    onEditClick: (() -> Unit)? = null   // null = no se muestra el lapiz
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.BottomEnd) {
 
@@ -40,7 +40,7 @@ fun AvatarWithPencil(
                 CircularProgressIndicator(modifier = Modifier.size(size * 0.5f))
             }
         } else if (previewBytes != null) {
-            // Vista previa local sin caché — muestra la imagen seleccionada antes de confirmar
+            // vista previa local sin cache — muestra la imagen seleccionada antes de confirmar
             val context = LocalPlatformContext.current
             val request = ImageRequest.Builder(context)
                 .data(previewBytes)

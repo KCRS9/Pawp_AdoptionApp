@@ -43,6 +43,7 @@ import ies.sequeros.dam.domain.repositories.IPostRepository
 import ies.sequeros.dam.domain.repositories.ICommentRepository
 import ies.sequeros.dam.infrastructure.RestPostRepository
 import ies.sequeros.dam.infrastructure.RestCommentRepository
+import ies.sequeros.dam.ui.settings.deleteAccount.DeleteAccountViewModel
 import ies.sequeros.dam.ui.social.PostFormViewModel
 import ies.sequeros.dam.ui.social.SocialViewModel
 import ies.sequeros.dam.ui.social.PostDetailViewModel
@@ -94,7 +95,7 @@ val appModule = module {
     //val baseUrl = "http://localhost:8000"
     val baseUrl = "http://192.168.18.13:8000"
 
-    // --- Infraestructura ---
+    // infraestructura
     single {
         val sessionManager: UserSessionManager = get()
         createHttpClient(
@@ -114,10 +115,10 @@ val appModule = module {
     single<IPostRepository> { RestPostRepository(get(), baseUrl) }
     single<ICommentRepository> { RestCommentRepository(get(), baseUrl) }
 
-    // --- Capa de aplicación ---
+    // capa de aplicacion
     single { UserSessionManager(get()) }
 
-    // --- Casos de uso ---
+    // casos de uso
     factory { LoginUseCase(get()) }
     factory { RegisterUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
@@ -160,7 +161,7 @@ val appModule = module {
     factory { CreateCommentUseCase(get()) }
     factory { DeleteCommentUseCase(get()) }
 
-    // --- Presentación ---
+    // presentacion
     // get() resuelve la instancia de Settings registrada por cada plataforma
     single { AppSettings(get()) }
     factory { AppViewModel(get(), get(), get(), get(), get(), get(), get()) }
@@ -186,4 +187,5 @@ val appModule = module {
     viewModel { PostDetailViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { UserPostsViewModel(get(), get()) }
+    viewModel { DeleteAccountViewModel() }
 }

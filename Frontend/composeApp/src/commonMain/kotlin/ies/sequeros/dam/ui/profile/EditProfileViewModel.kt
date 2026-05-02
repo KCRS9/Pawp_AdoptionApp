@@ -95,7 +95,7 @@ class EditProfileViewModel(
                     )
                 )
 
-                // Señalamos éxito — la pantalla llamará refreshCurrentUser() y cerrará
+                // senalamos exito — la pantalla llamara refreshCurrentUser() y cerrara
 
                 _state.update { it.copy(isSaving = false, isSaveSuccess = true) }
 
