@@ -138,7 +138,7 @@ class AppViewModel(
         // Si la app arranca con un token persistido, cargamos el perfil del servidor
         viewModelScope.launch {
             // filterNotNull() descarta el null inicial (estado "comprobando")
-            // first() obtiene el primer valor no nulo y cancela la colección
+            // first() obtiene el primer valor no nulo y cancela la coleccion
             val loggedIn = isLoggedIn.filterNotNull().first()
             if(loggedIn) fetchCurrentUser()
         }

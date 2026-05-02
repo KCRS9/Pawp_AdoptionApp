@@ -24,7 +24,7 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHost = remember { SnackbarHostState() }
 
-    // Pre-cargamos los datos de la protectora al entrar por primera vez
+    // precargamos datos al entrar por primera vez
     LaunchedEffect(shelterId) {
         if (shelterId.isNotBlank()) viewModel.init(shelterId)
     }
@@ -49,7 +49,7 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
         state.errorMessage?.let { snackbarHost.showBrief(it) }
     }
 
-    // Abre el selector → guarda bytes para previsualizar (no sube todavía)
+    // abre el selector → guarda bytes para previsualizar (no sube todavia)
     val logoLauncher = rememberFilePickerLauncher(type = PickerType.Image) { file ->
         viewModel.onLogoFileSelected(file)
     }
@@ -69,7 +69,7 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
             modifier     = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // Botones confirmar / cancelar visibles solo cuando hay previsualización pendiente
+        // botones confirmar / cancelar visibles solo cuando hay previsualizacion pendiente
         if (state.previewBytes != null) {
             Row(
                 modifier              = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
@@ -86,7 +86,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(24.dp))
 
-        // Nombre — obligatorio
         OutlinedTextField(
             value = state.name,
             onValueChange = viewModel::onNameChange,
@@ -99,7 +98,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
 
-        // Teléfono — obligatorio
         OutlinedTextField(
             value = state.phone,
             onValueChange = viewModel::onPhoneChange,
@@ -113,7 +111,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
 
-        // Email — obligatorio
         OutlinedTextField(
             value = state.email,
             onValueChange = viewModel::onEmailChange,
@@ -127,7 +124,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
 
-        // Dirección — opcional
         OutlinedTextField(
             value = state.address,
             onValueChange = viewModel::onAddressChange,
@@ -138,7 +134,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
 
-        // Web — opcional
         OutlinedTextField(
             value = state.website,
             onValueChange = viewModel::onWebsiteChange,
@@ -149,7 +144,6 @@ fun ShelterEditScreen(shelterId: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
 
-        // Descripción — opcional
         OutlinedTextField(
             value = state.description,
             onValueChange = viewModel::onDescriptionChange,

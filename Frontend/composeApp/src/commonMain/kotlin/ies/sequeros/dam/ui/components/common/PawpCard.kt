@@ -106,7 +106,7 @@ fun PawpCard(
 private fun PawpCardCircles() {
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // 1 — El más grande (60dp), inferior izquierda → #E9D5CA (melocotón)
+        // 1 — el mas grande (60dp), inferior izquierda → #E9D5CA
         Box(
             modifier = Modifier
                 .size(50.dp)
@@ -124,7 +124,7 @@ private fun PawpCardCircles() {
                 .background(Color(0xFFE9D5CA).copy(alpha = 0.75f), CircleShape)
         )
 
-        // 3 — Pequeño (12dp), superior izquierda → #D4B4C8 (rosa empolvado)
+        // 3 — pequeno (12dp), superior izquierda → #D4B4C8
         Box(
             modifier = Modifier
                 .size(12.dp)
@@ -133,7 +133,7 @@ private fun PawpCardCircles() {
                 .background(Color(0xFFD4B4C8).copy(alpha = 0.85f), CircleShape)
         )
 
-        // 4 — Extra pequeño (20dp), centro-derecha ligeramente arriba → #F0CBBE (salmón claro)
+        // 4 — extra pequeno (20dp), centro-derecha ligeramente arriba → #F0CBBE
         Box(
             modifier = Modifier
                 .size(20.dp)
@@ -142,7 +142,7 @@ private fun PawpCardCircles() {
                 .background(Color(0xFFF0CBBE).copy(alpha = 0.70f), CircleShape)
         )
 
-        // 5 — Extra pequeño (16dp), inferior derecha → #C5B4D9 (lavanda suave)
+        // 5 — extra pequeno (16dp), inferior derecha → #C5B4D9
         Box(
             modifier = Modifier
                 .size(16.dp)

@@ -45,13 +45,10 @@ fun ShelterCard(
     modifier: Modifier = Modifier
 
 ) {
-    val isDark = isSystemInDarkTheme()
-    val cardBg = if (isDark) PawpSurfaceDark else Color.White
-
     Surface(
 
         shape = CardShape,
-        color = cardBg,
+        color = MaterialTheme.colorScheme.surface,
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 4.dp, shape = CardShape)
@@ -89,7 +86,6 @@ fun ShelterCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // Nombre, ubicación, contador de animales
             Column(
 
                 modifier = Modifier
@@ -102,7 +98,7 @@ fun ShelterCard(
                     text = shelter.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isDark) Color.White else Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
 
@@ -111,7 +107,6 @@ fun ShelterCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Ubicación
                     if (!shelter.locationName.isNullOrBlank()) {
 
                         Row(

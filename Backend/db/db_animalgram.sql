@@ -165,9 +165,9 @@ INSERT INTO `LOCALITY` (name) VALUES
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES (
     '7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6',
     'Admin',
-    'admin@admin.com',
+    'admin@pawp.com',
     '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq',
-    'admin', 1,
+    'admin', 3,
     'Administrador principal de la plataforma Pawp.',
     NULL
 );
@@ -176,7 +176,7 @@ INSERT INTO `SHELTER` (id, name, address, location, phone, email, website, descr
     'b4e2f1a0-cc33-4d55-9e77-f12345678901',
     'Pawp Protectora',
     'Calle Adopción 1',
-    1,
+    3,
     '600000000',
     'protectora@pawp.com',
     NULL,

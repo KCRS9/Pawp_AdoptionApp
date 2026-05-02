@@ -133,7 +133,7 @@ fun LoginComponent(
                 enabled = state.isValid && !state.isLoading,
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PawpPurpleDark,
+                    containerColor = PawpPurple,
                     contentColor = Color.White
                 ),
 

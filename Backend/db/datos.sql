@@ -16,7 +16,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ─── Usuarios ────────────────────────────────────────────────────────────────
 
 INSERT INTO `USERS` (id, name, email, password, role, location, description, profile_image) VALUES
-('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Admin',           'admin@admin.com',    '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'admin',   1, 'Administrador principal de la plataforma Pawp. Responsable de la gestión global y supervisión de protectoras.', '/static/images/admin_profile.jpg'),
+('7d1f6fc1-dcaa-4662-8b86-c0e3b9670ca6', 'Admin',           'admin@pawp.com',    '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'admin',   3, 'Administrador principal de la plataforma Pawp. Responsable de la gestión global y supervisión de protectoras.', '/static/images/admin_profile.jpg'),
 ('102fb036-77ef-4003-9688-4a1f27da66cc', 'Juan Pérez',       'juan@perez.com',     '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Amante de los animales y voluntario ocasional.',                                                                '/static/images/user_0.jpg'),
 ('e2ad0f4a-b83a-4150-abad-99cc32093c8b', 'María García',     'maria@garcia.com',   '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Apasionada del mundo canino con amplio jardín.',                                                                '/static/images/user_5.jpg'),
 ('cedee2d2-c731-4371-8bbf-914f469cae30', 'Carlos López',     'carlos@lopez.com',   '$2b$12$2QzqcrYhIsmxU6kgMD8CSegRfRN.teMl5tb0uUkWy8yJmv6/0j/Aq', 'user',    3, 'Busco un gato tranquilo para mi apartamento.',                                                                  '/static/images/user_2.jpg'),

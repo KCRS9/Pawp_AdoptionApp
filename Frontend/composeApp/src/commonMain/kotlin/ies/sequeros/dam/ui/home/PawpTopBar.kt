@@ -40,7 +40,7 @@ fun PawpTopBar(
             }
         },
         actions = {
-            // Cada acción es un elemento independiente — no mezclar dentro del mismo IconButton
+            // cada accion es un elemento independiente — no mezclar dentro del mismo iconbutton
             IconButton(onClick = onNotificationClick) {
                 Icon(
                     imageVector        = Icons.Filled.Notifications,

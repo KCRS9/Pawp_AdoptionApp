@@ -157,7 +157,7 @@ class RegisterViewModel(
 
         val s = _state.value
 
-        // Si es protectora, todos sus campos deben ser válidos también
+        // si es protectora, todos sus campos deben ser validos tambien
         val shelterValid = if (s.isShelter) {
             s.shelterName.isNotBlank() &&
                     s.shelterDescription.isNotBlank() &&

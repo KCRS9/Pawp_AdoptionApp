@@ -7,6 +7,7 @@ import ies.sequeros.dam.application.usecases.DeleteCommentUseCase
 import ies.sequeros.dam.application.usecases.DeletePostUseCase
 import ies.sequeros.dam.application.usecases.GetCommentsUseCase
 import ies.sequeros.dam.application.usecases.GetPostByIdUseCase
+import ies.sequeros.dam.application.usecases.LikePostUseCase
 import ies.sequeros.dam.domain.models.Comment
 import ies.sequeros.dam.domain.models.Post
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,8 @@ class PostDetailViewModel(
     private val getComments: GetCommentsUseCase,
     private val createComment: CreateCommentUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
-    private val deletePost: DeletePostUseCase
+    private val deletePost: DeletePostUseCase,
+    private val likePost: LikePostUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PostDetailState())
@@ -63,13 +65,37 @@ class PostDetailViewModel(
         }
     }
 
-    // ── Comentario ────────────────────────────────────────────────────────────
+    fun toggleLike() {
+        val post = _state.value.post ?: return
+        val newLiked = !post.likedByMe
+        _state.update {
+            it.copy(post = post.copy(
+                likedByMe = newLiked,
+                likes = if (newLiked) post.likes + 1 else maxOf(0, post.likes - 1)
+            ))
+        }
+        viewModelScope.launch {
+            try {
+                val result = likePost(post.id)
+                _state.update { s ->
+                    s.copy(post = s.post?.copy(likes = result.likes, likedByMe = result.likedByMe))
+                }
+            } catch (e: Exception) {
+                _state.update { s ->
+                    s.copy(post = s.post?.copy(
+                        likedByMe = !newLiked,
+                        likes = if (!newLiked) (s.post.likes + 1) else maxOf(0, s.post.likes - 1)
+                    ))
+                }
+            }
+        }
+    }
 
     fun onCommentTextChange(text: String) = _state.update { it.copy(commentText = text) }
 
     fun submitComment() {
         val postId = _state.value.post?.id ?: return
-        val text   = _state.value.commentText.trim()
+        val text = _state.value.commentText.trim()
         if (text.isBlank()) return
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true) }
@@ -78,9 +104,9 @@ class PostDetailViewModel(
                 _state.update { s ->
                     s.copy(
                         isSubmitting = false,
-                        commentText  = "",
-                        comments     = s.comments + comment,
-                        post         = s.post?.copy(comments = s.post.comments + 1)
+                        commentText = "",
+                        comments = s.comments + comment,
+                        post = s.post?.copy(comments = s.post.comments + 1)
                     )
                 }
             } catch (e: Exception) {
@@ -96,7 +122,7 @@ class PostDetailViewModel(
                 _state.update { s ->
                     s.copy(
                         comments = s.comments.filter { it.id != commentId },
-                        post     = s.post?.copy(comments = maxOf(0, (s.post.comments) - 1))
+                        post = s.post?.copy(comments = maxOf(0, s.post.comments - 1))
                     )
                 }
             } catch (e: Exception) {
@@ -104,8 +130,6 @@ class PostDetailViewModel(
             }
         }
     }
-
-    // ── Eliminar publicación ──────────────────────────────────────────────────
 
     fun requestDeletePost() = _state.update { it.copy(showDeletePostDialog = true) }
     fun dismissDeletePost() = _state.update { it.copy(showDeletePostDialog = false) }

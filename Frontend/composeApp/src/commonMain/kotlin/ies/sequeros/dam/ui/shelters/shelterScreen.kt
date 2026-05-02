@@ -72,7 +72,7 @@ fun ProtectorasScreen(
                 HorizontalDivider()
                 Spacer(Modifier.height(8.dp))
 
-                // Opción "Todas las zonas"
+                // opcion "Todas las zonas"
                 TextButton(
 
                     onClick = {
