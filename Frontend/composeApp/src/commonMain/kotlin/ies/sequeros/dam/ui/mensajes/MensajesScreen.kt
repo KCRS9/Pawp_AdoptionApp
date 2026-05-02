@@ -15,7 +15,7 @@ fun MensajesScreen() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text  = "Mensajes",
+            text  = "No tiene nuevos mensajes",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground
         )

@@ -95,6 +95,7 @@ fun HomeScreen() {
     var selectedAnimalId by remember { mutableStateOf<String?>(null) }
     var selectedUserId by remember { mutableStateOf<String?>(null) }
     var selectedPostId by remember { mutableStateOf<Int?>(null) }
+    var postDetailBackDest by remember { mutableStateOf(HomeDestination.TABS) }
     var userPostsUserId by remember { mutableStateOf("") }
     var userPostsUserName by remember { mutableStateOf("") }
     var userPostsBackDest by remember { mutableStateOf(HomeDestination.PROFILE) }
@@ -304,6 +305,11 @@ fun HomeScreen() {
                         animalDetailBackDest = HomeDestination.SHELTER_PROFILE
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
+                    onPostClick = { id ->
+                        selectedPostId = id
+                        postDetailBackDest = HomeDestination.SHELTER_PROFILE
+                        homeDestination = HomeDestination.POST_DETAIL
+                    },
                     onVerAnimalesClick = {
                         misAnimalesBackDest = HomeDestination.SHELTER_PROFILE
                         homeDestination = HomeDestination.MIS_ANIMALES
@@ -463,15 +469,15 @@ fun HomeScreen() {
             HomeDestination.POST_DETAIL -> {
                 PostDetailScreen(
                     postId = selectedPostId ?: 0,
-                    onBack = { homeDestination = HomeDestination.TABS },
+                    onBack = { homeDestination = postDetailBackDest },
                     onAnimalClick = { id ->
                         selectedAnimalId = id
-                        animalDetailBackDest = HomeDestination.TABS
+                        animalDetailBackDest = HomeDestination.POST_DETAIL
                         homeDestination = HomeDestination.ANIMAL_DETAIL
                     },
                     onUserClick = { id ->
                         selectedUserId = id
-                        userProfileBackDest = HomeDestination.TABS
+                        userProfileBackDest = HomeDestination.POST_DETAIL
                         homeDestination = HomeDestination.USER_PROFILE
                     }
                 )
