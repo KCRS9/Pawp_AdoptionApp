@@ -14,6 +14,7 @@ val PawpPurpleDark = Color(0xFF2D2640)
 
 /** Superficie elevada en modo oscuro (cards, sheets) */
 val PawpSurfaceDark = Color(0xFF3D3552)
+//val PawpSurfaceDark = Color(0xFFff0000)
 
 /** Color de texto en modo claro */
 val PawpTextDark = Color(0xFF5F5B5B)

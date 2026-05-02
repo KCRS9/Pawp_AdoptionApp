@@ -186,7 +186,7 @@ fun ProfileContent(
         Spacer(Modifier.height(16.dp))
 
         //Descripción
-        val descriptionBg = if (isSystemInDarkTheme()) PawpSurfaceDark else Color(0xFFF0F0F0)
+        val descriptionBg = MaterialTheme.colorScheme.surfaceVariant
 
         Surface(
 
