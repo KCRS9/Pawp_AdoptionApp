@@ -122,7 +122,7 @@ fun PostDetailScreen(
                 .imePadding()
         ) {
 
-            // ── Scroll principal ──────────────────────────────────────────────
+            // scroll principal
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -143,12 +143,12 @@ fun PostDetailScreen(
                     state.post?.let { post ->
                         item {
                             PostCard(
-                                post           = post,
-                                onLikeClick    = {},
-                                onUserClick    = onUserClick,
-                                onAnimalClick  = if (post.animalId != null) onAnimalClick else null,
+                                post = post,
+                                onLikeClick = { viewModel.toggleLike() },
+                                onUserClick = onUserClick,
+                                onAnimalClick = if (post.animalId != null) onAnimalClick else null,
                                 showCommentBar = false,
-                                modifier       = Modifier.padding(horizontal = 12.dp)
+                                modifier = Modifier.padding(horizontal = 12.dp)
                             )
                         }
                     }
@@ -180,13 +180,19 @@ fun PostDetailScreen(
                         }
                     } else {
                         items(state.comments, key = { it.id }) { comment ->
-                            CommentItem(comment = comment)
+                            val canDeleteComment = currentUser != null &&
+                                (currentUser!!.role == "admin" || currentUser!!.id == comment.userId)
+                            CommentItem(
+                                comment = comment,
+                                canDelete = canDeleteComment,
+                                onDelete = { viewModel.deleteComment(comment.id) }
+                            )
                         }
                     }
                 }
             }
 
-            // ── Barra de escritura fija al pie ────────────────────────────────
+            // barra de escritura fija al pie
             HorizontalDivider()
             Row(
                 modifier = Modifier

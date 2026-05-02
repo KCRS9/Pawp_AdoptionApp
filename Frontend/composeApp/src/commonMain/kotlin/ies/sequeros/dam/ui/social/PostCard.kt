@@ -65,21 +65,19 @@ fun PostCard(
     ) {
         Column {
 
-            // ── Foto ──────────────────────────────────────────────────────────
             AsyncImage(
                 model = post.photoUrl,
                 contentDescription = "Foto de la publicación",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(260.dp)
+                    .height(360.dp)
                     .clip(PhotoShape)
                     .then(if (onPostClick != null) Modifier.clickable { onPostClick() } else Modifier)
             )
 
             Spacer(Modifier.height(10.dp))
 
-            // ── Fila: autor (izquierda) + animal + contadores (derecha) ───────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -87,7 +85,7 @@ fun PostCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Bloque izquierdo: avatar + nombre + fecha (clicable → perfil autor)
+                // bloque izquierdo: avatar + nombre + fecha
                 Row(
                     modifier = Modifier
                         .weight(1f)
@@ -124,12 +122,12 @@ fun PostCard(
                     }
                 }
 
-                // Bloque derecho: chip animal (opcional) + 💬 + ❤
+                // bloque derecho: chip animal (opcional) + contadores
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    // Chip del animal etiquetado
+                    // chip del animal etiquetado
                     if (post.animalId != null && post.animalName != null) {
                         Surface(
                             shape = MaterialTheme.shapes.extraLarge,
@@ -153,7 +151,7 @@ fun PostCard(
                         }
                     }
 
-                    // Contador de comentarios (clicable si hay onPostClick)
+                    // contador de comentarios
                     Text(
                         text = "💬 ${post.comments}",
                         style = MaterialTheme.typography.labelSmall,
@@ -161,7 +159,7 @@ fun PostCard(
                         modifier = if (onPostClick != null) Modifier.clickable { onPostClick() } else Modifier
                     )
 
-                    // Like toggle + contador
+                    // like toggle + contador
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(2.dp)
@@ -185,7 +183,6 @@ fun PostCard(
                 }
             }
 
-            // ── Caption (opcional) ────────────────────────────────────────────
             if (!post.text.isNullOrBlank()) {
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -195,7 +192,7 @@ fun PostCard(
                 )
             }
 
-            // ── Barra de añadir comentario (oculta en PostDetailScreen) ───────
+            // barra de comentario (oculta en postdetailscreen)
             if (showCommentBar) {
                 HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
                 Row(
