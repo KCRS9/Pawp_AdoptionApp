@@ -131,7 +131,7 @@ fun ShelterProfileScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProfileStatColumn(label = "En adopción", value = shelter.animals.size.toString(), onClick = { onVerAnimalesClick?.invoke() })
-            ProfileStatColumn(label = "Publicaciones", value = "0", onClick = {})
+            ProfileStatColumn(label = "Publicaciones", value = state.posts.size.toString(), onClick = {})
             ProfileStatColumn(label = "Seguidores", value = "0", onClick = {})
         }
 
@@ -213,7 +213,7 @@ fun ShelterProfileScreen(
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = "Publicaciones (${state.posts.size})",
+            text = "Publicaciones",
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(Modifier.height(8.dp))
