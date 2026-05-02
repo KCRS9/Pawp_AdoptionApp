@@ -853,10 +853,19 @@ def insert_post(user_id: str, photo_url: str, text: Optional[str], animal_id: Op
             }
 
 
-def get_posts(skip: int, limit: int, current_user_id: str) -> list[dict]:
+def get_posts(skip: int, limit: int, current_user_id: str, user_id: str = None) -> list[dict]:
     with mariadb.connect(**db_config) as conn:
         with conn.cursor() as cursor:
-            sql = """
+            filters = []
+            params  = [current_user_id]
+
+            if user_id:
+                filters.append("p.user = ?")
+                params.append(user_id)
+
+            where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+            sql = f"""
                 SELECT
                     p.id,
                     p.user          AS user_id,
@@ -868,15 +877,18 @@ def get_posts(skip: int, limit: int, current_user_id: str) -> list[dict]:
                     p.photo,
                     p.created_at,
                     p.likes,
-                    CASE WHEN pl.id IS NOT NULL THEN 1 ELSE 0 END AS liked_by_me
+                    CASE WHEN pl.id IS NOT NULL THEN 1 ELSE 0 END AS liked_by_me,
+                    (SELECT COUNT(*) FROM `COMMENT` c WHERE c.post = p.id) AS comments
                 FROM POST p
                 JOIN  USERS  u  ON u.id  = p.user
                 LEFT JOIN ANIMAL a  ON a.id  = p.animal
                 LEFT JOIN POST_LIKE pl ON pl.post = p.id AND pl.user = ?
+                {where_clause}
                 ORDER BY p.created_at DESC
                 LIMIT ? OFFSET ?
             """
-            cursor.execute(sql, (current_user_id, limit, skip))
+            params += [limit, skip]
+            cursor.execute(sql, tuple(params))
             rows = cursor.fetchall()
             return [
                 {
@@ -891,6 +903,7 @@ def get_posts(skip: int, limit: int, current_user_id: str) -> list[dict]:
                     "created_at":  r[8],
                     "likes":       r[9],
                     "liked_by_me": bool(r[10]),
+                    "comments":    r[11],
                 }
                 for r in rows
             ]
@@ -933,7 +946,90 @@ def toggle_like_post(post_id: int, user_id: str) -> dict:
             return {"likes": row[0], "liked_by_me": liked}
 
 
-# COMMENTS
+def get_post_by_id(post_id: int, current_user_id: str) -> dict | None:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT
+                    p.id, p.user, u.name, u.profile_image,
+                    p.animal, a.name,
+                    p.text, p.photo, p.created_at, p.likes,
+                    CASE WHEN pl.id IS NOT NULL THEN 1 ELSE 0 END,
+                    (SELECT COUNT(*) FROM `COMMENT` c WHERE c.post = p.id)
+                FROM POST p
+                JOIN  USERS  u  ON u.id  = p.user
+                LEFT JOIN ANIMAL a  ON a.id  = p.animal
+                LEFT JOIN POST_LIKE pl ON pl.post = p.id AND pl.user = ?
+                WHERE p.id = ?
+            """
+            cursor.execute(sql, (current_user_id, post_id))
+            r = cursor.fetchone()
+            if not r:
+                return None
+            return {
+                "id": r[0], "user": r[1], "user_name": r[2],
+                "user_image": r[3], "animal": r[4], "animal_name": r[5],
+                "text": r[6], "photo": r[7], "created_at": r[8],
+                "likes": r[9], "liked_by_me": bool(r[10]), "comments": r[11]
+            }
+
+
+def get_comments(post_id: int) -> list[dict]:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT c.id, c.user, u.name, u.profile_image, c.text, c.date
+                FROM COMMENT c
+                JOIN USERS u ON u.id = c.user
+                WHERE c.post = ?
+                ORDER BY c.date ASC
+            """
+            cursor.execute(sql, (post_id,))
+            return [
+                {
+                    "id": r[0], "user_id": r[1], "user_name": r[2],
+                    "user_image": r[3], "text": r[4], "date": str(r[5])
+                }
+                for r in cursor.fetchall()
+            ]
+
+
+def create_comment(post_id: int, user_id: str, text: str) -> dict:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO COMMENT (user, post, text) VALUES (?, ?, ?)",
+                (user_id, post_id, text)
+            )
+            comment_id = cursor.lastrowid
+            conn.commit()
+            cursor.execute(
+                "SELECT c.id, c.user, u.name, u.profile_image, c.text, c.date "
+                "FROM COMMENT c JOIN USERS u ON u.id = c.user WHERE c.id = ?",
+                (comment_id,)
+            )
+            r = cursor.fetchone()
+            return {
+                "id": r[0], "user_id": r[1], "user_name": r[2],
+                "user_image": r[3], "text": r[4], "date": str(r[5])
+            }
+
+
+def delete_post(post_id: int, user_id: str, user_role: str) -> bool:
+    with mariadb.connect(**db_config) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT user FROM POST WHERE id = ?", (post_id,))
+            row = cursor.fetchone()
+            if not row:
+                return False
+            if row[0] != user_id and user_role != "admin":
+                raise PermissionError("No autorizado para eliminar esta publicación")
+            cursor.execute("DELETE FROM POST WHERE id = ?", (post_id,))
+            conn.commit()
+            return True
+
+
+# COMMENTS (animal comments kept below)
 
 #def add_comment_db(user_id: str, post_id: int, text: str):
     #with mariadb.connect(**db_config) as conn:

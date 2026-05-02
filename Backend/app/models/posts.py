@@ -15,6 +15,7 @@ class PostOut(BaseModel):
     created_at: datetime
     likes: int
     liked_by_me: bool = False
+    comments: int = 0
 
 
 class LikeResponse(BaseModel):
