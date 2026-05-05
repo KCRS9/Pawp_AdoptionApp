@@ -42,7 +42,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     data: TokenData = decode_token(token)
     user = get_user_by_email(data.email)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return user
 
 class SignupRequest(BaseModel):
@@ -103,7 +103,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if email is None or password is None:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
-            detail = "Username and/or password incorrect"
+            detail = "Usuario y/o contraseña incorrectos"
         )
 
     # 2. Busco username en la base de datos
@@ -111,14 +111,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(
             status_code = status.HTTP_401_UNAUTHORIZED,
-            detail = "Username and/or password incorrect"
+            detail = "Usuario y/o contraseña incorrectos"
         )
 
     # 3. Compruebo contraseñas
     if not verify_password(password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username and/or password incorrect"
+            detail="Usuario y/o contraseña incorrectos"
         )
 
     return create_access_token(user)
