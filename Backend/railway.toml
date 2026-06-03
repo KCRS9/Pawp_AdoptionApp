@@ -1,0 +1,2 @@
+[build]
+dockerfilePath = "docker/fastapi/Dockerfile"

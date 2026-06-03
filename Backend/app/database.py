@@ -1,6 +1,7 @@
 import mariadb
 import uuid
 import uuid as uuid_lib
+import os
 from typing import Optional
 from app.models.users import UserDb, UserIn
 from app.models.animals import AnimalIn, AnimalDb
@@ -9,13 +10,13 @@ from datetime import datetime
 from app.models.shelters import ShelterIn, ShelterDb, ShelterRegistrationData, ShelterUpdateIn
 from app.auth.auth import get_hash_password
 
-# Configuración de la conexión a la base de datos
+# En local usa los valores por defecto; en Railway lee las variables de entorno que inyecta el plugin de MySQL
 db_config = {
-    "host": "myapidb",
-    "port": 3306,
-    "user": "myapi",
-    "password": "myapi",
-    "database": "animal_shelter_db"
+    "host":     os.getenv("DB_HOST",     "myapidb"),
+    "port":     int(os.getenv("DB_PORT", "3306")),
+    "user":     os.getenv("DB_USER",     "myapi"),
+    "password": os.getenv("DB_PASSWORD", "myapi"),
+    "database": os.getenv("DB_NAME",     "animal_shelter_db")
 }
 
 # USUARIOS (Tabla: USERS)
