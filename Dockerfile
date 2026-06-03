@@ -18,8 +18,6 @@ COPY --from=builder /app/Frontend/composeApp/build/dist/wasmJs/productionExecuta
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
+EXPOSE 8080
 
-EXPOSE 80
-
-ENTRYPOINT ["/bin/bash", "-c", "envsubst < /etc/nginx/nginx.conf > /tmp/nginx.conf && nginx -c /tmp/nginx.conf -g 'daemon off;'"]
+CMD ["nginx", "-g", "daemon off;"]
