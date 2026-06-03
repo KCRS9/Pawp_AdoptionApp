@@ -22,4 +22,4 @@ RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lis
 
 EXPOSE 80
 
-CMD ["sh", "-c", "envsubst '$$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.temp && mv /etc/nginx/nginx.conf.temp /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
+ENTRYPOINT ["/bin/bash", "-c", "envsubst < /etc/nginx/nginx.conf > /tmp/nginx.conf && nginx -c /tmp/nginx.conf -g 'daemon off;'"]
