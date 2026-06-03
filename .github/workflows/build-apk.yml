@@ -19,8 +19,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build APK
-      working-directory: Frontend
-      run: ./gradlew assembleRelease
+      run: ./gradlew -p Frontend assembleRelease
 
     - name: Get current date
       id: date
