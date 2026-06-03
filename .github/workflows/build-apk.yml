@@ -2,6 +2,12 @@ name: Build APK
 
 on:
   push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-apk:
@@ -20,8 +26,9 @@ jobs:
       working-directory: Frontend
       run: chmod +x ./gradlew && ./gradlew assembleRelease
 
-    - name: Upload APK as artifact
-      uses: actions/upload-artifact@v4
+    - name: Upload APK to Release
+      uses: softprops/action-gh-release@v2
+      if: github.ref_type == 'tag'
       with:
-        name: pawp-adoption-apk
-        path: Frontend/composeApp/build/outputs/apk/release/composeApp-release-unsigned.apk
+        files: Frontend/composeApp/build/outputs/apk/release/composeApp-release-unsigned.apk
+        name: APK ${{ github.ref_name }}
