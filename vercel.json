@@ -1,0 +1,5 @@
+{
+  "buildCommand": "apt-get update && apt-get install -y openjdk-17-jdk-headless && cd Frontend && ../gradlew wasmJsMainDistribution",
+  "outputDirectory": "Frontend/composeApp/build/dist/wasmJs/productionExecutable",
+  "root": "Frontend/composeApp"
+}
