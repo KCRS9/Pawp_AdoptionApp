@@ -7,7 +7,7 @@ COPY . .
 
 RUN chmod +x Frontend/gradlew && \
     cd Frontend && \
-    ./gradlew wasmJsMainDistribution
+    ./gradlew wasmJsBrowserDistribution
 
 # Stage 2: Serve
 FROM nginx:alpine
