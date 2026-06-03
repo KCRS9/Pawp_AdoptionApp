@@ -3,6 +3,8 @@ FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y libatomic1 && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
 RUN chmod +x Frontend/gradlew && \
