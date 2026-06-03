@@ -26,9 +26,11 @@ jobs:
       working-directory: Frontend
       run: chmod +x ./gradlew && ./gradlew assembleRelease
 
+    - name: Rename APK
+      run: mv Frontend/composeApp/build/outputs/apk/release/composeApp-release-unsigned.apk pawp-adoption-${{ github.ref_name }}.apk
+
     - name: Upload APK to Release
       uses: softprops/action-gh-release@v2
       if: github.ref_type == 'tag'
       with:
-        files: Frontend/composeApp/build/outputs/apk/release/composeApp-release-unsigned.apk
-        name: APK ${{ github.ref_name }}
+        files: pawp-adoption-${{ github.ref_name }}.apk
