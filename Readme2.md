@@ -45,7 +45,7 @@ Dependiendo del usuario que inicie sesión, la app te deja hacer unas cosas u ot
 
 #### Inicio de Sesión
 Es la pantalla de login para entrar a la app. Valida que los campos estén bien y tiene el enlace abajo para ir al registro si no tienes cuenta.
-![Inicio de Sesión](pantallas/inicio_sesion.png).
+![Inicio de Sesión](Backend/app/static/images/pantallas/Inicio_sesion.png)
 
 ---
 
@@ -53,11 +53,11 @@ Es la pantalla de login para entrar a la app. Valida que los campos estén bien 
 
 #### Vista de Inicio (Feed de Adopciones)
 Es lo primero que ves al entrar. Tiene los botones arriba para filtrar por categorías y las tarjetas con las fotos y datos básicos de los animales.
-![Inicio - Catálogo](pantallas/pantalla_inicio.png).
+![Inicio - Catálogo](Backend/app/static/images/pantallas/pantalla_inicio.png).
 
 #### Vista de Protectoras
 Un listado con todas las protectoras que se han apuntado a la app, diciendo dónde están y cuántos animales tienen allí metidos.
-![Protectoras](pantallas/ver_protectoras.png).
+![Protectoras](Backend/app/static/images/pantallas/ver_protectoras.png).
 
 ---
 
@@ -65,15 +65,15 @@ Un listado con todas las protectoras que se han apuntado a la app, diciendo dón
 
 #### Sección Social (Feed de Publicaciones)
 El muro donde la gente sube fotos e historias de sus animales. Se pueden ver las etiquetas de las mascotas, los likes y los comentarios de los demás.
-![Sección Social](pantallas/red_social.png)
+![Sección Social](Backend/app/static/images/pantallas/red_social.png)
 
 #### Añadir nueva publicación
 La pantalla para subir cosas al muro. Deja elegir una foto de la galería, escribir un texto y etiquetar a uno de los animales si quiere el usuario.
-![Nueva Publicación](pantallas/añadir_nueva_publicación.png).
+![Nueva Publicación](Backend/app/static/images/pantallas/añadir_nueva_publicación.png).
 
 #### Bandeja de Mensajes
 El apartado del chat para hablar de tú a tú con las protectoras. Sale este mensaje si todavía no has abierto ninguna conversación.
-![Mensajes](pantallas/ver_mensajes.png).
+![Mensajes](Backend/app/static/images/pantallas/ver_mensajes.png).
 
 ---
 
@@ -81,15 +81,15 @@ El apartado del chat para hablar de tú a tú con las protectoras. Sale este men
 
 #### Perfil de Usuario y Favoritos
 La pantalla de tu perfil con tu foto, biografía y el rol que tienes. Abajo del todo salen las tarjetas de los animales que has guardado en favoritos.
-![Mi Perfil](pantallas/ver_perfil.png).
+![Mi Perfil](Backend/app/static/images/pantallas/ver_perfil.png).
 
 #### Menu lateral
 El menú desplegable de la izquierda para moverte por la app, entrar a ver las solicitudes, abrir los ajustes o cerrar sesión de forma segura.
-![Menú Lateral](pantallas/menu_lateral.png).
+![Menú Lateral](Backend/app/static/images/pantallas/menu_lateral.png).
 
 #### Ver solicitudes de adopción
 La lista donde el adoptante puede ir revisando cómo va el papeleo de su solicitud y ver si la protectora la ha aceptado o sigue pendiente.
-![Mis Solicitudes](pantallas/ver_solicitudes.png).
+![Mis Solicitudes](Backend/app/static/images/pantallas/ver_solicitudes.png).
 
 ---
 
@@ -97,4 +97,4 @@ La lista donde el adoptante puede ir revisando cómo va el papeleo de su solicit
 
 #### Cambio de Contraseña
 Un formulario sencillo dentro de los ajustes para cambiar la clave actual por una nueva confirmando los campos.
-![Cambiar Contraseña](pantallas/cambiar_contraseña.png).
+![Cambiar Contraseña](Backend/app/static/images/pantallas/cambiar_contraseña.png).
