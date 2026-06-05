@@ -39,11 +39,15 @@ import ies.sequeros.dam.application.usecases.DeletePostUseCase
 import ies.sequeros.dam.application.usecases.GetCommentsUseCase
 import ies.sequeros.dam.application.usecases.CreateCommentUseCase
 import ies.sequeros.dam.application.usecases.DeleteCommentUseCase
+import ies.sequeros.dam.application.usecases.GetMessagesUseCase
+import ies.sequeros.dam.application.usecases.SendMessageUseCase
 import ies.sequeros.dam.domain.repositories.IAnimalRepository
 import ies.sequeros.dam.domain.repositories.IPostRepository
 import ies.sequeros.dam.domain.repositories.ICommentRepository
+import ies.sequeros.dam.domain.repositories.IMessagesRepository
 import ies.sequeros.dam.infrastructure.RestPostRepository
 import ies.sequeros.dam.infrastructure.RestCommentRepository
+import ies.sequeros.dam.infrastructure.LocalMessagesRepository
 import ies.sequeros.dam.ui.settings.deleteAccount.DeleteAccountViewModel
 import ies.sequeros.dam.ui.social.PostFormViewModel
 import ies.sequeros.dam.ui.social.SocialViewModel
@@ -87,6 +91,7 @@ import ies.sequeros.dam.ui.settings.changeEmail.ChangeEmailViewModel
 import ies.sequeros.dam.ui.settings.changePassword.ChangePasswordViewModel
 import ies.sequeros.dam.ui.shelters.shelterEdit.ShelterEditViewModel
 import ies.sequeros.dam.ui.shelters.shelterProfile.ShelterProfileViewModel
+import ies.sequeros.dam.ui.mensajes.MessagesViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -115,9 +120,10 @@ val appModule = module {
     single<IAdoptionRepository> { RestAdoptionRepository(get(), baseUrl) }
     single<IPostRepository> { RestPostRepository(get(), baseUrl) }
     single<ICommentRepository> { RestCommentRepository(get(), baseUrl) }
+    single<IMessagesRepository> { LocalMessagesRepository(get()) }
 
     // capa de aplicacion
-    single { UserSessionManager(get()) }
+    single { UserSessionManager(get(), get()) }
 
     // casos de uso
     factory { LoginUseCase(get()) }
@@ -162,6 +168,8 @@ val appModule = module {
     factory { GetCommentsUseCase(get()) }
     factory { CreateCommentUseCase(get()) }
     factory { DeleteCommentUseCase(get()) }
+    factory { GetMessagesUseCase(get()) }
+    factory { SendMessageUseCase(get()) }
 
     // presentacion
     // get() resuelve la instancia de Settings registrada por cada plataforma
@@ -190,4 +198,5 @@ val appModule = module {
     viewModel { ProfileViewModel(get()) }
     viewModel { UserPostsViewModel(get(), get()) }
     viewModel { DeleteAccountViewModel() }
+    viewModel { MessagesViewModel(get(), get()) }
 }
