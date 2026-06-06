@@ -9,6 +9,8 @@ services:
       - myapi_network
     volumes:
       - ./app:/app/app
+      - ./tests:/app/tests
+      - ./pytest.ini:/app/pytest.ini
     depends_on:
       - myapidb
 

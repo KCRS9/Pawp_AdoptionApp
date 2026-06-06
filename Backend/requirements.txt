@@ -8,3 +8,5 @@ sqlmodel
 mysql-connector-python
 cryptography
 mariadb
+pytest
+httpx

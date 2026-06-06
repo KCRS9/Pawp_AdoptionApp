@@ -1,13 +1,14 @@
 package ies.sequeros.dam.ui.appsettings
 
+import ies.sequeros.dam.domain.repositories.IMessagesRepository
 import ies.sequeros.dam.infrastructure.storage.TokenStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class UserSessionManager(
-
-    private val tokenStorage: TokenStorage
+    private val tokenStorage: TokenStorage,
+    private val messagesRepository: IMessagesRepository
 ) {
 
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
@@ -38,7 +39,9 @@ class UserSessionManager(
     fun logout(){
 
         println("LOG [UserSessionManager]: Cerrando sesión.")
-        tokenStorage.clear() // borra el JWT del almacenamiento persistente
+        messagesRepository.clearMessages()
         _isLoggedIn.value = false
+        tokenStorage.clear()
+
     }
 }
