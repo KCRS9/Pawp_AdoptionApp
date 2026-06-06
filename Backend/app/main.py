@@ -21,7 +21,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8081",
         "http://localhost:8080",
-        "https://pawpadoptionapp-production-993b.up.railway.app"
+        "https://pawpapp.up.railway.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
